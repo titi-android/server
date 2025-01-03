@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -17,6 +18,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor // 모든 필드를 인자로 받는 생성자
 @Table(name = "Users")
+@ToString
 public class User {
 
     @Id
@@ -32,5 +34,9 @@ public class User {
     public User(String name, String password) {
         this.name = name;
         this.password = password;
+    }
+
+    public User() {
+
     }
 }

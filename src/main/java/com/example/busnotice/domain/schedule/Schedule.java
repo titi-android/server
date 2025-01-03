@@ -13,10 +13,12 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@ToString
 public class Schedule {
 
     @Id
@@ -24,23 +26,28 @@ public class Schedule {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     LocalDateTime startTime;
 
-    @Column
+    @Column(nullable = false)
     LocalDateTime endTime;
 
     @OneToOne
     private BusStop busStop;
 
-    public Schedule(User user, String scheduleName, BusStop busStop, LocalDateTime startTime,
-        LocalDateTime endTime) {
+    public Schedule(User user, String scheduleName,  LocalDateTime startTime,
+        LocalDateTime endTime, BusStop busStop) {
+        this.user = user;
+        this.name = scheduleName;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.busStop = busStop;
     }
 
     public Schedule() {
@@ -49,12 +56,13 @@ public class Schedule {
     public static Schedule toEntity(
         User user,
         String scheduleName,
-        BusStop busStop,
         LocalDateTime startTime,
-        LocalDateTime endTime
+        LocalDateTime endTime,
+        BusStop busStop
     ) {
         return new Schedule(
-            user, scheduleName, busStop, startTime, endTime
+            user, scheduleName, startTime, endTime, busStop
         );
     }
+
 }
