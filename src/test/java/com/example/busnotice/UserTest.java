@@ -30,6 +30,7 @@ public class UserTest {
         ResponseEntity<String> res = userService.signUp(name, password);
         System.out.println("response = " + res);
     }
+
     @Test
     public void SignUpFailed() {
         userRepository.save(new User(name, password));

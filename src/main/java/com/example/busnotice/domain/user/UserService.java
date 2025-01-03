@@ -12,8 +12,9 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
+
     public ResponseEntity<String> signUp(String name, String password) {
-        if(userRepository.existsByName(name)){
+        if (userRepository.existsByName(name)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 이름입니다.");
         }
 
@@ -31,7 +32,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
         }
         User user = userRepository.findByName(name);
-        if(!user.getPassword().equals(password)){
+        if (!user.getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 틀렸습니다.");
         }
 

@@ -19,7 +19,7 @@ public class UserController {
     @PostMapping("/user/signUp")
     public ResponseEntity<String> signUp(
         @RequestBody SignUpRequest signUpRequest
-    ){
+    ) {
         ResponseEntity<String> res = userService.signUp(signUpRequest.name(),
             signUpRequest.password());
         return res;
@@ -28,7 +28,7 @@ public class UserController {
     @PostMapping("/user/login")
     public ResponseEntity<String> login(
         @RequestBody LoginRequest loginRequest
-    ){
+    ) {
         ResponseEntity<String> res = userService.login(loginRequest.name(),
             loginRequest.password());
         return res;

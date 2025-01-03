@@ -10,7 +10,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -72,5 +75,17 @@ public class BusService {
             }
         }
         return filteredItems;
+    }
+
+    @Description("버스 정류소 정보 배열에서 동일한 버스 중 가장 빠른 것들만 추출")
+    public List<Item> getMinArrTimeItems(List<Item> items) {
+        List<Item> minArrTimeItems = items.stream()
+            .collect(Collectors.groupingBy(item -> item.getRouteid().substring(0, item.getRouteid().length() - 3)))
+            .values().stream()
+            .map(group -> group.stream()
+                .min(Comparator.comparing(Item::getArrtime))
+                .orElseThrow())
+            .collect(Collectors.toList());
+        return minArrTimeItems;
     }
 }
