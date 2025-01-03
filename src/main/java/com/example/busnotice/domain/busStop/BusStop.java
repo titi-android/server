@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,4 +35,15 @@ public class BusStop {
 
     @OneToMany(mappedBy = "busStop")
     private List<Bus> busList;
+
+    public BusStop(String name) {
+    }
+
+    public BusStop() {
+
+    }
+
+    public static BusStop toEntity(String name){
+        return new BusStop(name);
+    }
 }

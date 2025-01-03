@@ -1,9 +1,10 @@
-package com.example.busnotice.domain.bus.Response;
+package com.example.busnotice.domain.bus.res;
 
+import java.util.List;
 import lombok.Data;
-@Data
-public class BusStationResponse {
 
+@Data
+public class BusStationArriveResponse {
     private Response response;
 
     @Data
@@ -20,22 +21,26 @@ public class BusStationResponse {
 
     @Data
     public static class Body {
-        private Items items; // 변경: List<Item>에서 Object로 변경
+        private Items items;
         private int numOfRows;
         private int pageNo;
         private int totalCount;
     }
 
     @Data
-    public static class Items{
-        private Item item;
+    public static class Items {
+        private List<Item> item;
     }
+
     @Data
     public static class Item {
-        private double gpslati;
-        private double gpslong;
+        private int arrprevstationcnt;
+        private int arrtime;
         private String nodeid;
         private String nodenm;
-        private String nodeno;
+        private String routeid;
+        private String routeno;
+        private String routetp;
+        private String vehicletp;
     }
 }

@@ -1,9 +1,8 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.bus.Response.BusStationArriveResponse;
-import com.example.busnotice.domain.bus.Response.BusStationArriveResponse.Item;
-import com.example.busnotice.domain.bus.Response.BusStationResponse;
-import java.io.IOException;
+import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
+import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.example.busnotice.domain.bus.res.BusStationResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;

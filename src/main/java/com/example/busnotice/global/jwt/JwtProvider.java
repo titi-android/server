@@ -39,4 +39,11 @@ public class JwtProvider {
             .parseClaimsJws(token)
             .getBody();
     }
+
+    public String extractToken(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer "를 제외하고 나머지 값만 반환
+        }
+        throw new IllegalArgumentException("유효하지 않은 형식의 bearer 토큰값입니다.");
+    }
 }

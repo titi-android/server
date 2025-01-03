@@ -39,4 +39,22 @@ public class Schedule {
     @OneToOne
     private BusStop busStop;
 
+    public Schedule(User user, String scheduleName, BusStop busStop, LocalDateTime startTime,
+        LocalDateTime endTime) {
+    }
+
+    public Schedule() {
+    }
+
+    public static Schedule toEntity(
+        User user,
+        String scheduleName,
+        BusStop busStop,
+        LocalDateTime startTime,
+        LocalDateTime endTime
+    ) {
+        return new Schedule(
+            user, scheduleName, busStop, startTime, endTime
+        );
+    }
 }

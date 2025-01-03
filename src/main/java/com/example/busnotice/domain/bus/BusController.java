@@ -1,12 +1,10 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.bus.Response.BusStationArriveResponse;
-import com.example.busnotice.domain.bus.Response.BusStationArriveResponse.Item;
-import com.example.busnotice.domain.bus.Response.BusStationResponse;
+import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
+import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.example.busnotice.domain.bus.res.BusStationResponse;
 import java.io.UnsupportedEncodingException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
