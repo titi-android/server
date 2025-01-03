@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.bus;
 
+import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.schedule.Schedule;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,8 +22,8 @@ public class Bus {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
+    @JoinColumn(name = "busStop_id")
+    private BusStop busStop;
 
     @Column
     private String name;

@@ -1,7 +1,9 @@
 package com.example.busnotice.domain.user;
 
+import com.example.busnotice.domain.user.request.LoginRequest;
 import com.example.busnotice.domain.user.request.SignUpRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +16,21 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user")
-    public String signUp(
+    @PostMapping("/user/signUp")
+    public ResponseEntity<String> signUp(
         @RequestBody SignUpRequest signUpRequest
     ){
-        return "회원가입 완료";
+        ResponseEntity<String> res = userService.signUp(signUpRequest.name(),
+            signUpRequest.password());
+        return res;
+    }
+
+    @PostMapping("/user/login")
+    public ResponseEntity<String> login(
+        @RequestBody LoginRequest loginRequest
+    ){
+        ResponseEntity<String> res = userService.login(loginRequest.name(),
+            loginRequest.password());
+        return res;
     }
 }
