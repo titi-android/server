@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,10 +21,10 @@ public class Bus {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "busStop_id")
+    @JoinColumn(name = "busStop_id", nullable = false)
     private BusStop busStop;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     public Bus() {
@@ -33,7 +32,8 @@ public class Bus {
     }
 
     public Bus(BusStop busStop, String name) {
-
+        this.busStop = busStop;
+        this.name = name;
     }
 
     public static Bus toEntity(BusStop busStop, String name) {

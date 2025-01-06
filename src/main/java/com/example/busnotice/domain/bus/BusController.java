@@ -23,12 +23,12 @@ public class BusController {
     @GetMapping("/node/id")
     String getNodeId
         (
-            @RequestParam Long cityCode, // 도시 코드
+            @RequestParam String cityCode, // 도시 코드
             @RequestParam String name // 정류소 이름
         ) throws UnsupportedEncodingException {
 
-        BusStationResponse result = busService.getBusStationInfo(cityCode, name);
-        return result.getResponse().getBody().getItems().getItem().getNodeid();
+        String nodeId =  busService.getNodeId(cityCode, name);
+        return nodeId;
     }
 
     @Description("특정 노드에 도착 예정인 모든 버스 정보 조회")

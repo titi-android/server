@@ -1,7 +1,7 @@
 package com.example.busnotice.domain.schedule;
 
-import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.busStop.BusStop;
+import com.example.busnotice.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -33,16 +34,16 @@ public class Schedule {
     private String name;
 
     @Column(nullable = false)
-    LocalDateTime startTime;
+    LocalTime startTime;
 
     @Column(nullable = false)
-    LocalDateTime endTime;
+    LocalTime endTime;
 
     @OneToOne
     private BusStop busStop;
 
-    public Schedule(User user, String scheduleName,  LocalDateTime startTime,
-        LocalDateTime endTime, BusStop busStop) {
+    public Schedule(User user, String scheduleName, LocalTime startTime,
+        LocalTime endTime, BusStop busStop) {
         this.user = user;
         this.name = scheduleName;
         this.startTime = startTime;
@@ -56,8 +57,8 @@ public class Schedule {
     public static Schedule toEntity(
         User user,
         String scheduleName,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
+        LocalTime startTime,
+        LocalTime endTime,
         BusStop busStop
     ) {
         return new Schedule(

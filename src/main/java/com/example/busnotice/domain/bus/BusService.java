@@ -3,6 +3,7 @@ package com.example.busnotice.domain.bus;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
 import com.example.busnotice.domain.bus.res.BusStationResponse;
+import com.example.busnotice.domain.busStop.BusStop;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -29,10 +30,14 @@ public class BusService {
 
     private final WebClient webClient;
 
-    public BusStationResponse getBusStationInfo(Long cityCode, String name) throws UnsupportedEncodingException {
+    // 버스 정류장의 노드 id 조회
+    public String getNodeId(String cityCode, String busStopName) throws UnsupportedEncodingException {
+        cityCode = cityCode.trim().replaceAll("\\s+", "");
+        busStopName = busStopName.trim().replaceAll("\\s+", "");
+
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnNoList";
         String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode), StandardCharsets.UTF_8.toString());
-        String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
+        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8.toString());
         String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey, StandardCharsets.UTF_8.toString());
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&_type=json",
             url, encodedServiceKey, encodedCityCode, encodedName));
@@ -43,10 +48,12 @@ public class BusService {
             .retrieve()
             .bodyToMono(BusStationResponse.class)
             .block();
-        System.out.println("result = " + result);
-        return result;
+        String nodeId = result.getResponse().getBody().getItems().getItem().getNodeid();
+        System.out.println(busStopName + " 의 node id: " + nodeId);
+        return nodeId;
     }
 
+    // 특정 버스 정류장의 도착하는 버스 정보 조회
     public BusStationArriveResponse getBusStationArriveInfo(Long cityCode, String nodeId) throws UnsupportedEncodingException {
         String url = "http://apis.data.go.kr/1613000/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList";
         String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode), StandardCharsets.UTF_8.toString());
@@ -63,6 +70,8 @@ public class BusService {
             .block();
         return result;
     }
+
+    // 특정 버스 정류장의 특정 버스들 중 가장 빨리 도착하는 버스 정보 조회
 
     public List<Item> filterArriveInfo(BusStationArriveResponse result, String[] routeNos) {
         List<Item> items = result.getResponse().getBody().getItems().getItem();
@@ -87,4 +96,8 @@ public class BusService {
             .collect(Collectors.toList());
         return minArrTimeItems;
     }
+
+//    public void getMinArrTimeBus(BusStop busStop, List<Bus> busList) {
+//        getBusStationArriveInfo(busStop.getCityCode(), busStop.getNodeId(),)
+//    }
 }

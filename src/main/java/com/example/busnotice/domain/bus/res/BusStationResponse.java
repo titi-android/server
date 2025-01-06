@@ -27,15 +27,15 @@ public class BusStationResponse {
     }
 
     @Data
-    public static class Items{
-        private Item item;
-    }
-    @Data
     public static class Item {
         private double gpslati;
         private double gpslong;
         private String nodeid;
         private String nodenm;
         private String nodeno;
+    }
+    @Data
+    public static class Items {
+        private Item item;
     }
 }

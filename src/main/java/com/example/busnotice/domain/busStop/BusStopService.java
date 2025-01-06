@@ -47,7 +47,7 @@ public class BusStopService {
                 String cityNameText = item.path("cityname").asText();
                 if (cityNameText.contains(cityName)) {
                     String cityCode = item.path("citycode").asText();
-                    System.out.println("cityCode = " + cityCode);
+                    System.out.println(cityName + "의 도시 코드: " + cityCode);
                     result.append(cityCode).append("\n");
                 }
             }

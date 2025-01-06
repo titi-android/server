@@ -9,11 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,23 +25,32 @@ public class BusStop {
     private Long id;
 
     @OneToOne(mappedBy = "busStop", fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id")
+    @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
 
-    @Column
+    @Column(nullable = false)
+    private String cityCode;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String nodeId;
 
     @OneToMany(mappedBy = "busStop")
     private List<Bus> busList;
 
-    public BusStop(String name) {
+    public BusStop(String cityCode, String name, String nodeId) {
+        this.cityCode = cityCode;
+        this.name = name;
+        this.nodeId = nodeId;
     }
 
     public BusStop() {
 
     }
 
-    public static BusStop toEntity(String name){
-        return new BusStop(name);
+    public static BusStop toEntity(String cityCode, String name, String nodeId) {
+        return new BusStop(cityCode, name, nodeId);
     }
 }

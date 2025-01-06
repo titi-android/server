@@ -13,10 +13,9 @@ import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.domain.user.UserService;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,19 +43,20 @@ public class ScheduleTest {
     private BusRepository busRepository;
     // 객체 생성 예시
     CreateScheduleRequest createScheduleRequest = new CreateScheduleRequest(
-        "Morning Schedule", // 스케줄 이름
-        LocalDateTime.of(2025, 1, 4, 7, 0, 0, 0), // 시작 시간
-        LocalDateTime.of(2025, 1, 4, 9, 0, 0, 0), // 마치는 시간
-        12L, // 도시 코드
-        "Main Bus Stop", // 버스 정류장 이름
-        List.of("Bus A", "Bus B", "Bus C") // 버스 종류
+        "동대구역으로 출근", // 스케줄 이름
+        LocalTime.of(7,  0), // 시작 시간(오전 7시)
+        LocalTime.of(9, 0), // 마치는 시간(오전 9시)
+        "대구광역시 ", // 지역 이름
+        "복현오거리2", // 버스 정류장 이름
+        List.of("413", "937") // 버스 종류
     );
+
     @Test
     public void createSchedule() {
         User user = userRepository.save(new User("donghyun", "1234"));
 
         // 스케줄상의 버스 정류장 생성
-        BusStop busStop = BusStop.toEntity(createScheduleRequest.name());
+        BusStop busStop = BusStop.toEntity("22", createScheduleRequest.name(), "tempnodeid");
         busStopRepository.save(busStop);
         // 해당 스케줄상의 버스 정류장에서 조회하고픈 버스 목록 등록
         List<String> busNames = createScheduleRequest.busList();
@@ -66,7 +66,8 @@ public class ScheduleTest {
         }
         busRepository.saveAll(busList);
         // 스케줄 생성 후 생성한 버스 정류장 등록
-        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(), createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
+        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
+            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         scheduleRepository.save(schedule);
         System.out.println("schedule.toString() = " + schedule);
     }
