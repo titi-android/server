@@ -1,5 +1,7 @@
 package com.example.busnotice.domain.user;
 
+import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,9 +15,9 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
 
-    public ResponseEntity<String> signUp(String name, String password) {
+    public void signUp(String name, String password) {
         if (userRepository.existsByName(name)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 이름입니다.");
+            throw new UserException(StatusCode.CONFLICT, "이미 존재하는 이름입니다.");
         }
 
         User newUser = User.builder()
@@ -24,20 +26,17 @@ public class UserService {
             .build();
 
         userRepository.save(newUser);
-        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
     }
 
-    public ResponseEntity<String> login(String name, String password) {
-        if (!userRepository.existsByName(name)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
-        }
-        User user = userRepository.findByName(name);
+    public String login(String name, String password) {
+        User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
+            StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
         if (!user.getPassword().equals(password)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 틀렸습니다.");
+            throw new UserException(StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다.");
         }
 
-        String token = jwtProvider.createToken(name);
-        return ResponseEntity.status(HttpStatus.OK).body(token.toString());
+        String jwt = jwtProvider.createToken(name);
+        return jwt;
     }
 
 }

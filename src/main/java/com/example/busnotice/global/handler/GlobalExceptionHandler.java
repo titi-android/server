@@ -1,7 +1,8 @@
 package com.example.busnotice.global.handler;
 
 import com.example.busnotice.global.exception.BusinessException;
-import com.example.busnotice.global.exception.schedule.ScheduleException;
+import com.example.busnotice.global.exception.ScheduleException;
+import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,4 +19,10 @@ public class GlobalExceptionHandler {
     public ApiResponse<Void> handleScheduleException(ScheduleException e) {
         return ApiResponse.createFail(e.getStatusCode(), e.getMessage());
     }
+
+    @ExceptionHandler(UserException.class)
+    public ApiResponse<Void> handleUserException(UserException e) {
+        return ApiResponse.createFail(e.getStatusCode(), e.getMessage());
+    }
+
 }

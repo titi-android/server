@@ -27,30 +27,26 @@ public class UserTest {
 
     @Test
     public void SignUpSuccess() {
-        ResponseEntity<String> res = userService.signUp(name, password);
-        System.out.println("response = " + res);
+        userService.signUp(name, password);
     }
 
     @Test
     public void SignUpFailed() {
         userRepository.save(new User(name, password));
-
-        ResponseEntity<String> res = userService.signUp(name, password);
-        System.out.println("response = " + res);
+        userService.signUp(name, password);
     }
 
     @Test
     public void LoginSuccess() {
         userService.signUp(name, password);
-        ResponseEntity<String> res = userService.login(name, password);
-        System.out.println("response = " + res);
+        String token = userService.login(name, password);
+        System.out.println("token = " + token);
     }
 
     @Test
     public void getUsernameFromJwt() {
         userService.signUp(name, password);
-        ResponseEntity<String> res = userService.login(name, password);
-        String jwt = res.getBody().toString();
+        String jwt = userService.login(name, password);
 
         Assertions.assertThat(name).isEqualTo(jwtProvider.getUsername(jwt));
     }

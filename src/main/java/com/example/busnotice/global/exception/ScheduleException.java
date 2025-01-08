@@ -1,4 +1,4 @@
-package com.example.busnotice.global.exception.schedule;
+package com.example.busnotice.global.exception;
 
 import com.example.busnotice.global.code.StatusCode;
 

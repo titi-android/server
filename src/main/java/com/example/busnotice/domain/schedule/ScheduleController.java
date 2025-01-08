@@ -1,6 +1,5 @@
 package com.example.busnotice.domain.schedule;
 
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.global.format.ApiResponse;
@@ -33,7 +32,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedule/today")
-    @Description("모든 스케줄 조회 - 오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
+    @Description("오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<List<ScheduleResponse>> getAllSchedules(
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
@@ -43,7 +42,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedule/now")
-    @Description("현재 시각의 스케줄 조회 - 현재 스케줄의 가장 빠른 버스 정보 조회")
+    @Description("현재 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
