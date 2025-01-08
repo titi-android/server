@@ -5,6 +5,7 @@ import java.util.List;
 
 public record CreateScheduleRequest(
     String name, // 스케줄 이름
+    String days, // 요일
     LocalTime startTime, // 시작 시간
     LocalTime endTime, // 마치는 시간
     String regionName, // 지역 이름

@@ -11,11 +11,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-    List<Schedule> findAllByUserName(String username);
-
     List<Schedule> findAllByUser(User user);
 
-    @Query("SELECT s FROM Schedule s WHERE s.user = :user AND :currentTime BETWEEN s.startTime AND s.endTime")
-    Schedule findByCurrentTime(@Param("user") User user, @Param("currentTime") LocalTime now);
+    @Query("SELECT s FROM Schedule s " +
+        "WHERE s.user = :user " + // 유저가 일치
+        "AND :currentTime BETWEEN s.startTime AND s.endTime " + // 현재시간이 스케줄 내 시간에 포함
+        "AND s.days = :today") // 요일(한글) 일치
+    Schedule findByCurrentTimeAndDay(
+        @Param("user") User user,
+        @Param("today") String today,
+        @Param("currentTime") LocalTime now
+    );
 
 }

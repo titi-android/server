@@ -33,6 +33,9 @@ public class Schedule {
     private String name;
 
     @Column(nullable = false)
+    private String days; // 요일
+
+    @Column(nullable = false)
     LocalTime startTime;
 
     @Column(nullable = false)
@@ -41,10 +44,11 @@ public class Schedule {
     @OneToOne
     private BusStop busStop;
 
-    public Schedule(User user, String scheduleName, LocalTime startTime,
+    public Schedule(User user, String scheduleName, String days, LocalTime startTime,
         LocalTime endTime, BusStop busStop) {
         this.user = user;
         this.name = scheduleName;
+        this.days = days;
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
@@ -56,12 +60,13 @@ public class Schedule {
     public static Schedule toEntity(
         User user,
         String scheduleName,
+        String days,
         LocalTime startTime,
         LocalTime endTime,
         BusStop busStop
     ) {
         return new Schedule(
-            user, scheduleName, startTime, endTime, busStop
+            user, scheduleName, days, startTime, endTime, busStop
         );
     }
 

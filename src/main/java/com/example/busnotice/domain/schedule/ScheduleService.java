@@ -11,6 +11,7 @@ import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.jwt.JwtProvider;
+import com.example.busnotice.util.DayConverter;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class ScheduleService {
         }
         busRepository.saveAll(busList);
         // 스케줄 생성 후 생성한 버스 정류장 등록
-        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
+        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),createScheduleRequest.days(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         scheduleRepository.save(schedule);
         return schedule;
@@ -64,8 +65,9 @@ public class ScheduleService {
     }
 
     public Schedule getCurrentSchedule(User user) {
-        Schedule schedule = scheduleRepository.findByCurrentTime(user,
-            LocalTime.now());
+        String today = DayConverter.getTodayAsString();
+        Schedule schedule = scheduleRepository.findByCurrentTimeAndDay(user,
+            today, LocalTime.now());
         return schedule;
     }
 

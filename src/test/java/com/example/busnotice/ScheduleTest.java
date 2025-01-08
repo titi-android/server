@@ -44,6 +44,7 @@ public class ScheduleTest {
     // 객체 생성 예시
     CreateScheduleRequest createScheduleRequest = new CreateScheduleRequest(
         "동대구역으로 출근", // 스케줄 이름
+        "월요일",
         LocalTime.of(7,  0), // 시작 시간(오전 7시)
         LocalTime.of(9, 0), // 마치는 시간(오전 9시)
         "대구광역시 ", // 지역 이름
@@ -67,6 +68,7 @@ public class ScheduleTest {
         busRepository.saveAll(busList);
         // 스케줄 생성 후 생성한 버스 정류장 등록
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
+            createScheduleRequest.days(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         scheduleRepository.save(schedule);
         System.out.println("schedule.toString() = " + schedule);
