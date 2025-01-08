@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.bus.res;
 
-import com.example.busnotice.domain.schedule.res.NowScheduleResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.Data;
 
@@ -51,8 +52,11 @@ public class BusStationArriveResponse {
         private String vehicletp;
 
         // Item 객체를 NowScheduleResponse로 변환
-        public NowScheduleResponse toResponseDto() {
-            return new NowScheduleResponse(
+        public ScheduleResponse toResponseDto(String days, LocalTime startTime, LocalTime endTime) {
+            return new ScheduleResponse(
+                days,
+                startTime,
+                endTime,
                 this.arrprevstationcnt,
                 this.arrtime,
                 this.nodeid,

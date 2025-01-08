@@ -2,14 +2,13 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
-import com.example.busnotice.domain.schedule.res.NowScheduleResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,34 +29,26 @@ public class ScheduleController {
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
         scheduleService.createSchedule(bearerToken, createScheduleRequest);
-        return ApiResponse.createSuccess("스케줄 등록 완료");
+        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
 
-    @GetMapping("/schedule/all")
-    @Description("모든 스케줄 조회 - 모든 스케줄의 가장 빠른 버스 정보 조회")
-    public List<Schedule> getAllSchedules(
+    @GetMapping("/schedule/today")
+    @Description("모든 스케줄 조회 - 오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
+    public ApiResponse<List<ScheduleResponse>> getAllSchedules(
         @RequestHeader("Authorization") String bearerToken
-    ) {
-        List<Schedule> schedules = scheduleService.getAllSchedule(bearerToken);
-        return schedules;
+    ) throws UnsupportedEncodingException {
+        List<ScheduleResponse> scheduleResponses = scheduleService.오늘_스케줄들의_가장_빨리_도착하는_버스_정보(
+            bearerToken);
+        return ApiResponse.createSuccessWithData(scheduleResponses);
     }
 
     @GetMapping("/schedule/now")
     @Description("현재 시각의 스케줄 조회 - 현재 스케줄의 가장 빠른 버스 정보 조회")
-    public ApiResponse<NowScheduleResponse> getCurrentSchedule(
+    public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
-        Item fastestBus = scheduleService.현재_스케줄의_가장_빨리_도착하는_버스_정보(bearerToken);
-        return ApiResponse.createSuccessWithData(fastestBus.toResponseDto());
-    }
-
-    @GetMapping("/schedule/{scheduleId}")
-    @Description("특정 스케줄 상세 조회 - 특정 스케줄의 상세 정보 조회")
-    public List<Schedule> getSchedule(
-        @RequestHeader("Authorization") String bearerToken,
-        @PathVariable("scheduleId") String scheduleId
-    ) {
-        List<Schedule> schedules = scheduleService.getAllSchedule(bearerToken);
-        return schedules;
+        ScheduleResponse scheduleResponse = scheduleService.현재_스케줄의_가장_빨리_도착하는_버스_정보(
+            bearerToken);
+        return ApiResponse.createSuccessWithData(scheduleResponse);
     }
 }

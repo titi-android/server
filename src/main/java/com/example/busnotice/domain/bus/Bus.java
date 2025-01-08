@@ -28,7 +28,6 @@ public class Bus {
     private String name;
 
     public Bus() {
-
     }
 
     public Bus(BusStop busStop, String name) {

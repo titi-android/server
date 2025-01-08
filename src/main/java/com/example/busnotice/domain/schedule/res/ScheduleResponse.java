@@ -1,16 +1,19 @@
 package com.example.busnotice.domain.schedule.res;
 
-import java.util.List;
+import java.time.LocalTime;
 
-// 해당 스케줄의 버스들 중 가장 빠른 시간대의 버스
 public record ScheduleResponse(
-    List<ScheduleResponseDTO> buses
+    String days,
+    LocalTime startTime,
+    LocalTime endTime,
+    int arrprevstationcnt,
+    int arrtime,
+    String nodeid,
+    String nodenm,
+    String routeid,
+    String routeno,
+    String routetp,
+    String vehicletp
 ) {
 
-    record ScheduleResponseDTO(
-        String busName,
-        Long arrTime
-    ) {
-
-    }
 }
