@@ -6,6 +6,8 @@ import com.example.busnotice.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +16,7 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void signUp(String name, String password) {
         if (userRepository.existsByName(name)) {
@@ -22,7 +25,7 @@ public class UserService {
 
         User newUser = User.builder()
             .name(name)
-            .password(password)
+            .password(passwordEncoder.encode(password))
             .build();
 
         userRepository.save(newUser);
@@ -31,12 +34,10 @@ public class UserService {
     public String login(String name, String password) {
         User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
             StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
-        if (!user.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserException(StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다.");
         }
-
-        String jwt = jwtProvider.createToken(name);
-        return jwt;
+        return jwtProvider.createToken(name);
     }
 
 }

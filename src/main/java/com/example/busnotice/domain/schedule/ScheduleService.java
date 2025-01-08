@@ -47,7 +47,7 @@ public class ScheduleService {
             createScheduleRequest.endTime())) {
             throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
         }
-        ;
+
         // 도시 코드 구하기
         String cityCode = busStopService.도시코드_조회(createScheduleRequest.regionName());
         // 스케줄상의 버스 정류장의 node id 구하기
@@ -93,6 +93,7 @@ public class ScheduleService {
         String today = DayConverter.getTodayAsString();
         List<Schedule> schedules = scheduleRepository.findAllByUserAndDays(user, today)
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+
         List<ScheduleResponse> scheduleResponses = new ArrayList<>();
         for (Schedule schedule : schedules) {
             List<String> busNames = schedule.getBusStop().getBusList().stream()
@@ -108,7 +109,7 @@ public class ScheduleService {
     public Schedule getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
         Schedule schedule = scheduleRepository.findByCurrentTimeAndDay(user,
-            today, LocalTime.now())
+                today, LocalTime.now())
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "현재 스케줄이 존재하지 않습니다."));
         return schedule;
     }

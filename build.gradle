@@ -66,6 +66,9 @@ dependencies {
     annotationProcessor 'com.querydsl:querydsl-apt'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
+    // Spring Security Crypto
+    implementation 'org.springframework.security:spring-security-crypto'
+
 }
 
 tasks.named('test') {
