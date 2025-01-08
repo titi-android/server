@@ -2,12 +2,12 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.NowScheduleResponse;
+import com.example.busnotice.global.format.ApiResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +25,12 @@ public class ScheduleController {
 
     @PostMapping("/schedule")
     @Description("스케줄 등록")
-    public ResponseEntity<String> createSchedule(
+    public ApiResponse<Void> createSchedule(
         @RequestBody CreateScheduleRequest createScheduleRequest,
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
-        Schedule schedule = scheduleService.createSchedule(bearerToken, createScheduleRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(schedule.toString());
+        scheduleService.createSchedule(bearerToken, createScheduleRequest);
+        return ApiResponse.createSuccess("스케줄 등록 완료");
     }
 
     @GetMapping("/schedule/all")
@@ -44,11 +44,11 @@ public class ScheduleController {
 
     @GetMapping("/schedule/now")
     @Description("현재 시각의 스케줄 조회 - 현재 스케줄의 가장 빠른 버스 정보 조회")
-    public Item getCurrentSchedule(
+    public ApiResponse<NowScheduleResponse> getCurrentSchedule(
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
         Item fastestBus = scheduleService.현재_스케줄의_가장_빨리_도착하는_버스_정보(bearerToken);
-        return fastestBus;
+        return ApiResponse.createSuccessWithData(fastestBus.toResponseDto());
     }
 
     @GetMapping("/schedule/{scheduleId}")
