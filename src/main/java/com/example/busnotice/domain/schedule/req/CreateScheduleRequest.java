@@ -1,6 +1,5 @@
 package com.example.busnotice.domain.schedule.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalTime;
 import java.util.List;
 

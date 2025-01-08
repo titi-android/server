@@ -1,6 +1,5 @@
 package com.example.busnotice.domain.busStop;
 
-import com.example.busnotice.domain.bus.res.BusStationResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
@@ -23,9 +22,10 @@ public class BusStopService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final BusStopRepository busStopRepository;
 
-    public String getCityCode(String cityName) throws UnsupportedEncodingException {
+    public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCtyCodeList";
-        String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey, StandardCharsets.UTF_8.toString());
+        String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey,
+            StandardCharsets.UTF_8.toString());
         URI uri = URI.create(String.format("%s?serviceKey=%s&_type=json",
             url, encodedServiceKey));
 
@@ -52,7 +52,7 @@ public class BusStopService {
                 }
             }
 
-            return result.toString();
+            return result.toString().trim();
         } catch (Exception e) {
             e.printStackTrace();
             return "Error while processing the response";

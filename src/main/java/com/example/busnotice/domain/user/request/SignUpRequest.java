@@ -4,4 +4,5 @@ public record SignUpRequest(
     String name,
     String password
 ) {
+
 }

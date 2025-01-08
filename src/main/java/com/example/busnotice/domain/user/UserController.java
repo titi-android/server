@@ -16,7 +16,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user/signup")
+    @PostMapping("/users/signup")
     public ResponseEntity<String> signUp(
         @RequestBody SignUpRequest signUpRequest
     ) {
@@ -25,7 +25,7 @@ public class UserController {
         return res;
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/users/login")
     public ResponseEntity<String> login(
         @RequestBody LoginRequest loginRequest
     ) {

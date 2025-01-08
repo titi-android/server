@@ -6,6 +6,7 @@ import java.util.List;
 public record ScheduleResponse(
     List<ScheduleResponseDTO> buses
 ) {
+
     record ScheduleResponseDTO(
         String busName,
         Long arrTime
