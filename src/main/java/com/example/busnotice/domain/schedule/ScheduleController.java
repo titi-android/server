@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,17 +42,17 @@ public class ScheduleController {
         @RequestBody UpdateScheduleRequest updateScheduleRequest,
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
-        scheduleService.updateSchedule(bearerToken,scheduleId, updateScheduleRequest);
+        scheduleService.updateSchedule(bearerToken, scheduleId, updateScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
     }
 
-    @DeleteMapping("/schedule")
+    @DeleteMapping("/schedule/{scheduleId}")
     @Description("스케줄 삭제")
     public ApiResponse<Void> deleteSchedule(
-        @RequestBody CreateScheduleRequest createScheduleRequest,
+        @PathVariable("scheduleId") Long scheduleId,
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
-        scheduleService.createSchedule(bearerToken, createScheduleRequest);
+        scheduleService.deleteSchedule(bearerToken, scheduleId);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
 

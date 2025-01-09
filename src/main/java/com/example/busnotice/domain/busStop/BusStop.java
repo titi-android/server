@@ -2,6 +2,7 @@ package com.example.busnotice.domain.busStop;
 
 import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.schedule.Schedule;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,11 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
 
 @Entity
 @Getter
@@ -39,7 +38,7 @@ public class BusStop {
     @Column(nullable = false)
     private String nodeId;
 
-    @OneToMany(mappedBy = "busStop")
+    @OneToMany(mappedBy = "busStop", cascade = CascadeType.REMOVE)
     private List<Bus> busList;
 
     public BusStop(String cityCode, String name, String nodeId) {
@@ -57,7 +56,7 @@ public class BusStop {
     }
 
     public void update(String cityCode, String name, String nodeId,
-        List<Bus> buses){
+        List<Bus> buses) {
         this.cityCode = cityCode;
         this.name = name;
         this.nodeId = nodeId;

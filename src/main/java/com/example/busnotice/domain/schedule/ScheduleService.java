@@ -102,6 +102,17 @@ public class ScheduleService {
             existBusStop);
     }
 
+    @Transactional
+    public void deleteSchedule(String bearerToken, Long scheduleId) {
+        User user = getUserByBearerToken(bearerToken);
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "삭제할 스케줄이 존재하지 않습니다."));
+        if (schedule.getUser().getId() != user.getId()) {
+            throw new ScheduleException(StatusCode.BAD_REQUEST, "삭제할 스케줄이 본인의 스케줄이 아닙니다.");
+        }
+        scheduleRepository.deleteById(scheduleId);
+    }
+
     public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(String bearerToken)
         throws UnsupportedEncodingException {
         User user = getUserByBearerToken(bearerToken);

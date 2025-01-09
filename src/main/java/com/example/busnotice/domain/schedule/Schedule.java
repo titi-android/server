@@ -2,10 +2,9 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,7 +42,7 @@ public class Schedule {
     @Column(nullable = false)
     LocalTime endTime;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private BusStop busStop;
 
     public Schedule(User user, String scheduleName, String days, LocalTime startTime,
