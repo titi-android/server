@@ -69,6 +69,10 @@ dependencies {
     // Spring Security Crypto
     implementation 'org.springframework.security:spring-security-crypto'
 
+    // Spring Security
+    implementation "org.springframework.boot:spring-boot-starter-security"
+
+
 }
 
 tasks.named('test') {
