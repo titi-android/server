@@ -8,6 +8,7 @@ import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
@@ -42,31 +43,63 @@ public class ScheduleService {
         User user = getUserByBearerToken(bearerToken);
 
         // 겹치는 스케줄 있는지 확인
-        if (isScheduleOverLapping(user, createScheduleRequest.days(),
-            createScheduleRequest.startTime(),
-            createScheduleRequest.endTime())) {
-            throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
-        }
+        새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.days(), createScheduleRequest.startTime(),
+            createScheduleRequest.endTime());
 
-        // 도시 코드 구하기
+        // 도시 코드
         String cityCode = busStopService.도시코드_조회(createScheduleRequest.regionName());
-        // 스케줄상의 버스 정류장의 node id 구하기
+        // 스케줄상의 버스 정류장의 node id
         String nodeId = busService.버스정류장_노드_ID_조회(cityCode, createScheduleRequest.busStopName());
         // 스케줄상의 버스 정류장 생성
         BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
         busStopRepository.save(busStop);
-        // 해당 스케줄상의 버스 정류장에서 조회하고픈 버스 목록 등록
+        // 해당 스케줄상의 버스 정류장에 버스 목록 등록
         List<String> busNames = createScheduleRequest.busList();
-        List<Bus> busList = new ArrayList<>();
-        for (String busName : busNames) {
-            busList.add(Bus.toEntity(busStop, busName));
-        }
-        busRepository.saveAll(busList);
+        List<Bus> buses = busNames.stream().map(busName -> Bus.toEntity(busStop, busName)).toList();
+        busRepository.saveAll(buses);
         // 스케줄 생성 후 생성한 버스 정류장 등록
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
             createScheduleRequest.days(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         scheduleRepository.save(schedule);
+    }
+
+    @Transactional
+    public void updateSchedule(String bearerToken, Long scheduleId,
+        UpdateScheduleRequest updateScheduleRequest)
+        throws UnsupportedEncodingException {
+        User user = getUserByBearerToken(bearerToken);
+        Schedule existSchedule = scheduleRepository.findById(scheduleId)
+            .orElseThrow(() -> new ScheduleException(
+                StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
+
+        // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
+        기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.days(),
+            updateScheduleRequest.startTime(),
+            updateScheduleRequest.endTime());
+
+        // 도시 코드
+        String cityCode = busStopService.도시코드_조회(updateScheduleRequest.regionName());
+        // 수정한 스케줄상의 버스 정류장의 node id
+        String newNodeId = busService.버스정류장_노드_ID_조회(cityCode, updateScheduleRequest.busStopName());
+        // 스케줄상의 기존 버스 정류장 엔티티
+        BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();
+        // 해당 버스 정류장에 등록된 버스들 삭제
+        List<Long> busIds = existBusStop.getBusList().stream().map(bus -> bus.getId()).toList();
+        busRepository.deleteAllById(busIds);
+        // 버스 정류장 업데이트 및 버스 생성
+        List<String> busNames = updateScheduleRequest.busList();
+        List<Bus> newBuses = busNames.stream().map(busName -> Bus.toEntity(existBusStop, busName))
+            .toList();
+        busRepository.saveAll(newBuses);
+        existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);
+        // 최종적으로 스케줄 업데이트
+        existSchedule.update(
+            updateScheduleRequest.name(),
+            updateScheduleRequest.days(),
+            updateScheduleRequest.startTime(),
+            updateScheduleRequest.endTime(),
+            existBusStop);
     }
 
     public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(String bearerToken)
@@ -76,11 +109,8 @@ public class ScheduleService {
         Schedule currentSchedule = getCurrentSchedule(user);
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
+        // 현재 스케줄의 버스정류장에 등록된 버스들
         List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
-        System.out.println(
-            "현재 스케줄: " + currentSchedule.getName()
-                + " " + busStop.getName()
-                + " " + busNames);
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
         return fastestBus.toResponseDto(currentSchedule.getDays(), currentSchedule.startTime,
@@ -95,15 +125,58 @@ public class ScheduleService {
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
 
         List<ScheduleResponse> scheduleResponses = new ArrayList<>();
-        for (Schedule schedule : schedules) {
-            List<String> busNames = schedule.getBusStop().getBusList().stream()
+        for (Schedule s : schedules) {
+            List<String> busNames = s.getBusStop().getBusList().stream()
                 .map(bus -> bus.getName()).toList();
-            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(schedule.getBusStop().getCityCode(),
-                schedule.getBusStop().getNodeId(), busNames);
+            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
+                s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toResponseDto(schedule.getDays(), schedule.startTime, schedule.endTime));
+                item.toResponseDto(s.getDays(), s.startTime, s.endTime));
         }
         return scheduleResponses;
+    }
+
+    private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
+        LocalTime endTime) {
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
+        for (Schedule existSchedule : schedules) {
+            if (isDaysOverLapping(days, existSchedule.getDays())) {
+                if (isTimeOverLapping(startTime, endTime, existSchedule.startTime,
+                    existSchedule.endTime)) {
+                    throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
+                }
+            }
+        }
+    }
+
+    private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, String days,
+        LocalTime startTime,
+        LocalTime endTime) {
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
+        for (Schedule existSchedule : schedules) {
+            if (scheduleId != existSchedule.getId() && isDaysOverLapping(days,
+                existSchedule.getDays())) {
+                if (isTimeOverLapping(startTime, endTime, existSchedule.startTime,
+                    existSchedule.endTime)) {
+                    throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
+                }
+            }
+        }
+    }
+
+    private boolean isTimeOverLapping(LocalTime startTime, LocalTime endTime,
+        LocalTime existStartTime, LocalTime existEndTime) {
+        return (startTime.isBefore(existEndTime) && endTime.isAfter(existStartTime));
+    }
+
+
+    private boolean isDaysOverLapping(String newDays, String existDays) {
+        if (newDays.equals(existDays)) {
+            return true;
+        }
+        return false;
     }
 
     public Schedule getCurrentSchedule(User user) {
@@ -120,33 +193,5 @@ public class ScheduleService {
         User user = userRepository.findByName(username)
             .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND, "유저가 존재하지 않습니다."));
         return user;
-    }
-
-    private boolean isScheduleOverLapping(User user, String days, LocalTime startTime,
-        LocalTime endTime) {
-        List<Schedule> schedules = scheduleRepository.findAllByUser(user)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
-        for (Schedule existSchedule : schedules) {
-            if (isDaysOverLapping(days, existSchedule.getDays())) {
-                if (isTimeOverLapping(startTime, endTime, existSchedule.startTime,
-                    existSchedule.endTime)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean isTimeOverLapping(LocalTime startTime, LocalTime endTime,
-        LocalTime existStartTime, LocalTime existEndTime) {
-        return (startTime.isBefore(existEndTime) && endTime.isAfter(existStartTime));
-    }
-
-
-    private boolean isDaysOverLapping(String newDays, String existDays) {
-        if (newDays.equals(existDays)) {
-            return true;
-        }
-        return false;
     }
 }

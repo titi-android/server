@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class DayConverter {
+
     public static String getTodayAsString() {
         DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
 

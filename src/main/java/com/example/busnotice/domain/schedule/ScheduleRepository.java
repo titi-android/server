@@ -28,5 +28,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("SELECT s FROM Schedule s " +
         "WHERE s.user = :user " +
         "AND s.days = :today")
-    Optional<List<Schedule>> findAllByUserAndDays(@Param("user") User user, @Param("today") String today);
+    Optional<List<Schedule>> findAllByUserAndDays(@Param("user") User user,
+        @Param("today") String today);
 }

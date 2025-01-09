@@ -11,9 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
 
 @Entity
 @Getter
@@ -52,5 +54,13 @@ public class BusStop {
 
     public static BusStop toEntity(String cityCode, String name, String nodeId) {
         return new BusStop(cityCode, name, nodeId);
+    }
+
+    public void update(String cityCode, String name, String nodeId,
+        List<Bus> buses){
+        this.cityCode = cityCode;
+        this.name = name;
+        this.nodeId = nodeId;
+        this.busList = buses;
     }
 }

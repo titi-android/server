@@ -1,17 +1,21 @@
 package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,6 +34,28 @@ public class ScheduleController {
         scheduleService.createSchedule(bearerToken, createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
+
+    @PutMapping("/schedule/{scheduleId}")
+    @Description("스케줄 수정")
+    public ApiResponse<Void> updateSchedule(
+        @RequestParam("scheduleId") Long scheduleId,
+        @RequestBody UpdateScheduleRequest updateScheduleRequest,
+        @RequestHeader("Authorization") String bearerToken
+    ) throws UnsupportedEncodingException {
+        scheduleService.updateSchedule(bearerToken,scheduleId, updateScheduleRequest);
+        return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
+    }
+
+    @DeleteMapping("/schedule")
+    @Description("스케줄 삭제")
+    public ApiResponse<Void> deleteSchedule(
+        @RequestBody CreateScheduleRequest createScheduleRequest,
+        @RequestHeader("Authorization") String bearerToken
+    ) throws UnsupportedEncodingException {
+        scheduleService.createSchedule(bearerToken, createScheduleRequest);
+        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
+    }
+
 
     @GetMapping("/schedule/today")
     @Description("오늘 모든 스케줄의 가장 빠른 버스 정보 조회")

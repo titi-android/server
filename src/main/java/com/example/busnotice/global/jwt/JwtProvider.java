@@ -15,7 +15,7 @@ public class JwtProvider {
 
     private final Long validityInSecs = 3600000L; // 1h
 
-    public String createToken(String username){
+    public String createToken(String username) {
         Claims claims = Jwts.claims().setSubject(username);
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInSecs);

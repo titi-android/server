@@ -70,4 +70,12 @@ public class Schedule {
         );
     }
 
+    public void update(String name, String days, LocalTime startTime, LocalTime endTime,
+        BusStop busStop) {
+        this.name = name;
+        this.days = days;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.busStop = busStop;
+    }
 }

@@ -4,9 +4,6 @@ import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
