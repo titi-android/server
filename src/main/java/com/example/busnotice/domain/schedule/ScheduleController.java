@@ -53,7 +53,7 @@ public class ScheduleController {
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {
         scheduleService.deleteSchedule(bearerToken, scheduleId);
-        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
+        return ApiResponse.createSuccess("스케줄이 삭제되었습니다.");
     }
 
 
