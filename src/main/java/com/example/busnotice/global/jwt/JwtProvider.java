@@ -59,6 +59,7 @@ public class JwtProvider {
             getUsername(token)
         );
 
-        return new UsernamePasswordAuthenticationToken(customUserDetails, customUserDetails.getPassword());
+        return new UsernamePasswordAuthenticationToken(customUserDetails,
+            customUserDetails.getPassword());
     }
 }

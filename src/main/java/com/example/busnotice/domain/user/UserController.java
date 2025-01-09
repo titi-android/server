@@ -3,10 +3,7 @@ package com.example.busnotice.domain.user;
 import com.example.busnotice.domain.user.req.LoginRequest;
 import com.example.busnotice.domain.user.req.SignUpRequest;
 import com.example.busnotice.global.format.ApiResponse;
-import com.example.busnotice.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,12 +30,5 @@ public class UserController {
     ) {
         String jwt = userService.login(loginRequest.name(), loginRequest.password());
         return ApiResponse.createSuccessWithData(jwt, "로그인에 성공했습니다.");
-    }
-
-    @GetMapping("/users/test")
-    public ApiResponse<String> test(
-        @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        return ApiResponse.createSuccessWithData(userDetails.getUsername());
     }
 }

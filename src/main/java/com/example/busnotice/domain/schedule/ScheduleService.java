@@ -38,9 +38,9 @@ public class ScheduleService {
     private final BusStopService busStopService;
 
     @Transactional
-    public void createSchedule(String bearerToken, CreateScheduleRequest createScheduleRequest)
+    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
         throws UnsupportedEncodingException {
-        User user = getUserByBearerToken(bearerToken);
+        User user = getUserById(userId);
 
         // 겹치는 스케줄 있는지 확인
         새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.days(), createScheduleRequest.startTime(),
@@ -65,10 +65,10 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateSchedule(String bearerToken, Long scheduleId,
+    public void updateSchedule(Long userId, Long scheduleId,
         UpdateScheduleRequest updateScheduleRequest)
         throws UnsupportedEncodingException {
-        User user = getUserByBearerToken(bearerToken);
+        User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleException(
                 StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
@@ -103,8 +103,8 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(String bearerToken, Long scheduleId) {
-        User user = getUserByBearerToken(bearerToken);
+    public void deleteSchedule(Long userId, Long scheduleId) {
+        User user = getUserById(userId);
         Schedule schedule = scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "삭제할 스케줄이 존재하지 않습니다."));
         if (schedule.getUser().getId() != user.getId()) {
@@ -113,9 +113,9 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(String bearerToken)
+    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(Long userId)
         throws UnsupportedEncodingException {
-        User user = getUserByBearerToken(bearerToken);
+        User user = getUserById(userId);
         // 현재 스케줄
         Schedule currentSchedule = getCurrentSchedule(user);
         // 현재 스케줄의 버스정류장
@@ -128,9 +128,9 @@ public class ScheduleService {
             currentSchedule.endTime);
     }
 
-    public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(String bearerToken)
+    public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
         throws UnsupportedEncodingException {
-        User user = getUserByBearerToken(bearerToken);
+        User user = getUserById(userId);
         String today = DayConverter.getTodayAsString();
         List<Schedule> schedules = scheduleRepository.findAllByUserAndDays(user, today)
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
@@ -153,7 +153,8 @@ public class ScheduleService {
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
 
         for (Schedule s : schedules) {
-            if(요일_겹침_유무(s.getDays(), days) && 시간대_겹침_유무(startTime,endTime,s.getStartTime(),s.getEndTime())){
+            if (요일_겹침_유무(s.getDays(), days) && 시간대_겹침_유무(startTime, endTime, s.getStartTime(),
+                s.getEndTime())) {
                 throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
             }
         }
@@ -200,6 +201,13 @@ public class ScheduleService {
         String username = jwtProvider.getUsername(token);
         User user = userRepository.findByName(username)
             .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND, "유저가 존재하지 않습니다."));
+        return user;
+    }
+
+    private User getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+            () -> new UserException(StatusCode.NOT_FOUND, "해당 ID의 유저가 존재하지 않습니다.")
+        );
         return user;
     }
 }

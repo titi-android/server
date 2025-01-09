@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
@@ -27,7 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/h2-console", "/api/v1/users/signup", "/api/v1/users/login"
         );
         String requestPath = request.getRequestURI();
-        if(excludePaths.stream().anyMatch(requestPath::contains)){
+        if (excludePaths.stream().anyMatch(requestPath::contains)) {
             filterChain.doFilter(request, response);
             return;
         }
