@@ -10,6 +10,7 @@ import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +39,7 @@ public class ScheduleController {
     @PutMapping("/schedule/{scheduleId}")
     @Description("스케줄 수정")
     public ApiResponse<Void> updateSchedule(
-        @RequestParam("scheduleId") Long scheduleId,
+        @PathVariable("scheduleId") Long scheduleId,
         @RequestBody UpdateScheduleRequest updateScheduleRequest,
         @RequestHeader("Authorization") String bearerToken
     ) throws UnsupportedEncodingException {

@@ -12,4 +12,5 @@ public record UpdateScheduleRequest(
     String busStopName, // 버스 정류장 이름
     List<String> busList // 버스 종류
 ) {
+
 }
