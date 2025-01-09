@@ -1,9 +1,11 @@
 package com.example.busnotice.global.handler;
 
+import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusinessException;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
+import java.io.UnsupportedEncodingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -25,4 +27,8 @@ public class GlobalExceptionHandler {
         return ApiResponse.createFail(e.getStatusCode(), e.getMessage());
     }
 
+    @ExceptionHandler(UnsupportedEncodingException.class)
+    public ApiResponse<Void> handleUnsupportedEncodingException(UnsupportedEncodingException e) {
+        return ApiResponse.createFail(StatusCode.INTERNAL_SERVER_ERROR, "지원되지 않는 인코딩을 사용하였습니다.");
+    }
 }

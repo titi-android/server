@@ -151,12 +151,10 @@ public class ScheduleService {
         LocalTime endTime) {
         List<Schedule> schedules = scheduleRepository.findAllByUser(user)
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
-        for (Schedule existSchedule : schedules) {
-            if (isDaysOverLapping(days, existSchedule.getDays())) {
-                if (isTimeOverLapping(startTime, endTime, existSchedule.startTime,
-                    existSchedule.endTime)) {
-                    throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
-                }
+
+        for (Schedule s : schedules) {
+            if(요일_겹침_유무(s.getDays(), days) && 시간대_겹침_유무(startTime,endTime,s.getStartTime(),s.getEndTime())){
+                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
             }
         }
     }
@@ -166,24 +164,23 @@ public class ScheduleService {
         LocalTime endTime) {
         List<Schedule> schedules = scheduleRepository.findAllByUser(user)
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
-        for (Schedule existSchedule : schedules) {
-            if (scheduleId != existSchedule.getId() && isDaysOverLapping(days,
-                existSchedule.getDays())) {
-                if (isTimeOverLapping(startTime, endTime, existSchedule.startTime,
-                    existSchedule.endTime)) {
-                    throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
-                }
+
+        for (Schedule es : schedules) {
+            if (scheduleId != es.getId()
+                && 요일_겹침_유무(days, es.getDays())
+                && 시간대_겹침_유무(startTime, endTime, es.startTime, es.endTime)) {
+                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
             }
         }
     }
 
-    private boolean isTimeOverLapping(LocalTime startTime, LocalTime endTime,
+    private boolean 시간대_겹침_유무(LocalTime startTime, LocalTime endTime,
         LocalTime existStartTime, LocalTime existEndTime) {
         return (startTime.isBefore(existEndTime) && endTime.isAfter(existStartTime));
     }
 
 
-    private boolean isDaysOverLapping(String newDays, String existDays) {
+    private boolean 요일_겹침_유무(String newDays, String existDays) {
         if (newDays.equals(existDays)) {
             return true;
         }
