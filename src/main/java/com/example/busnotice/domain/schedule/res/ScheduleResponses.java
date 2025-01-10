@@ -5,6 +5,7 @@ import java.util.List;
 
 public record ScheduleResponses(
 
+    String name,
     String days,
 
     LocalTime startTime,

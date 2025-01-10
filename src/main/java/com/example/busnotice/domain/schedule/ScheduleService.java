@@ -151,7 +151,7 @@ public class ScheduleService {
                 item.getRoutetp(), item.getVehicletp())
         ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
         // 요일과 시간대는 필드에 직접 주입
-        return new ScheduleResponses(currentSchedule.getDays(), currentSchedule.getStartTime(),
+        return new ScheduleResponses(currentSchedule.getName(), currentSchedule.getDays(), currentSchedule.getStartTime(),
             currentSchedule.getEndTime()
             , busInfoDtos);
     }
@@ -197,7 +197,7 @@ public class ScheduleService {
                     item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
                     item.getRoutetp(), item.getVehicletp())
             ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
-            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getDays(),
+            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getName(), s.getDays(),
                 s.getStartTime(), s.getEndTime()
                 , busInfoDtos);
             scheduleResponsesList.add(scheduleResponses);
