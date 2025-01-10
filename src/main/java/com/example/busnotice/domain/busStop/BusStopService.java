@@ -1,5 +1,7 @@
 package com.example.busnotice.domain.busStop;
 
+import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.GeneralException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
@@ -55,7 +57,7 @@ public class BusStopService {
             return result.toString().trim();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error while processing the response";
+            throw new GeneralException(StatusCode.INTERNAL_SERVER_ERROR, "도시 코드 조회에 실패했습니다.");
         }
     }
 }

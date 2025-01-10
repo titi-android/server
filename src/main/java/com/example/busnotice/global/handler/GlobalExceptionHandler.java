@@ -2,6 +2,7 @@ package com.example.busnotice.global.handler;
 
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusinessException;
+import com.example.busnotice.global.exception.GeneralException;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
@@ -30,5 +31,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnsupportedEncodingException.class)
     public ApiResponse<Void> handleUnsupportedEncodingException(UnsupportedEncodingException e) {
         return ApiResponse.createFail(StatusCode.INTERNAL_SERVER_ERROR, "지원되지 않는 인코딩을 사용하였습니다.");
+    }
+
+    @ExceptionHandler(GeneralException.class)
+    public ApiResponse<Void> GeneralException(GeneralException e) {
+        return ApiResponse.createFail(StatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 }
