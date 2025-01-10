@@ -6,14 +6,19 @@ public record ScheduleResponse(
     String days,
     LocalTime startTime,
     LocalTime endTime,
-    int arrprevstationcnt,
-    int arrtime,
-    String nodeid,
-    String nodenm,
-    String routeid,
-    String routeno,
-    String routetp,
-    String vehicletp
+    BusInfoDto busInfo
 ) {
 
+    public record BusInfoDto(
+        int arrprevstationcnt,
+        int arrtime,
+        String nodeid,
+        String nodenm,
+        String routeid,
+        String routeno,
+        String routetp,
+        String vehicletp
+    ) {
+
+    }
 }

@@ -11,6 +11,7 @@ import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
+import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.StatusCode;
@@ -126,7 +127,8 @@ public class ScheduleService {
         List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
-        return fastestBus.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
+        return fastestBus.toScheduleResponse(currentSchedule.getDays(),
+            currentSchedule.getStartTime(),
             currentSchedule.getEndTime());
     }
 
@@ -142,11 +144,16 @@ public class ScheduleService {
         List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(),
             busNames);
-        List<ScheduleResponse> scheduleResponses = items.stream().map(
-                item -> item.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
-                    currentSchedule.getEndTime()))
-            .sorted(Comparator.comparing(ScheduleResponse::startTime)).toList();
-        return new ScheduleResponses(scheduleResponses);
+        // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
+        List<BusInfoDto> busInfoDtos = items.stream().map(
+            item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
+                item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
+                item.getRoutetp(), item.getVehicletp())
+        ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
+        // 요일과 시간대는 필드에 직접 주입
+        return new ScheduleResponses(currentSchedule.getDays(), currentSchedule.getStartTime(),
+            currentSchedule.getEndTime()
+            , busInfoDtos);
     }
 
     public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
@@ -163,9 +170,10 @@ public class ScheduleService {
             Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime()));
+                item.toScheduleResponse(s.getDays(), s.getStartTime(), s.getEndTime()));
         }
-        return scheduleResponses;
+        return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
+            .toList();
     }
 
     public List<ScheduleResponses> 오늘_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
@@ -182,14 +190,20 @@ public class ScheduleService {
             List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
                 s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
-            List<ScheduleResponse> scheduleResponses = items.stream()
-                .map(item -> item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime())).sorted(Comparator.comparing(ScheduleResponse::startTime)).toList();
-            ScheduleResponses scheduleResponse = new ScheduleResponses(scheduleResponses);
-            scheduleResponsesList.add(scheduleResponse);
+
+            // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
+            List<BusInfoDto> busInfoDtos = items.stream().map(
+                item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
+                    item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
+                    item.getRoutetp(), item.getVehicletp())
+            ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
+            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getDays(),
+                s.getStartTime(), s.getEndTime()
+                , busInfoDtos);
+            scheduleResponsesList.add(scheduleResponses);
         }
         return scheduleResponsesList.stream().sorted(
-                Comparator.comparing(responses -> responses.scheduleResponses().get(0).startTime()))
-            .toList();
+            Comparator.comparing(responses -> responses.startTime())).toList();
     }
 
     private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
