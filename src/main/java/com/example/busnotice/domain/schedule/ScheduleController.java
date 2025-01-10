@@ -27,7 +27,7 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
-    @PostMapping("/v1/schedule")
+    @PostMapping("/v1/schedules")
     @Description("스케줄 등록")
     public ApiResponse<Void> createSchedule(
         @RequestBody CreateScheduleRequest createScheduleRequest,
@@ -37,7 +37,7 @@ public class ScheduleController {
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
 
-    @PutMapping("/v1/schedule/{scheduleId}")
+    @PutMapping("/v1/schedules/{scheduleId}")
     @Description("스케줄 수정")
     public ApiResponse<Void> updateSchedule(
         @PathVariable("scheduleId") Long scheduleId,
@@ -48,7 +48,7 @@ public class ScheduleController {
         return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
     }
 
-    @DeleteMapping("/v1/schedule/{scheduleId}")
+    @DeleteMapping("/v1/schedules/{scheduleId}")
     @Description("스케줄 삭제")
     public ApiResponse<Void> deleteSchedule(
         @PathVariable("scheduleId") Long scheduleId,
@@ -59,7 +59,7 @@ public class ScheduleController {
     }
 
 
-    @GetMapping("/v1/schedule/today")
+    @GetMapping("/v1/schedules/today")
     @Description("오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<List<ScheduleResponse>> getAllSchedules(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -69,7 +69,7 @@ public class ScheduleController {
         return ApiResponse.createSuccessWithData(scheduleResponses);
     }
 
-    @GetMapping("/v2/schedule/today")
+    @GetMapping("/v2/schedules/today")
     @Description("오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -79,7 +79,7 @@ public class ScheduleController {
         return ApiResponse.createSuccessWithData(scheduleResponsesList);
     }
 
-    @GetMapping("/v1/schedule/now")
+    @GetMapping("/v1/schedules/now")
     @Description("현재 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -89,7 +89,7 @@ public class ScheduleController {
         return ApiResponse.createSuccessWithData(scheduleResponse);
     }
 
-    @GetMapping("/v2/schedule/now")
+    @GetMapping("/v2/schedules/now")
     @Description("현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
     public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
