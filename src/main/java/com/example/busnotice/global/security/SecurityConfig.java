@@ -33,7 +33,8 @@ public class SecurityConfig {
                             "/swagger-resource",
                             "/v3/api-docs",
                             "/api/v1/users/**",
-                            "/api/v1/schedule/**"
+                            "/api/v1/schedule/**",
+                            "/api/v2/schedule/**"
                         ).permitAll()
                         .anyRequest().authenticated()
             )

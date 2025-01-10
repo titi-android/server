@@ -37,10 +37,10 @@ public class Schedule {
     private String days; // 요일
 
     @Column(nullable = false)
-    LocalTime startTime;
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    LocalTime endTime;
+    private LocalTime endTime;
 
     @OneToOne(cascade = CascadeType.REMOVE)
     private BusStop busStop;

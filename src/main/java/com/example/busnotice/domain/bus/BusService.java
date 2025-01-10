@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -110,4 +111,12 @@ public class BusService {
         return fastestBus;
     }
 
+    public List<Item> 특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(String cityCode, String nodeId,
+        List<String> busList)
+        throws UnsupportedEncodingException {
+        List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityCode, nodeId, busList);
+        List<Item> sortedItems = items.stream().sorted(Comparator.comparingInt(Item::getArrtime))
+            .collect(Collectors.toList());
+        return sortedItems.stream().limit(2).collect(Collectors.toList());
+    }
 }

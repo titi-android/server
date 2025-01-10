@@ -10,6 +10,7 @@ import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.StatusCode;
@@ -124,8 +125,26 @@ public class ScheduleService {
         List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
-        return fastestBus.toResponseDto(currentSchedule.getDays(), currentSchedule.startTime,
-            currentSchedule.endTime);
+        return fastestBus.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
+            currentSchedule.getEndTime());
+    }
+
+    public ScheduleResponses 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
+        throws UnsupportedEncodingException {
+        User user = getUserById(userId);
+        // 현재 스케줄
+        Schedule currentSchedule = getCurrentSchedule(user);
+        // 현재 스케줄의 버스정류장
+        BusStop busStop = currentSchedule.getBusStop();
+        // 현재 스케줄의 버스정류장에 등록된 버스들
+        List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
+        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(busStop.getCityCode(),
+            busStop.getNodeId(),
+            busNames);
+        List<ScheduleResponse> scheduleResponses = items.stream().map(
+            item -> item.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
+                currentSchedule.getEndTime())).toList();
+        return new ScheduleResponses(scheduleResponses);
     }
 
     public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
@@ -142,9 +161,32 @@ public class ScheduleService {
             Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toResponseDto(s.getDays(), s.startTime, s.endTime));
+                item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime()));
         }
         return scheduleResponses;
+    }
+
+    public List<ScheduleResponses> 오늘_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
+        throws UnsupportedEncodingException {
+        User user = getUserById(userId);
+        String today = DayConverter.getTodayAsString();
+        List<Schedule> schedules = scheduleRepository.findAllByUserAndDays(user, today)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+
+        List<ScheduleResponses> scheduleResponsesList = new ArrayList<>();
+        for (Schedule s : schedules) {
+            List<String> busNames = s.getBusStop().getBusList().stream()
+                .map(bus -> bus.getName()).toList();
+            List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
+                s.getBusStop().getCityCode(),
+                s.getBusStop().getNodeId(), busNames);
+            List<ScheduleResponse> scheduleResponses = items.stream()
+                .map(item -> item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime()))
+                .toList();
+            ScheduleResponses scheduleResponse = new ScheduleResponses(scheduleResponses);
+            scheduleResponsesList.add(scheduleResponse);
+        }
+        return scheduleResponsesList;
     }
 
     private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
@@ -169,7 +211,7 @@ public class ScheduleService {
         for (Schedule es : schedules) {
             if (scheduleId != es.getId()
                 && 요일_겹침_유무(days, es.getDays())
-                && 시간대_겹침_유무(startTime, endTime, es.startTime, es.endTime)) {
+                && 시간대_겹침_유무(startTime, endTime, es.getStartTime(), es.getEndTime())) {
                 throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
             }
         }
