@@ -7,6 +7,7 @@ import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
+import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
