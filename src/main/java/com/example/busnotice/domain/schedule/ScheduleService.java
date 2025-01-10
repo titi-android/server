@@ -21,6 +21,7 @@ import com.example.busnotice.util.DayConverter;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -142,8 +143,9 @@ public class ScheduleService {
             busStop.getNodeId(),
             busNames);
         List<ScheduleResponse> scheduleResponses = items.stream().map(
-            item -> item.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
-                currentSchedule.getEndTime())).toList();
+                item -> item.toResponseDto(currentSchedule.getDays(), currentSchedule.getStartTime(),
+                    currentSchedule.getEndTime()))
+            .sorted(Comparator.comparing(ScheduleResponse::startTime)).toList();
         return new ScheduleResponses(scheduleResponses);
     }
 
@@ -181,12 +183,13 @@ public class ScheduleService {
                 s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             List<ScheduleResponse> scheduleResponses = items.stream()
-                .map(item -> item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime()))
-                .toList();
+                .map(item -> item.toResponseDto(s.getDays(), s.getStartTime(), s.getEndTime())).sorted(Comparator.comparing(ScheduleResponse::startTime)).toList();
             ScheduleResponses scheduleResponse = new ScheduleResponses(scheduleResponses);
             scheduleResponsesList.add(scheduleResponse);
         }
-        return scheduleResponsesList;
+        return scheduleResponsesList.stream().sorted(
+                Comparator.comparing(responses -> responses.scheduleResponses().get(0).startTime()))
+            .toList();
     }
 
     private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
