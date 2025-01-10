@@ -90,7 +90,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedule/now")
-    @Description("현재 스케줄의 가장 빠른 버스 정보 조회")
+    @Description("현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
     public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
