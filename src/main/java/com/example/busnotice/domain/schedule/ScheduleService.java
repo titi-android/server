@@ -124,7 +124,7 @@ public class ScheduleService {
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
-        List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
+        List<String> busNames = getBusNames(busStop);
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
         return fastestBus.toScheduleResponse(currentSchedule.getName(), currentSchedule.getDays(),
@@ -140,7 +140,7 @@ public class ScheduleService {
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
-        List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
+        List<String> busNames = getBusNames(busStop);
         List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(),
             busNames);
@@ -161,17 +161,16 @@ public class ScheduleService {
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
         String today = DayConverter.getTodayAsString();
-        List<Schedule> schedules = scheduleRepository.findAllByUserAndDays(user, today)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
 
         List<ScheduleResponse> scheduleResponses = new ArrayList<>();
         for (Schedule s : schedules) {
-            List<String> busNames = s.getBusStop().getBusList().stream()
-                .map(bus -> bus.getName()).toList();
+            List<String> busNames = getBusNames(s.getBusStop());
             Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toScheduleResponse(s.getName(), s.getDays(), s.getStartTime(), s.getEndTime()));
+                item.toScheduleResponse(s.getName(), s.getDays(), s.getStartTime(),
+                    s.getEndTime()));
         }
         return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
             .toList();
@@ -181,13 +180,11 @@ public class ScheduleService {
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
         String today = DayConverter.getTodayAsString();
-        List<Schedule> schedules = scheduleRepository.findAllByUserAndDays(user, today)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
 
         List<ScheduleResponses> scheduleResponsesList = new ArrayList<>();
         for (Schedule s : schedules) {
-            List<String> busNames = s.getBusStop().getBusList().stream()
-                .map(bus -> bus.getName()).toList();
+            List<String> busNames = getBusNames(s.getBusStop());
             List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
                 s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
@@ -235,6 +232,11 @@ public class ScheduleService {
         }
     }
 
+    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String today) {
+        return scheduleRepository.findAllByUserAndDays(user, today)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+    }
+
     private boolean 시간대_겹침_유무(LocalTime startTime, LocalTime endTime,
         LocalTime existStartTime, LocalTime existEndTime) {
         return (startTime.isBefore(existEndTime) && endTime.isAfter(existStartTime));
@@ -242,32 +244,22 @@ public class ScheduleService {
 
 
     private boolean 요일_겹침_유무(String newDays, String existDays) {
-        if (newDays.equals(existDays)) {
-            return true;
-        }
-        return false;
+        return newDays.equals(existDays);
     }
 
     public Schedule getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
-        Schedule schedule = scheduleRepository.findByCurrentTimeAndDay(user,
+        return scheduleRepository.findByCurrentTimeAndDay(user,
                 today, LocalTime.now())
             .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "현재 스케줄이 존재하지 않습니다."));
-        return schedule;
-    }
-
-    private User getUserByBearerToken(String bearerToken) {
-        String token = jwtProvider.extractToken(bearerToken);
-        String username = jwtProvider.getUsername(token);
-        User user = userRepository.findByName(username)
-            .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND, "유저가 존재하지 않습니다."));
-        return user;
     }
 
     private User getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-            () -> new UserException(StatusCode.NOT_FOUND, "해당 ID의 유저가 존재하지 않습니다.")
-        );
-        return user;
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND, "해당 ID의 유저가 존재하지 않습니다."));
+    }
+
+    private List<String> getBusNames(BusStop busStop) {
+        return busStop.getBusList().stream().map(Bus::getName).toList();
     }
 }
