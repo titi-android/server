@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,7 +14,6 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor // 모든 필드를 인자로 받는 생성자
 @Table(name = "Users")
 @ToString
@@ -37,6 +35,5 @@ public class User {
     }
 
     public User() {
-
     }
 }

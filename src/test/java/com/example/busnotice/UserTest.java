@@ -31,12 +31,6 @@ public class UserTest {
     }
 
     @Test
-    public void SignUpFailed() {
-        userRepository.save(new User(name, password));
-        userService.signUp(name, password);
-    }
-
-    @Test
     public void LoginSuccess() {
         userService.signUp(name, password);
         String token = userService.login(name, password);

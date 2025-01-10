@@ -19,13 +19,7 @@ public class UserService {
         if (userRepository.existsByName(name)) {
             throw new UserException(StatusCode.CONFLICT, "이미 존재하는 이름입니다.");
         }
-
-        User newUser = User.builder()
-            .name(name)
-            .password(passwordEncoder.encode(password))
-            .build();
-
-        userRepository.save(newUser);
+        userRepository.save(new User(name, passwordEncoder.encode(password)));
     }
 
     public String login(String name, String password) {
