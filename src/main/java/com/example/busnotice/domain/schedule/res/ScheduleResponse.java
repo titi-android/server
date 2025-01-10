@@ -3,6 +3,7 @@ package com.example.busnotice.domain.schedule.res;
 import java.time.LocalTime;
 
 public record ScheduleResponse(
+    String name,
     String days,
     LocalTime startTime,
     LocalTime endTime,

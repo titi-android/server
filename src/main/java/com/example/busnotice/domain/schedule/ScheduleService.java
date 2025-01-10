@@ -127,7 +127,7 @@ public class ScheduleService {
         List<String> busNames = busStop.getBusList().stream().map(bus -> bus.getName()).toList();
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
-        return fastestBus.toScheduleResponse(currentSchedule.getDays(),
+        return fastestBus.toScheduleResponse(currentSchedule.getName(), currentSchedule.getDays(),
             currentSchedule.getStartTime(),
             currentSchedule.getEndTime());
     }
@@ -146,12 +146,13 @@ public class ScheduleService {
             busNames);
         // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
         List<BusInfoDto> busInfoDtos = items.stream().map(
-            item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
-                item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
-                item.getRoutetp(), item.getVehicletp())
-        ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
+            i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(),
+                i.getNodeid(), i.getNodenm(), i.getRouteid(), i.getRouteno(),
+                i.getRoutetp(), i.getVehicletp())
+        ).toList();
         // 요일과 시간대는 필드에 직접 주입
-        return new ScheduleResponses(currentSchedule.getName(), currentSchedule.getDays(), currentSchedule.getStartTime(),
+        return new ScheduleResponses(currentSchedule.getName(), currentSchedule.getDays(),
+            currentSchedule.getStartTime(),
             currentSchedule.getEndTime()
             , busInfoDtos);
     }
@@ -170,7 +171,7 @@ public class ScheduleService {
             Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toScheduleResponse(s.getDays(), s.getStartTime(), s.getEndTime()));
+                item.toScheduleResponse(s.getName(), s.getDays(), s.getStartTime(), s.getEndTime()));
         }
         return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
             .toList();
@@ -196,7 +197,7 @@ public class ScheduleService {
                 item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
                     item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
                     item.getRoutetp(), item.getVehicletp())
-            ).sorted(Comparator.comparing(BusInfoDto::arrtime)).toList();
+            ).toList();
             ScheduleResponses scheduleResponses = new ScheduleResponses(s.getName(), s.getDays(),
                 s.getStartTime(), s.getEndTime()
                 , busInfoDtos);
