@@ -7,6 +7,8 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Schedule", description = "스케줄 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -30,7 +33,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/v1/schedules")
-    @Description("스케줄 등록")
+    @Operation(summary = "스케줄 등록")
     public ApiResponse<Void> createSchedule(
         @RequestBody CreateScheduleRequest createScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -40,7 +43,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/v1/schedules/{scheduleId}")
-    @Description("스케줄 조회")
+    @Operation(summary = "스케줄 조회")
     public ApiResponse<ScheduleInfoResponse> getSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -52,7 +55,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/v1/schedules/{scheduleId}")
-    @Description("스케줄 수정")
+    @Operation(summary = "스케줄 수정")
     public ApiResponse<Void> updateSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @RequestBody UpdateScheduleRequest updateScheduleRequest,
@@ -63,7 +66,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/v1/schedules/{scheduleId}")
-    @Description("스케줄 삭제")
+    @Operation(summary = "스케줄 삭제")
     public ApiResponse<Void> deleteSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -73,8 +76,8 @@ public class ScheduleController {
     }
 
 
-    @GetMapping("/v1/schedules/today")
-    @Description("오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
+//    @GetMapping("/v1/schedules/today")
+    @Operation(summary = "오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<List<ScheduleResponse>> getAllSchedules(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
@@ -84,7 +87,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedules/today")
-    @Description("오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    @Operation(summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
@@ -94,7 +97,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/v1/schedules/now")
-    @Description("현재 스케줄의 가장 빠른 버스 정보 조회")
+    @Operation(summary = "현재 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
@@ -104,7 +107,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedules/now")
-    @Description("현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    @Operation(summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
     public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {

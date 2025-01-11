@@ -72,6 +72,9 @@ dependencies {
 
     // Spring Security
     implementation "org.springframework.boot:spring-boot-starter-security"
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 }
 // Querydsl 설정부
 def generated = 'src/main/generated'

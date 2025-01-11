@@ -25,8 +25,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // JWT 필터 거치는 PATH 인지 검사
         List<String> excludePaths = Arrays.asList(
-            "/h2-console", "/api/v1/users/signup", "/api/v1/users/login"
-        );
+            "/api/v1/users/signup",
+            "/api/v1/users/login",
+            "/h2-console",
+            "/swagger-ui", "/swagger-resource", "/v3/api-docs"
+            );
         String requestPath = request.getRequestURI();
         if (excludePaths.stream().anyMatch(requestPath::contains)) {
             filterChain.doFilter(request, response);
