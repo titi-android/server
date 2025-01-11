@@ -58,9 +58,9 @@ public class BusController {
         @RequestParam("routeNo") List<String> busList
     ) throws UnsupportedEncodingException {
         List<String> allBusNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityCode, nodeId);
-        if(allBusNames.containsAll(busList.stream().map(busName -> busName.trim()).toList())){
-            return ApiResponse.createSuccess("올바른 버스 목록입니다.");
-        }
-        return ApiResponse.createFail(StatusCode.BAD_REQUEST, "해당 정류장에 속한 버스 노선이 아닙니다.");
+        boolean isValid = allBusNames.containsAll(busList.stream().map(String::trim).toList());
+        return isValid
+            ? ApiResponse.createSuccess("올바른 버스 목록입니다.")
+            : ApiResponse.createFail(StatusCode.BAD_REQUEST, "해당 정류장에 속한 버스 노선이 아닙니다.");
     }
 }
