@@ -54,7 +54,10 @@ public class BusStopService {
                     result.append(cityCode).append("\n");
                 }
             }
-
+            String cityCode = result.toString().trim();
+            if(cityCode == null || cityCode.isEmpty()){
+                throw new GeneralException(StatusCode.BAD_REQUEST, "도시 코드 조회에 실패했습니다.");
+            }
             return result.toString().trim();
         } catch (Exception e) {
             e.printStackTrace();

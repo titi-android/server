@@ -34,7 +34,8 @@ public class SecurityConfig {
                             "/v3/api-docs",
                             "/api/v1/users/**",
                             "/api/v1/schedules/**",
-                            "/api/v2/schedules/**"
+                            "/api/v2/schedules/**",
+                            "/api/v1/cityCode"
                         ).permitAll()
                         .anyRequest().authenticated()
             )
