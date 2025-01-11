@@ -28,7 +28,7 @@ public class BusStopController {
         return ApiResponse.createSuccessWithData(cityCodes, "도시코드 조회에 성공했습니다.");
     }
 
-    @Description("정류소의 노드 ID 조회")
+    @GetMapping("정류소의 노드 ID 조회")
     @Operation(summary = "/node/id")
     public ApiResponse<String> getNodeId
         (
