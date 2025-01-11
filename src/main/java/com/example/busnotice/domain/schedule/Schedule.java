@@ -44,6 +44,7 @@ public class Schedule {
     private LocalTime startTime;
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     @OneToOne(cascade = CascadeType.REMOVE)
