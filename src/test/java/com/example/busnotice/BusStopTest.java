@@ -1,7 +1,11 @@
 package com.example.busnotice;
 
+import com.example.busnotice.domain.bus.res.BusStationAllInfoResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -9,8 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +33,8 @@ public class BusStopTest {
     private String busStationArriveInfoServiceKey;
     @Autowired
     WebClient webClient;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     @Description("특정 node id 에 도착하는 모든 버스들 조회")
@@ -81,6 +89,35 @@ public class BusStopTest {
         } else {
             System.out.println("조회된 버스가 없습니다.");
         }
+    }
+
+    @Test
+    public void getAllBusNamesOfBusSt() throws UnsupportedEncodingException, JsonProcessingException {
+        String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
+        String encodedCityCode = URLEncoder.encode(String.valueOf("22"),
+            StandardCharsets.UTF_8.toString());
+        String encodedNodeId = URLEncoder.encode("DGB7021025900", StandardCharsets.UTF_8.toString());
+        String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey,
+            StandardCharsets.UTF_8.toString());
+        URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeid=%s&numOfRows=20&_type=json",
+            url, encodedServiceKey, encodedCityCode, encodedNodeId));
+
+        // WebClient 호출
+        BusStationAllInfoResponse result = webClient.get()
+            .uri(uri)
+            .retrieve()
+            .bodyToMono(BusStationAllInfoResponse.class)
+            .block();
+
+        // routeno 리스트 추출
+        List<String> busNames = result.getResponse()
+            .getBody()
+            .getItems()
+            .getItem()
+            .stream()
+            .map(BusStationAllInfoResponse.Item::getRouteNo).toList();
+        List<String> routeNos = busNames;
+        System.out.println("routeNos = " + routeNos);
     }
 
     List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(

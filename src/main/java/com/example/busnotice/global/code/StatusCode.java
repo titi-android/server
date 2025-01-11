@@ -26,4 +26,9 @@ public enum StatusCode {
     public int getCode() {
         return code;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(code);
+    }
 }

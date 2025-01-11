@@ -17,18 +17,6 @@ public class BusController {
 
     private final BusService busService;
 
-    @Description("정류소의 노드 ID 조회")
-    @GetMapping("/node/id")
-    String getNodeId
-        (
-            @RequestParam String cityCode, // 도시 코드
-            @RequestParam String name // 정류소 이름
-        ) throws UnsupportedEncodingException {
-
-        String nodeId = busService.버스정류장_노드_ID_조회(cityCode, name);
-        return nodeId;
-    }
-
     @Description("특정 노드에 도착 예정인 모든 버스 정보 조회")
     @GetMapping("/node/arrive/info")
     List<Item> getNodeArriveInfo(
@@ -48,5 +36,15 @@ public class BusController {
     ) throws UnsupportedEncodingException {
         Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(cityCode, nodeId, busList);
         return item;
+    }
+
+    @Description("특정 노드를 경유하는 모든 버스들 이름 조회")
+    @GetMapping("/node/bus-names/all")
+    List<String> getBusNamesOfNode(
+        @RequestParam String cityCode,
+        @RequestParam String nodeId
+    ) throws UnsupportedEncodingException {
+        List<String> busNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityCode, nodeId);
+        return busNames;
     }
 }

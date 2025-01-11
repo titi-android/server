@@ -53,7 +53,7 @@ public class ScheduleService {
         // 도시 코드
         String cityCode = busStopService.도시코드_조회(createScheduleRequest.regionName());
         // 스케줄상의 버스 정류장의 node id
-        String nodeId = busService.버스정류장_노드_ID_조회(cityCode, createScheduleRequest.busStopName());
+        String nodeId = busStopService.버스정류장_노드_ID_조회(cityCode, createScheduleRequest.busStopName());
         // 스케줄상의 버스 정류장 생성
         BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
         busStopRepository.save(busStop);
@@ -85,7 +85,7 @@ public class ScheduleService {
         // 도시 코드
         String cityCode = busStopService.도시코드_조회(updateScheduleRequest.regionName());
         // 수정한 스케줄상의 버스 정류장의 node id
-        String newNodeId = busService.버스정류장_노드_ID_조회(cityCode, updateScheduleRequest.busStopName());
+        String newNodeId = busStopService.버스정류장_노드_ID_조회(cityCode, updateScheduleRequest.busStopName());
         // 스케줄상의 기존 버스 정류장 엔티티
         BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();
         // 해당 버스 정류장에 등록된 버스들 삭제
