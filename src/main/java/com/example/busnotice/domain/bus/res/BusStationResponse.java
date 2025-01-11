@@ -1,5 +1,8 @@
 package com.example.busnotice.domain.bus.res;
 
+import com.example.busnotice.util.ItemsDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -31,6 +34,13 @@ public class BusStationResponse {
     }
 
     @Data
+    public static class Items {
+
+        @JsonDeserialize(using = ItemsDeserializer.class)
+        private List<Item> item;
+    }
+
+    @Data
     public static class Item {
 
         private double gpslati;
@@ -38,11 +48,5 @@ public class BusStationResponse {
         private String nodeid;
         private String nodenm;
         private String nodeno;
-    }
-
-    @Data
-    public static class Items {
-
-        private Item item;
     }
 }

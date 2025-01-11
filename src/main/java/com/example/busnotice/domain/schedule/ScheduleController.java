@@ -6,6 +6,7 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import jdk.jfr.Description;
@@ -32,7 +33,7 @@ public class ScheduleController {
     public ApiResponse<Void> createSchedule(
         @RequestBody CreateScheduleRequest createScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws UnsupportedEncodingException {
+    ) throws IOException {
         scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
@@ -43,7 +44,7 @@ public class ScheduleController {
         @PathVariable("scheduleId") Long scheduleId,
         @RequestBody UpdateScheduleRequest updateScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws UnsupportedEncodingException {
+    ) throws IOException {
         scheduleService.updateSchedule(userDetails.getId(), scheduleId, updateScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
     }

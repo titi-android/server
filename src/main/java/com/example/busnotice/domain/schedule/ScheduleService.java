@@ -20,6 +20,7 @@ import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.util.DayConverter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class ScheduleService {
 
     @Transactional
     public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
-        throws UnsupportedEncodingException {
+        throws IOException {
         User user = getUserById(userId);
 
         // 겹치는 스케줄 있는지 확인
@@ -71,7 +72,7 @@ public class ScheduleService {
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId,
         UpdateScheduleRequest updateScheduleRequest)
-        throws UnsupportedEncodingException {
+        throws IOException {
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleException(

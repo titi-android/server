@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.busStop;
 
 import com.example.busnotice.global.format.ApiResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,9 @@ public class BusStopController {
         (
             @RequestParam("cityName") String cityCode, // 도시 코드
             @RequestParam("name") String name // 정류소 이름
-        ) throws UnsupportedEncodingException {
+        ) throws IOException {
 
         String nodeId = busStopService.버스정류장_노드_ID_조회(cityCode, name);
-        return ApiResponse.createSuccess(nodeId);
+        return ApiResponse.createSuccessWithData(nodeId, "버스정류장 노드 ID 조회에 성공했습니다.");
     }
 }
