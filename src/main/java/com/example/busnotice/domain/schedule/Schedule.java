@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Getter
@@ -39,6 +40,7 @@ public class Schedule {
     private String days; // 요일
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
     @Column(nullable = false)
