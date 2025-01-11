@@ -12,4 +12,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>,
     ScheduleCustomRepository {
 
     Optional<List<Schedule>> findAllByUser(User user);
+
+    Optional<Schedule> findByIdAndUserId(Long scheduleId, Long userId);
 }

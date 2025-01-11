@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public record ScheduleResponses(
-
+    Long id,
     String name,
     String days,
 

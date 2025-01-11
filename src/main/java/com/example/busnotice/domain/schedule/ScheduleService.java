@@ -10,6 +10,7 @@ import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
@@ -69,6 +70,11 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
     }
 
+    public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId, userId)
+            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
+        return schedule.toInfoResponse(schedule.getBusStop());
+    }
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId,
         UpdateScheduleRequest updateScheduleRequest)
@@ -129,7 +135,7 @@ public class ScheduleService {
         List<String> busNames = getBusNames(busStop);
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
-        return fastestBus.toScheduleResponse(currentSchedule.getName(), currentSchedule.getDays(),
+        return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(), currentSchedule.getDays(),
             currentSchedule.getStartTime(),
             currentSchedule.getEndTime());
     }
@@ -153,7 +159,7 @@ public class ScheduleService {
                 i.getRoutetp(), i.getVehicletp())
         ).toList();
         // 요일과 시간대는 필드에 직접 주입
-        return new ScheduleResponses(currentSchedule.getName(), currentSchedule.getDays(),
+        return new ScheduleResponses(currentSchedule.getId(), currentSchedule.getName(), currentSchedule.getDays(),
             currentSchedule.getStartTime(),
             currentSchedule.getEndTime()
             , busInfoDtos);
@@ -171,7 +177,7 @@ public class ScheduleService {
             Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
-                item.toScheduleResponse(s.getName(), s.getDays(), s.getStartTime(),
+                item.toScheduleResponse(s.getId(), s.getName(), s.getDays(), s.getStartTime(),
                     s.getEndTime()));
         }
         return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
@@ -197,7 +203,7 @@ public class ScheduleService {
                     item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
                     item.getRoutetp(), item.getVehicletp())
             ).toList();
-            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getName(), s.getDays(),
+            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getId(), s.getName(), s.getDays(),
                 s.getStartTime(), s.getEndTime()
                 , busInfoDtos);
             scheduleResponsesList.add(scheduleResponses);
@@ -264,4 +270,5 @@ public class ScheduleService {
     private List<String> getBusNames(BusStop busStop) {
         return busStop.getBusList().stream().map(Bus::getName).toList();
     }
+
 }

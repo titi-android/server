@@ -1,7 +1,9 @@
 package com.example.busnotice.domain.schedule;
 
+import com.example.busnotice.domain.bus.BusService;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.global.format.ApiResponse;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,6 +39,18 @@ public class ScheduleController {
     ) throws IOException {
         scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
+    }
+
+    @GetMapping("/v1/schedules/{scheduleId}")
+    @Description("스케줄 조회")
+    public ApiResponse<ScheduleInfoResponse> getSchedule(
+        @PathVariable("scheduleId") Long scheduleId,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        ScheduleInfoResponse scheduleInfoResponse = scheduleService.getSchedule(userDetails.getId(),
+            scheduleId);
+        return ApiResponse.createSuccessWithData(scheduleInfoResponse, "스케줄 조회에 성공했습니다.");
+
     }
 
     @PutMapping("/v1/schedules/{scheduleId}")

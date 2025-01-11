@@ -1,6 +1,10 @@
 package com.example.busnotice.domain.schedule;
 
+import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.busStop.BusStop;
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusInfoDto;
 import com.example.busnotice.domain.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -68,6 +72,14 @@ public class Schedule {
     ) {
         return new Schedule(
             user, scheduleName, days, startTime, endTime, busStop
+        );
+    }
+
+    public ScheduleInfoResponse toInfoResponse(BusStop busStop){
+        return new ScheduleInfoResponse(
+            this.id, this.name, this.days, this.startTime, this.endTime,
+            busStop.getName(),
+            busStop.getBusList().stream().map(Bus::getName).toList()
         );
     }
 
