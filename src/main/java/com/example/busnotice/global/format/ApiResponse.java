@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class ApiResponse<T> {
 
-    private StatusCode status;
+    private int status;
     private T data;
     private String message;
 
@@ -31,25 +31,25 @@ public class ApiResponse<T> {
     }
 
     private ApiResponse(StatusCode status) {
-        this.status = status;
+        this.status = status.getCode();
         this.data = null;
         this.message = null;
     }
 
     private ApiResponse(StatusCode status, String message) {
-        this.status = status;
+        this.status = status.getCode();
         this.data = null;
         this.message = message;
     }
 
     private ApiResponse(StatusCode status, T data) {
-        this.status = status;
+        this.status = status.getCode();
         this.data = data;
         this.message = null;
     }
 
     private ApiResponse(StatusCode status, T data, String message) {
-        this.status = status;
+        this.status = status.getCode();
         this.data = data;
         this.message = message;
     }
