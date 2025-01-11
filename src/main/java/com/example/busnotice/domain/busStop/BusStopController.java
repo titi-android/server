@@ -28,8 +28,8 @@ public class BusStopController {
         return ApiResponse.createSuccessWithData(cityCodes, "도시코드 조회에 성공했습니다.");
     }
 
-    @GetMapping("정류소의 노드 ID 조회")
-    @Operation(summary = "/node/id")
+    @GetMapping("/node/id")
+    @Operation(summary = "정류소의 노드 ID 조회")
     public ApiResponse<String> getNodeId
         (
             @RequestParam("cityName") String cityCode, // 도시 코드
