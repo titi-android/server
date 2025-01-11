@@ -53,7 +53,8 @@ public class BusStationArriveResponse {
         private String vehicletp;
 
         // Item 객체를 NowScheduleResponse로 변환
-        public ScheduleResponse toScheduleResponse(Long id, String name, String days, LocalTime startTime,
+        public ScheduleResponse toScheduleResponse(Long id, String name, String days,
+            LocalTime startTime,
             LocalTime endTime) {
             return new ScheduleResponse(
                 id,

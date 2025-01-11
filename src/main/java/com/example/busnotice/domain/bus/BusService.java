@@ -3,7 +3,6 @@ package com.example.busnotice.domain.bus;
 import com.example.busnotice.domain.bus.res.BusStationAllInfoResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
-import com.example.busnotice.domain.bus.res.BusStationResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -105,5 +104,13 @@ public class BusService {
         List<String> busNames = result.getResponse().getBody().getItems().getItem().stream()
             .map(BusStationAllInfoResponse.Item::getRouteNo).toList();
         return busNames;
+    }
+
+    public boolean checkBusNamesExist(List<String> busNames, List<String> allBusNames) {
+        if (allBusNames.containsAll(busNames)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

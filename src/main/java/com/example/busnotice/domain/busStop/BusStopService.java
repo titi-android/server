@@ -6,7 +6,6 @@ import com.example.busnotice.domain.bus.res.BusStationResponse.Items;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.GeneralException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -29,6 +28,7 @@ public class BusStopService {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCtyCodeList";
         String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey,
@@ -59,7 +59,7 @@ public class BusStopService {
                 }
             }
             String cityCode = result.toString().trim();
-            if(cityCode == null || cityCode.isEmpty()){
+            if (cityCode == null || cityCode.isEmpty()) {
                 throw new GeneralException(StatusCode.BAD_REQUEST, "도시 코드 조회에 실패했습니다.");
             }
             return result.toString().trim();
@@ -92,7 +92,7 @@ public class BusStopService {
             .block();
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
-        if(items == null){
+        if (items == null) {
             throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
         }
         List<Item> itemsList = items.getItem();
