@@ -29,7 +29,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/api/v1/users/login",
             "/h2-console",
             "/swagger-ui", "/swagger-resource", "/v3/api-docs"
-            );
+        );
         String requestPath = request.getRequestURI();
         if (excludePaths.stream().anyMatch(requestPath::contains)) {
             filterChain.doFilter(request, response);

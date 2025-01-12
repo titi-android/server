@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import jdk.jfr.Description;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -78,7 +77,7 @@ public class ScheduleController {
     }
 
 
-//    @GetMapping("/v1/schedules/today")
+    //    @GetMapping("/v1/schedules/today")
     @Operation(summary = "오늘 모든 스케줄의 가장 빠른 버스 정보 조회")
     public ApiResponse<List<ScheduleResponse>> getAllSchedules(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -94,7 +93,7 @@ public class ScheduleController {
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
         List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-            userDetails.getId(),DayConverter.getTodayAsString());
+            userDetails.getId(), DayConverter.getTodayAsString());
         return ApiResponse.createSuccessWithData(scheduleResponsesList);
     }
 
@@ -105,7 +104,7 @@ public class ScheduleController {
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
         List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-            userDetails.getId(),days);
+            userDetails.getId(), days);
         return ApiResponse.createSuccessWithData(scheduleResponsesList);
     }
 
