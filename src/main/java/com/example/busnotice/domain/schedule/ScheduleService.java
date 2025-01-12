@@ -189,11 +189,10 @@ public class ScheduleService {
             .toList();
     }
 
-    public List<ScheduleResponses> 오늘_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
+    public List<ScheduleResponses> 특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId, String days)
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
-        String today = DayConverter.getTodayAsString();
-        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
+        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, days);
 
         List<ScheduleResponses> scheduleResponsesList = new ArrayList<>();
         for (Schedule s : schedules) {

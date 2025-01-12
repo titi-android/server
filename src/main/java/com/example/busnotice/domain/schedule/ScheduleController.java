@@ -7,6 +7,7 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
+import com.example.busnotice.util.DayConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Schedule", description = "스케줄 관련 API")
@@ -88,11 +90,22 @@ public class ScheduleController {
 
     @GetMapping("/v2/schedules/today")
     @Operation(summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
-    public ApiResponse<List<ScheduleResponses>> getAllSchedulesV2(
+    public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfTodayV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
-        List<ScheduleResponses> scheduleResponsesList = scheduleService.오늘_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-            userDetails.getId());
+        List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
+            userDetails.getId(),DayConverter.getTodayAsString());
+        return ApiResponse.createSuccessWithData(scheduleResponsesList);
+    }
+
+    @GetMapping("/v2/schedules/days")
+    @Operation(summary = "특정 요일의 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfDaysV2(
+        @RequestParam("days") String days,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws UnsupportedEncodingException {
+        List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
+            userDetails.getId(),days);
         return ApiResponse.createSuccessWithData(scheduleResponsesList);
     }
 
