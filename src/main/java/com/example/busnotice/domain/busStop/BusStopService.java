@@ -15,10 +15,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BusStopService {
@@ -29,7 +32,9 @@ public class BusStopService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Cacheable(value = "cityCodes", key = "#p0", unless = "#result == null || #result.isEmpty()")
     public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
+        log.info("{} 에 대한 도시코드 캐싱 실패, 메서드 실행", cityName);
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCtyCodeList";
         String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey,
             StandardCharsets.UTF_8.toString());
