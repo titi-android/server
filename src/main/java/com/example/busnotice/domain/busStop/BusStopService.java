@@ -32,7 +32,7 @@ public class BusStopService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Cacheable(value = "cityCodes", key = "#p0", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
         log.info("{} 에 대한 도시코드 캐싱 실패, 메서드 실행", cityName);
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCtyCodeList";
@@ -74,7 +74,8 @@ public class BusStopService {
         }
     }
 
-    // 버스 정류장의 노드 id 조회
+
+    @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")
     public String 버스정류장_노드_ID_조회(String cityCode, String busStopName)
         throws IOException {
         cityCode = cityCode.trim().replaceAll("\\s+", "");
@@ -97,7 +98,7 @@ public class BusStopService {
             .block();
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
-        if (items == null) {
+        if (items == null || items.getItem().isEmpty()) {
             throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
         }
         List<Item> itemsList = items.getItem();
