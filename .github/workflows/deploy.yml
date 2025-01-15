@@ -70,4 +70,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
             docker stop bus-notice
             docker rm $(docker ps --filter 'status=exited' -a -q)
-            docker run -d --name bus-notice --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
+            docker run -d --name bus-notice --log-driver=syslog --network bus-notice -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
