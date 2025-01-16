@@ -11,10 +11,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BusService {
@@ -84,8 +87,11 @@ public class BusService {
         return sortedItems.stream().limit(2).collect(Collectors.toList());
     }
 
+    @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
     public List<String> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityCode, String nodeId)
         throws UnsupportedEncodingException {
+        log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityCode, nodeId);
+
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
         String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode),
             StandardCharsets.UTF_8.toString());

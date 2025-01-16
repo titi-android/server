@@ -1,5 +1,8 @@
 package com.example.busnotice.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -32,10 +35,24 @@ public class RedisConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        // 타입 정보를 활성화, 지금은 필요없음
+//        objectMapper.activateDefaultTyping(
+//            BasicPolymorphicTypeValidator.builder()
+//                .allowIfSubType("java.util") // 컬렉션 타입 허용
+//                .allowIfSubType("java.lang") // 기본 타입 허용
+//                .allowIfSubType("com.example") // 사용자 정의 클래스 허용
+//                .build(),
+//            DefaultTyping.EVERYTHING // 모든 객체에 타입 정보 추가
+//        );
+
+        // GenericJackson2JsonRedisSerializer에 ObjectMapper 설정
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
-            .entryTtl(Duration.ofMinutes(1L));
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+            .entryTtl(Duration.ofHours(1L));
 
         return RedisCacheManager
             .RedisCacheManagerBuilder

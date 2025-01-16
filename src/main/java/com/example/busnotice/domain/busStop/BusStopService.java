@@ -78,6 +78,7 @@ public class BusStopService {
     @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")
     public String 버스정류장_노드_ID_조회(String cityCode, String busStopName)
         throws IOException {
+        log.info("{}_{} 에 대한 노드 ID 캐싱 실패, 메서드 실행", cityCode, busStopName);
         cityCode = cityCode.trim().replaceAll("\\s+", "");
         busStopName = busStopName.trim().replaceAll("\\s+", "");
 
