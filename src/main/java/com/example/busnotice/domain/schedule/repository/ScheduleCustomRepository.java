@@ -10,5 +10,6 @@ public interface ScheduleCustomRepository {
 
     Optional<Schedule> findByCurrentTimeAndDay(User user, String today, LocalTime now);
 
-    Optional<List<Schedule>> findAllByUserAndDays(User user, String today);
+    List<Schedule> findAllByUserAndDays(User user, String today);
+
 }

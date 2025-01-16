@@ -1,8 +1,6 @@
 package com.example.busnotice.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -12,7 +10,6 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -47,11 +44,14 @@ public class RedisConfig {
 //        );
 
         // GenericJackson2JsonRedisSerializer에 ObjectMapper 설정
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(
+            objectMapper);
 
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                new StringRedisSerializer()))
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(serializer))
             .entryTtl(Duration.ofHours(1L));
 
         return RedisCacheManager

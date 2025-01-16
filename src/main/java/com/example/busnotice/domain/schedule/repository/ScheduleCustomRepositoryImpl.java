@@ -30,7 +30,7 @@ public class ScheduleCustomRepositoryImpl implements ScheduleCustomRepository {
     }
 
     @Override
-    public Optional<List<Schedule>> findAllByUserAndDays(User user, String today) {
+    public List<Schedule> findAllByUserAndDays(User user, String today) {
         List<Schedule> schedules = jpaQueryFactory
             .selectFrom(schedule)
             .where(
@@ -38,6 +38,6 @@ public class ScheduleCustomRepositoryImpl implements ScheduleCustomRepository {
                 schedule.days.eq(today)
             )
             .fetch();
-        return Optional.ofNullable(schedules);
+        return schedules;
     }
 }

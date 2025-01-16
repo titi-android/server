@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,7 +132,9 @@ public class ScheduleService {
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
         // 현재 스케줄
-        Schedule currentSchedule = getCurrentSchedule(user);
+        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
+        if(optionalCurrentSchedule.isEmpty()) return null;
+        Schedule currentSchedule = optionalCurrentSchedule.get();
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
@@ -148,7 +151,9 @@ public class ScheduleService {
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
         // 현재 스케줄
-        Schedule currentSchedule = getCurrentSchedule(user);
+        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
+        if(optionalCurrentSchedule.isEmpty()) return null;
+        Schedule currentSchedule = optionalCurrentSchedule.get();
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
@@ -219,8 +224,7 @@ public class ScheduleService {
 
     private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
         LocalTime endTime) {
-        List<Schedule> schedules = scheduleRepository.findAllByUser(user)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
 
         for (Schedule s : schedules) {
             if (요일_겹침_유무(s.getDays(), days) && 시간대_겹침_유무(startTime, endTime, s.getStartTime(),
@@ -233,8 +237,7 @@ public class ScheduleService {
     private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, String days,
         LocalTime startTime,
         LocalTime endTime) {
-        List<Schedule> schedules = scheduleRepository.findAllByUser(user)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "유저의 스케줄이 존재하지 않습니다."));
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
 
         for (Schedule es : schedules) {
             if (scheduleId != es.getId()
@@ -245,9 +248,8 @@ public class ScheduleService {
         }
     }
 
-    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String today) {
-        return scheduleRepository.findAllByUserAndDays(user, today)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "오늘의 스케줄이 존재하지 않습니다."));
+    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String days) {
+        return scheduleRepository.findAllByUserAndDays(user, days);
     }
 
     private boolean 시간대_겹침_유무(LocalTime startTime, LocalTime endTime,
@@ -260,11 +262,10 @@ public class ScheduleService {
         return newDays.equals(existDays);
     }
 
-    public Schedule getCurrentSchedule(User user) {
+    public Optional<Schedule> getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
         return scheduleRepository.findByCurrentTimeAndDay(user,
-                today, LocalTime.now())
-            .orElseThrow(() -> new ScheduleException(StatusCode.NO_CONTENT, "현재 스케줄이 존재하지 않습니다."));
+                today, LocalTime.now());
     }
 
     private User getUserById(Long userId) {
