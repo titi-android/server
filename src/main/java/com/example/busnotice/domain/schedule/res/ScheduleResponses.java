@@ -11,6 +11,8 @@ public record ScheduleResponses(
     LocalTime startTime,
     LocalTime endTime,
 
+    String busStopName,
+
     List<BusInfoDto> busInfos
 ) {
 

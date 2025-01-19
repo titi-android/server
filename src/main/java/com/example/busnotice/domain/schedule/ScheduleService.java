@@ -172,7 +172,7 @@ public class ScheduleService {
             currentSchedule.getDays(),
             currentSchedule.getStartTime(),
             currentSchedule.getEndTime()
-            , busInfoDtos);
+            , busStop.getName(), busInfoDtos);
     }
 
     public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
@@ -215,7 +215,7 @@ public class ScheduleService {
             ScheduleResponses scheduleResponses = new ScheduleResponses(s.getId(), s.getName(),
                 s.getDays(),
                 s.getStartTime(), s.getEndTime()
-                , busInfoDtos);
+                , s.getBusStop().getName(), busInfoDtos);
             scheduleResponsesList.add(scheduleResponses);
         }
         return scheduleResponsesList.stream().sorted(
