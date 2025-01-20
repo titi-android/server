@@ -2,9 +2,9 @@ package com.example.busnotice;
 
 
 import com.example.busnotice.domain.bus.BusService;
-import com.example.busnotice.domain.bus.res.BusStationResponse;
-import com.example.busnotice.domain.bus.res.BusStationResponse.Item;
-import com.example.busnotice.domain.bus.res.BusStationResponse.Items;
+import com.example.busnotice.domain.busStop.res.BusStopsDto;
+import com.example.busnotice.domain.busStop.res.BusStopsDto.Item;
+import com.example.busnotice.domain.busStop.res.BusStopsDto.Items;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import java.io.UnsupportedEncodingException;
@@ -41,10 +41,10 @@ public class BusTest {
             url, encodedServiceKey, encodedCityCode, encodedName));
 
         // WebClient 호출
-        BusStationResponse result = webClient.get()
+        BusStopsDto result = webClient.get()
             .uri(uri)
             .retrieve()
-            .bodyToMono(BusStationResponse.class)
+            .bodyToMono(BusStopsDto.class)
             .block();
         Items items = result.getResponse().getBody().getItems();
         if (items == null || items.getItem().isEmpty()) {

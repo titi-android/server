@@ -1,6 +1,6 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +43,7 @@ public class BusController {
     }
 
     @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름 조회")
-//    @GetMapping("/node/bus-names/all")
+    @GetMapping("/node/bus-names/all")
     public List<String> getBusNamesOfNode(
         @RequestParam("cityCode") String cityCode,
         @RequestParam("nodeId") String nodeId

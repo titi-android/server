@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class BusStationArriveResponse {
+public class BusArrInfosDto {
 
     private Response response;
 
@@ -51,6 +51,18 @@ public class BusStationArriveResponse {
         private String routeno;
         private String routetp;
         private String vehicletp;
+
+        public Item(int arrprevstationcnt, int arrtime, String nodeId, String nodenm,
+            String routeid, String routeno, String routetp, String vehicletp) {
+            this.arrprevstationcnt = arrprevstationcnt;
+            this.arrtime = arrtime;
+            this.nodeid = nodeId;
+            this.nodenm = nodenm;
+            this.routeid = routeid;
+            this.routeno = routeno;
+            this.routetp = routetp;
+            this.vehicletp = vehicletp;
+        }
 
         // Item 객체를 NowScheduleResponse로 변환
         public ScheduleResponse toScheduleResponse(Long id, String name, String days,

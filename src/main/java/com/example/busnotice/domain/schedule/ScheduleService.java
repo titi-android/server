@@ -3,7 +3,7 @@ package com.example.busnotice.domain.schedule;
 import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.bus.BusRepository;
 import com.example.busnotice.domain.bus.BusService;
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
@@ -133,7 +133,9 @@ public class ScheduleService {
         User user = getUserById(userId);
         // 현재 스케줄
         Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-        if(optionalCurrentSchedule.isEmpty()) return null;
+        if (optionalCurrentSchedule.isEmpty()) {
+            return null;
+        }
         Schedule currentSchedule = optionalCurrentSchedule.get();
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
@@ -152,7 +154,9 @@ public class ScheduleService {
         User user = getUserById(userId);
         // 현재 스케줄
         Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-        if(optionalCurrentSchedule.isEmpty()) return null;
+        if (optionalCurrentSchedule.isEmpty()) {
+            return null;
+        }
         Schedule currentSchedule = optionalCurrentSchedule.get();
         // 현재 스케줄의 버스정류장
         BusStop busStop = currentSchedule.getBusStop();
@@ -265,7 +269,7 @@ public class ScheduleService {
     public Optional<Schedule> getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
         return scheduleRepository.findByCurrentTimeAndDay(user,
-                today, LocalTime.now());
+            today, LocalTime.now());
     }
 
     private User getUserById(Long userId) {

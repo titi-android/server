@@ -1,9 +1,10 @@
 package com.example.busnotice;
 
-import com.example.busnotice.domain.bus.res.BusStationAllInfoResponse;
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
-import com.example.busnotice.domain.bus.res.SeoulBusStationResponseDto;
+import com.example.busnotice.domain.bus.res.BusInfosDto;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
+import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
+import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
 import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,10 +107,10 @@ public class BusStopTest {
                 url, encodedServiceKey, encodedCityCode, encodedNodeId));
 
         // WebClient 호출
-        BusStationAllInfoResponse result = webClient.get()
+        BusInfosDto result = webClient.get()
             .uri(uri)
             .retrieve()
-            .bodyToMono(BusStationAllInfoResponse.class)
+            .bodyToMono(BusInfosDto.class)
             .block();
 
         // routeno 리스트 추출
@@ -115,7 +119,7 @@ public class BusStopTest {
             .getItems()
             .getItem()
             .stream()
-            .map(BusStationAllInfoResponse.Item::getRouteNo).toList();
+            .map(BusInfosDto.Item::getRouteNo).toList();
         List<String> routeNos = busNames;
         System.out.println("routeNos = " + routeNos);
     }
@@ -151,14 +155,68 @@ public class BusStopTest {
                 encodedServiceKey, encodedNodeId));
 
         // WebClient 호출
-        SeoulBusStationResponseDto result = webClient.get().uri(uri).retrieve()
-            .bodyToMono(SeoulBusStationResponseDto.class).block();
+        SeoulBusInfosDto result = webClient.get().uri(uri).retrieve()
+            .bodyToMono(SeoulBusInfosDto.class).block();
         List<String> busNames = result.getMsgBody().getItemList().stream()
             .map(i -> i.getBusRouteNm()).toList();
         System.out.println("bus names: " + busNames);
     }
 
-    List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(
+    @Test
+    public void parseTest() {
+        Pattern pattern = Pattern.compile("\\s*(\\d+)분\\s*(\\d+)초후\\s*\\[(\\d+)번째 전\\]\\s*");
+        Matcher matcher = pattern.matcher("2분28초후[1번째 전]");
+
+        if (matcher.find()) {
+            int minutes = Integer.parseInt(matcher.group(1));
+            int seconds = Integer.parseInt(matcher.group(2));
+            int stopNumber = Integer.parseInt(matcher.group(3));
+
+            int totalSeconds = (minutes * 60) + seconds;
+
+            System.out.println("stopNumber = " + stopNumber);
+            System.out.println("totalSeconds = " + totalSeconds);
+
+        }
+    }
+
+    @Test
+    void 서울_특정_노드_ID에_도착하는_모든_버스들_정보_조회() throws UnsupportedEncodingException {
+//        String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
+//        String encodedNodeId = URLEncoder.encode("03228", StandardCharsets.UTF_8.toString());
+//        String encodedServiceKey = URLEncoder.encode(serviceKey,
+//            StandardCharsets.UTF_8.toString());
+//        URI uri = URI.create(
+//            String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
+//                encodedServiceKey, encodedNodeId));
+//
+//        // WebClient 호출
+//        SeoulBusStationArriveResponse result = webClient.get().uri(uri).retrieve()
+//            .bodyToMono(SeoulBusStationArriveResponse.class).block();
+//        List<SeoulBusStationArriveResponse.Item> itemList = result.getMsgBody().getItemList();
+//        System.out.println("result.toString() = " + result.toString());
+
+        String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
+        String encodedNodeId = URLEncoder.encode("03228", StandardCharsets.UTF_8.toString());
+        String encodedServiceKey = URLEncoder.encode(serviceKey,
+            StandardCharsets.UTF_8.toString());
+        URI uri = URI.create(
+            String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
+                encodedServiceKey, encodedNodeId));
+
+        // WebClient 호출
+        SeoulBusArrInfosDto result = webClient.get().uri(uri).retrieve()
+            .bodyToMono(SeoulBusArrInfosDto.class).block();
+        System.out.println("result.toString() = " + result.toString());
+
+        List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
+        List<Item> items = itemList.stream().map(i -> i.toGeneralItem()).filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime)).toList();
+
+        System.out.println("items = " + items);
+    }
+
+
+    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(
         String cityCode,
         String nodeId
     ) throws UnsupportedEncodingException {
@@ -172,17 +230,17 @@ public class BusStopTest {
             url, encodedServiceKey, encodedCityCode, encodedNodeId));
 
         // WebClient 호출
-        BusStationArriveResponse result = webClient.get()
+        BusArrInfosDto result = webClient.get()
             .uri(uri)
             .retrieve()
-            .bodyToMono(BusStationArriveResponse.class)
+            .bodyToMono(BusArrInfosDto.class)
             .block();
 
         if (result != null && result.getResponse() != null &&
             result.getResponse().getBody() != null &&
             result.getResponse().getBody().getItems() != null) {
 
-            List<BusStationArriveResponse.Item> items = result.getResponse().getBody().getItems()
+            List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
                 .getItem();
             return items;
         } else {
@@ -199,7 +257,7 @@ public class BusStopTest {
         List<Item> items = 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityCode, nodeId);
 
         // 특정 routeno 에 해당하는 item 필터링
-        List<BusStationArriveResponse.Item> filteredItems = items.stream()
+        List<BusArrInfosDto.Item> filteredItems = items.stream()
             .filter(item -> busList.contains(item.getRouteno())) // busList에 있는 routeno와 매칭
             .toList(); // 필터링 결과를 리스트로 변환
 

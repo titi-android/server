@@ -1,8 +1,8 @@
 package com.example.busnotice.domain.busStop;
 
-import com.example.busnotice.domain.bus.res.BusStationResponse;
-import com.example.busnotice.domain.bus.res.BusStationResponse.Item;
-import com.example.busnotice.domain.bus.res.BusStationResponse.Items;
+import com.example.busnotice.domain.busStop.res.BusStopsDto;
+import com.example.busnotice.domain.busStop.res.BusStopsDto.Item;
+import com.example.busnotice.domain.busStop.res.BusStopsDto.Items;
 import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
@@ -36,7 +36,7 @@ public class BusStopService {
     @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
         // 서울인 경우만 따로 처리
-        if(cityName.contains("서울")){
+        if (cityName.contains("서울")) {
             System.out.println(cityName + "의 도시 코드: " + "11");
             return "11";
         }
@@ -86,7 +86,7 @@ public class BusStopService {
     public String 버스정류장_노드_ID_조회(String cityCode, String busStopName)
         throws IOException {
         // 서울인 경우만 따로 처리
-        if(cityCode.equals("11")){
+        if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";
             String encodedServiceKey = URLEncoder.encode(serviceKey,
                 StandardCharsets.UTF_8.toString());
@@ -95,14 +95,15 @@ public class BusStopService {
             URI uri = URI.create(String.format("%s?serviceKey=%s&stSrch=%s&resultType=json",
                 url, encodedServiceKey, endCodedBusStopName));
 
-            // WebClient 호출
+            // WebClient 호출 - 서울의 해당 이름이 포함된 버스정류장을 모두 조회
             SeoulBusStopsDto response = webClient.get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(SeoulBusStopsDto.class)
                 .block();
             System.out.println("response.toString() = " + response.toString());
-            if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList().isEmpty()) {
+            if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
+                .isEmpty()) {
                 throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
             }
             String nodeId = response.getMsgBody().getItemList().get(0).getArsId();
@@ -122,11 +123,11 @@ public class BusStopService {
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&_type=json", url,
             encodedServiceKey, encodedCityCode, encodedName));
 
-        // WebClient 호출
-        BusStationResponse result = webClient.get()
+        // WebClient 호출 - 해당 지역의 해당 이름이 포함된 버스정류장을 모두 조회
+        BusStopsDto result = webClient.get()
             .uri(uri)
             .retrieve()
-            .bodyToMono(BusStationResponse.class)
+            .bodyToMono(BusStopsDto.class)
             .block();
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
@@ -134,10 +135,6 @@ public class BusStopService {
             throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
         }
         List<Item> itemsList = items.getItem();
-//        경북대학교, 경북대학교북문 <- 이런 경우에 경북대학교를 검색 시 첫 번째껄 선택하도록 하기 위해 주석 처리
-//        if (itemsList.size() >= 2) {
-//            throw new BusStopException(StatusCode.BAD_REQUEST, "해당 이름을 포함하는 버스정류장이 2개 이상입니다.");
-//        }
         return itemsList.get(0).getNodeid();
     }
 }

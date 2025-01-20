@@ -8,7 +8,7 @@ import lombok.ToString;
 
 @ToString
 @Data
-public class BusStationAllInfoResponse {
+public class BusInfosDto {
 
     @JsonProperty("response")
     private Response response;

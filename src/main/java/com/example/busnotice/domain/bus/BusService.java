@@ -1,10 +1,11 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.bus.res.BusStationAllInfoResponse;
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
-import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
-import com.example.busnotice.domain.bus.res.SeoulBusStationResponseDto;
-import com.example.busnotice.domain.bus.res.SeoulBusStationResponseDto.BusRoute;
+import com.example.busnotice.domain.bus.res.BusInfosDto;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
+import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
+import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
+import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +14,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +35,30 @@ public class BusService {
 
     public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityCode, String nodeId)
         throws UnsupportedEncodingException {
+        // 서울의 경우는 따로 처리
+        if (cityCode.equals("11")) {
+            String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
+            String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
+            String encodedServiceKey = URLEncoder.encode(serviceKey,
+                StandardCharsets.UTF_8.toString());
+            URI uri = URI.create(
+                String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
+                    encodedServiceKey, encodedNodeId));
+
+            // WebClient 호출 - 서울의 해당 노드 ID 에 도착하는 모든 버스들 조회 (운행종료 포함)
+            SeoulBusArrInfosDto result = webClient.get().uri(uri).retrieve()
+                .bodyToMono(SeoulBusArrInfosDto.class).block();
+            System.out.println("result.toString() = " + result.toString());
+
+            List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
+            List<Item> items = itemList.stream().map(i -> i.toGeneralItem()).filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime)).toList();
+            return items;
+        }
+
         System.out.println("cityCode = " + cityCode);
         System.out.println("nodeId = " + nodeId);
         String url = "http://apis.data.go.kr/1613000/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList";
-        String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode),
+        String encodedCityCode = URLEncoder.encode(cityCode,
             StandardCharsets.UTF_8.toString());
         String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
         String encodedServiceKey = URLEncoder.encode(serviceKey,
@@ -44,14 +66,14 @@ public class BusService {
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeId=%s&_type=json", url,
             encodedServiceKey, encodedCityCode, encodedNodeId));
 
-        // WebClient 호출
-        BusStationArriveResponse result = webClient.get().uri(uri).retrieve()
-            .bodyToMono(BusStationArriveResponse.class).block();
+        // WebClient 호출 - 해당 지역의 해당 노드 ID 에 도착 예정인 모든 버스들 조회
+        BusArrInfosDto result = webClient.get().uri(uri).retrieve()
+            .bodyToMono(BusArrInfosDto.class).block();
 
         if (result != null && result.getResponse() != null && result.getResponse().getBody() != null
             && result.getResponse().getBody().getItems() != null) {
 
-            List<BusStationArriveResponse.Item> items = result.getResponse().getBody().getItems()
+            List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
                 .getItem();
             return items;
         } else {
@@ -65,7 +87,7 @@ public class BusService {
         List<Item> items = 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityCode, nodeId);
         System.out.println("items = " + items);
         // 특정 routeno 에 해당하는 item 필터링
-        List<BusStationArriveResponse.Item> filteredItems = items.stream()
+        List<BusArrInfosDto.Item> filteredItems = items.stream()
             .filter(item -> busList.contains(item.getRouteno())) // busList에 있는 routeno와 매칭
             .toList(); // 필터링 결과를 리스트로 변환
 
@@ -104,12 +126,13 @@ public class BusService {
                 String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
                     encodedServiceKey, encodedNodeId));
 
-            // WebClient 호출
-            SeoulBusStationResponseDto result = webClient.get().uri(uri).retrieve()
-                .bodyToMono(SeoulBusStationResponseDto.class).block();
+            // WebClient 호출 - 서울의 해당 노드 ID 를 경유하는 노선 정보 조회
+            SeoulBusInfosDto result = webClient.get().uri(uri).retrieve()
+                .bodyToMono(SeoulBusInfosDto.class).block();
             List<BusRoute> busRoutes = result.getMsgBody().getItemList();
-            if( busRoutes == null ||  busRoutes.isEmpty()){
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
+            if (busRoutes == null || busRoutes.isEmpty()) {
+                throw new BusStopException(StatusCode.NOT_FOUND,
+                    "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
             }
             List<String> busNames = result.getMsgBody().getItemList().stream()
                 .map(i -> i.getBusRouteNm()).toList();
@@ -118,7 +141,7 @@ public class BusService {
         }
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
-        String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode),
+        String encodedCityCode = URLEncoder.encode(cityCode,
             StandardCharsets.UTF_8.toString());
         String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
         String encodedServiceKey = URLEncoder.encode(serviceKey,
@@ -127,26 +150,21 @@ public class BusService {
             String.format("%s?serviceKey=%s&cityCode=%s&nodeid=%s&numOfRows=20&_type=json", url,
                 encodedServiceKey, encodedCityCode, encodedNodeId));
 
-        // WebClient 호출
-        BusStationAllInfoResponse result = webClient.get().uri(uri).retrieve()
-            .bodyToMono(BusStationAllInfoResponse.class).block();
+        // WebClient 호출 - 해당 지역의 해당 노드 ID 를 경유하는 노선 정보 조회
+        BusInfosDto result = webClient.get().uri(uri).retrieve()
+            .bodyToMono(BusInfosDto.class).block();
 
-        if(result.getResponse().getBody().getItems().getItem()== null ||  result.getResponse().getBody().getItems().getItem().isEmpty()){
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
+        if (result.getResponse().getBody().getItems().getItem() == null || result.getResponse()
+            .getBody().getItems().getItem().isEmpty()) {
+            throw new BusStopException(StatusCode.NOT_FOUND,
+                "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
         }
 
         // routeno 리스트 추출
         List<String> busNames = result.getResponse().getBody().getItems().getItem().stream()
-            .map(BusStationAllInfoResponse.Item::getRouteNo).toList();
+            .map(BusInfosDto.Item::getRouteNo).toList();
         System.out.println("bus names: " + busNames);
         return busNames;
     }
 
-    public boolean checkBusNamesExist(List<String> busNames, List<String> allBusNames) {
-        if (allBusNames.containsAll(busNames)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

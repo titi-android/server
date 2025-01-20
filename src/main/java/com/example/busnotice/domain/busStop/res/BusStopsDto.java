@@ -1,4 +1,4 @@
-package com.example.busnotice.domain.bus.res;
+package com.example.busnotice.domain.busStop.res;
 
 import com.example.busnotice.util.ItemsDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class BusStationResponse {
+public class BusStopsDto {
 
     private Response response;
 

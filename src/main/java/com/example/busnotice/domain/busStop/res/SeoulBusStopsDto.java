@@ -5,12 +5,14 @@ import lombok.Data;
 
 @Data
 public class SeoulBusStopsDto {
+
     private ComMsgHeader comMsgHeader;
     private MsgHeader msgHeader;
     private MsgBody msgBody;
 
     @Data
     public static class ComMsgHeader {
+
         private String errMsg;
         private String requestMsgID;
         private String responseMsgID;
@@ -21,6 +23,7 @@ public class SeoulBusStopsDto {
 
     @Data
     public static class MsgHeader {
+
         private String headerMsg;
         private int headerCd;
         private int itemCount;
@@ -28,11 +31,13 @@ public class SeoulBusStopsDto {
 
     @Data
     public static class MsgBody {
+
         private List<Item> itemList;
     }
 
     @Data
     public static class Item {
+
         private String stId;
         private String stNm;
         private double tmX;
