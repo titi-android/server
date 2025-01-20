@@ -3,10 +3,15 @@ package com.example.busnotice;
 
 import com.example.busnotice.domain.bus.BusService;
 import com.example.busnotice.domain.bus.res.BusStationResponse;
+import com.example.busnotice.domain.bus.res.BusStationResponse.Item;
+import com.example.busnotice.domain.bus.res.BusStationResponse.Items;
+import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.BusStopException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +46,15 @@ public class BusTest {
             .retrieve()
             .bodyToMono(BusStationResponse.class)
             .block();
-        String nodeid = result.getResponse().getBody().getItems().getItem().getNodeid();
-        System.out.println("nodeid = " + nodeid);
+        Items items = result.getResponse().getBody().getItems();
+        if (items == null || items.getItem().isEmpty()) {
+            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+        }
+        List<Item> itemsList = items.getItem();
+        if (itemsList.size() >= 2) {
+            throw new BusStopException(StatusCode.BAD_REQUEST, "해당 이름을 포함하는 버스정류장이 2개 이상입니다.");
+        }
+        System.out.println("노드 ID: " + itemsList.get(0).getNodeid());
     }
 
 }

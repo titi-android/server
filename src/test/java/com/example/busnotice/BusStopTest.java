@@ -3,8 +3,9 @@ package com.example.busnotice;
 import com.example.busnotice.domain.bus.res.BusStationAllInfoResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse;
 import com.example.busnotice.domain.bus.res.BusStationArriveResponse.Item;
+import com.example.busnotice.domain.bus.res.SeoulBusStationResponseDto;
+import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -13,10 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,10 +26,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Transactional
 public class BusStopTest {
 
-    @Value("${bus.station.info.inquire.service.key}")
-    private String busStationInfoServiceKey;
-    @Value("${bus.station.arrive.info.inquire.service.key}")
-    private String busStationArriveInfoServiceKey;
+    @Value("${open-api.service.key}")
+    private String serviceKey;
     @Autowired
     WebClient webClient;
     @Autowired
@@ -92,15 +89,18 @@ public class BusStopTest {
     }
 
     @Test
-    public void getAllBusNamesOfBusSt() throws UnsupportedEncodingException, JsonProcessingException {
+    public void getAllBusNamesOfBusSt()
+        throws UnsupportedEncodingException, JsonProcessingException {
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
         String encodedCityCode = URLEncoder.encode(String.valueOf("22"),
             StandardCharsets.UTF_8.toString());
-        String encodedNodeId = URLEncoder.encode("DGB7021025900", StandardCharsets.UTF_8.toString());
-        String encodedServiceKey = URLEncoder.encode(busStationInfoServiceKey,
+        String encodedNodeId = URLEncoder.encode("DGB7021025900",
             StandardCharsets.UTF_8.toString());
-        URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeid=%s&numOfRows=20&_type=json",
-            url, encodedServiceKey, encodedCityCode, encodedNodeId));
+        String encodedServiceKey = URLEncoder.encode(serviceKey,
+            StandardCharsets.UTF_8.toString());
+        URI uri = URI.create(
+            String.format("%s?serviceKey=%s&cityCode=%s&nodeid=%s&numOfRows=20&_type=json",
+                url, encodedServiceKey, encodedCityCode, encodedNodeId));
 
         // WebClient 호출
         BusStationAllInfoResponse result = webClient.get()
@@ -120,6 +120,44 @@ public class BusStopTest {
         System.out.println("routeNos = " + routeNos);
     }
 
+    @Test
+    void 서울_버스정류장_이름으로_노드_ID_조회() throws UnsupportedEncodingException {
+        String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";
+        String encodedServiceKey = URLEncoder.encode(serviceKey,
+            StandardCharsets.UTF_8.toString());
+        String endCodedBusStopName = URLEncoder.encode("김동현체육공원",
+            StandardCharsets.UTF_8.toString());
+        URI uri = URI.create(String.format("%s?serviceKey=%s&stSrch=%s&resultType=json",
+            url, encodedServiceKey, endCodedBusStopName));
+
+        // WebClient 호출
+        SeoulBusStopsDto response = webClient.get()
+            .uri(uri)
+            .retrieve()
+            .bodyToMono(SeoulBusStopsDto.class)
+            .block();
+        System.out.println("response.toString() = " + response.toString());
+//        System.out.println(response.getMsgBody().getItemList().get(0).getArsId());
+    }
+
+    @Test
+    void 서울_특정_노선을_경유하는_버스_목록_조회() throws UnsupportedEncodingException {
+        String url = "http://ws.bus.go.kr/api/rest/stationinfo/getRouteByStation";
+        String encodedNodeId = URLEncoder.encode("03228", StandardCharsets.UTF_8.toString());
+        String encodedServiceKey = URLEncoder.encode(serviceKey,
+            StandardCharsets.UTF_8.toString());
+        URI uri = URI.create(
+            String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
+                encodedServiceKey, encodedNodeId));
+
+        // WebClient 호출
+        SeoulBusStationResponseDto result = webClient.get().uri(uri).retrieve()
+            .bodyToMono(SeoulBusStationResponseDto.class).block();
+        List<String> busNames = result.getMsgBody().getItemList().stream()
+            .map(i -> i.getBusRouteNm()).toList();
+        System.out.println("bus names: " + busNames);
+    }
+
     List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(
         String cityCode,
         String nodeId
@@ -128,7 +166,7 @@ public class BusStopTest {
         String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode),
             StandardCharsets.UTF_8.toString());
         String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
-        String encodedServiceKey = URLEncoder.encode(busStationArriveInfoServiceKey,
+        String encodedServiceKey = URLEncoder.encode(serviceKey,
             StandardCharsets.UTF_8.toString());
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeId=%s&_type=json",
             url, encodedServiceKey, encodedCityCode, encodedNodeId));
