@@ -23,12 +23,15 @@ public class BusController {
 
     @Operation(summary = "특정 노드에 도착 예정인 모든 버스 정보 조회")
     @GetMapping("/node/arrive/info")
-    public List<Item> getNodeArriveInfo(
+    public ApiResponse<List<Item>> getNodeArriveInfo(
         @RequestParam("cityCode") String cityCode, // 도시 코드
         @RequestParam("nodeId") String nodeId // 노드 ID
     ) throws UnsupportedEncodingException {
         List<Item> items = busService.특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityCode, nodeId);
-        return items;
+        String msg = items.isEmpty()
+            ? "현재 도착 예정인 버스가 존재하지 않습니다."
+            : "현재 도착 예정인 버스가 존재합니다.";
+        return ApiResponse.createSuccessWithData(items, msg);
     }
 
     @Operation(summary = "특정 노드에 도착 예정인 특정 버스들의 가장 빠른 정보 조회")

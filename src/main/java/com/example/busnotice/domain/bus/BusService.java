@@ -12,6 +12,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -78,10 +80,8 @@ public class BusService {
             List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
                 .getItem();
             return items;
-        } else {
-            System.out.println("No data available.");
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public List<Item> 특정_노드_ID에_도착하는_특정_버스들_정보_조회(String cityCode, String nodeId,

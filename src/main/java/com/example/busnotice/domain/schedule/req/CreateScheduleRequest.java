@@ -1,12 +1,20 @@
 package com.example.busnotice.domain.schedule.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.List;
 
 public record CreateScheduleRequest(
     String name, // 스케줄 이름
+
     String days, // 요일
+
+    @Schema(type = "string", example = "00:00")
+    @JsonFormat(pattern = "HH:mm")
     LocalTime startTime, // 시작 시간
+    @Schema(type = "string", example = "00:00")
+    @JsonFormat(pattern = "HH:mm")
     LocalTime endTime, // 마치는 시간
     String regionName, // 지역 이름
     String busStopName, // 버스 정류장 이름

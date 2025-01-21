@@ -70,7 +70,11 @@ public class ScheduleTest {
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
             createScheduleRequest.days(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
-        scheduleRepository.save(schedule);
-        System.out.println("schedule.toString() = " + schedule);
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        System.out.println("savedSchedule = " + savedSchedule);
+        System.out.println("savedSchedule.getStartTime().getHour() = " + savedSchedule.getStartTime().getHour());
+        System.out.println("savedSchedule.getStartTime().getHour() = " + savedSchedule.getStartTime().getMinute());
+        System.out.println("savedSchedule.getStartTime().getHour() = " + savedSchedule.getStartTime().getSecond());
+        System.out.println("savedSchedule.getStartTime().getHour() = " + savedSchedule.getStartTime().getNano());
     }
 }

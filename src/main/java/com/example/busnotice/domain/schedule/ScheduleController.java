@@ -44,7 +44,9 @@ public class ScheduleController {
     }
 
     @GetMapping("/v1/schedules/{scheduleId}")
-    @Operation(summary = "스케줄 조회")
+    @Operation(
+        summary = "스케줄 조회"
+    )
     public ApiResponse<ScheduleInfoResponse> getSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -88,7 +90,10 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedules/today")
-    @Operation(summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    @Operation(
+        summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
+        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+    )
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfTodayV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
@@ -101,7 +106,10 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedules/days")
-    @Operation(summary = "특정 요일의 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    @Operation(
+        summary = "특정 요일의 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
+        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+    )
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfDaysV2(
         @RequestParam("days") String days,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -115,7 +123,10 @@ public class ScheduleController {
     }
 
     @GetMapping("/v1/schedules/now")
-    @Operation(summary = "현재 스케줄의 가장 빠른 버스 정보 조회")
+    @Operation(
+        summary = "현재 스케줄의 가장 빠른 버스 정보 조회",
+        description = "현재 스케줄이 없는 경우 null 을 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+    )
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
@@ -128,7 +139,10 @@ public class ScheduleController {
     }
 
     @GetMapping("/v2/schedules/now")
-    @Operation(summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회")
+    @Operation(
+        summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
+        description = "현재 스케줄이 없는 경우 null 을 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+    )
     public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
