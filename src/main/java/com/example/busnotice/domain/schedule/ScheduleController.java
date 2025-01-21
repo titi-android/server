@@ -126,7 +126,7 @@ public class ScheduleController {
     @GetMapping("/v1/schedules/now")
     @Operation(
         summary = "현재 스케줄의 가장 빠른 버스 정보 조회",
-        description = "현재 스케줄이 없는 경우 null 을 반환"
+        description = "현재 스케줄이 없는 경우 null 을 반환, 현재 스케줄이 있지만 도착 예정인 버스가 없으면 busInfo 가 null"
     )
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @AuthenticationPrincipal CustomUserDetails userDetails

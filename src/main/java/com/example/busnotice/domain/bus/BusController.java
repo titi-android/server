@@ -21,7 +21,10 @@ public class BusController {
 
     private final BusService busService;
 
-    @Operation(summary = "특정 노드에 도착 예정인 모든 버스 정보 조회")
+    @Operation(
+        summary = "특정 노드에 도착 예정인 모든 버스 정보 조회",
+        description = "도착 예정인 버스가 없는 경우 빈 리스트를 반환"
+    )
     @GetMapping("/node/arrive/info")
     public ApiResponse<List<Item>> getNodeArriveInfo(
         @RequestParam("cityCode") String cityCode, // 도시 코드

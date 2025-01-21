@@ -143,6 +143,12 @@ public class ScheduleService {
         List<String> busNames = getBusNames(busStop);
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
             busStop.getNodeId(), busNames);
+        if(fastestBus == null){
+            return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
+                currentSchedule.getDays(),
+                currentSchedule.getStartTime(),
+                currentSchedule.getEndTime(), null);
+        }
         return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
             currentSchedule.getDays(),
             currentSchedule.getStartTime(),
