@@ -19,7 +19,6 @@ import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
-import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.util.DayConverter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,14 +28,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
-    private final JwtProvider jwtProvider;
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
     private final BusStopRepository busStopRepository;
@@ -54,9 +54,9 @@ public class ScheduleService {
             createScheduleRequest.endTime());
 
         // 도시 코드
-        String cityCode = busStopService.도시코드_조회(createScheduleRequest.regionName());
+        String cityCode = busStopService.도시코드_DB_조회(createScheduleRequest.regionName());
         // 스케줄상의 버스 정류장의 node id
-        String nodeId = busStopService.버스정류장_노드_ID_조회(cityCode,
+        String nodeId = busStopService.버스정류장_노드_ID_조회(createScheduleRequest.regionName(),
             createScheduleRequest.busStopName());
         // 스케줄상의 버스 정류장 생성
         BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
@@ -93,7 +93,7 @@ public class ScheduleService {
             updateScheduleRequest.endTime());
 
         // 도시 코드
-        String cityCode = busStopService.도시코드_조회(updateScheduleRequest.regionName());
+        String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
         // 수정한 스케줄상의 버스 정류장의 node id
         String newNodeId = busStopService.버스정류장_노드_ID_조회(cityCode,
             updateScheduleRequest.busStopName());

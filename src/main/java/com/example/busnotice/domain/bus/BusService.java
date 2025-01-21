@@ -1,8 +1,8 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.bus.res.BusInfosDto;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
+import com.example.busnotice.domain.bus.res.BusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
@@ -51,7 +51,9 @@ public class BusService {
             System.out.println("result.toString() = " + result.toString());
 
             List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
-            List<Item> items = itemList.stream().map(i -> i.toGeneralItem()).filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime)).toList();
+            List<Item> items = itemList.stream().map(i -> i.toGeneralItem())
+                .filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime))
+                .toList();
             return items;
         }
 

@@ -35,7 +35,7 @@ public class BusStopService {
     private final CityCodeRepository cityCodeRepository;
 
     @Cacheable(value = "cityCodes", key = "#p0")
-    public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
+    public String 도시코드_API_조회(String cityName) throws UnsupportedEncodingException {
         // 서울인 경우만 따로 처리
         if (cityName.contains("서울")) {
             System.out.println(cityName + "의 도시 코드: " + "11");
@@ -82,13 +82,19 @@ public class BusStopService {
         }
     }
 
+    @Cacheable(value = "cityCodes", key = "#p0")
+    public String 도시코드_DB_조회(String cityName) {
+        String cityCode = cityCodeRepository.findByName(cityName.trim())
+            .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
+            .getCode();
+        return cityCode;
+    }
+
 
     @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")
     public String 버스정류장_노드_ID_조회(String cityName, String busStopName)
         throws IOException {
-        String cityCode = cityCodeRepository.findByName(cityName)
-            .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
-            .getCode();
+        String cityCode = 도시코드_DB_조회(cityName);
 
         // 서울인 경우만 따로 처리
         if (cityCode.equals("11")) {

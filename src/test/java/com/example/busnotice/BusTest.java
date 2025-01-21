@@ -2,11 +2,13 @@ package com.example.busnotice;
 
 
 import com.example.busnotice.domain.bus.BusService;
+import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.domain.busStop.res.BusStopsDto;
 import com.example.busnotice.domain.busStop.res.BusStopsDto.Item;
 import com.example.busnotice.domain.busStop.res.BusStopsDto.Items;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
+import com.example.busnotice.global.exception.GeneralException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -23,11 +26,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Transactional
 public class BusTest {
 
-    @Value("${bus.station.info.inquire.service.key}")
+    @Value("${open-api.service.key}")
     private String busStationInfoServiceKey;
 
     @Autowired
     BusService busService;
+    @Autowired
+    CityCodeRepository cityCodeRepository;
     @Autowired
     WebClient webClient;
 
@@ -57,4 +62,11 @@ public class BusTest {
         System.out.println("노드 ID: " + itemsList.get(0).getNodeid());
     }
 
+    @Test
+    public void 도시코드_DB_조회() {
+        String cityCode = cityCodeRepository.findByName("광주시")
+            .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
+            .getCode();
+        System.out.println("cityCode = " + cityCode);
+    }
 }
