@@ -55,6 +55,10 @@ public class BusInfosDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Item {
 
+        public Item() {
+            // 기본 생성자
+        }
+
         @JsonProperty("endnodenm")
         private String endNodeNm;
 

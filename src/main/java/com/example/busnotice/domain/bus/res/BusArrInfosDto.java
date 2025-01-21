@@ -52,6 +52,9 @@ public class BusArrInfosDto {
         private String routetp;
         private String vehicletp;
 
+        public Item() {
+
+        }
         public Item(int arrprevstationcnt, int arrtime, String nodeId, String nodenm,
             String routeid, String routeno, String routetp, String vehicletp) {
             this.arrprevstationcnt = arrprevstationcnt;
