@@ -15,7 +15,7 @@ public class CityCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     String code;
 
     @Column(unique = true, nullable = false)

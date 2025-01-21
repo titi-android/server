@@ -31,11 +31,11 @@ public class BusStopController {
     @Operation(summary = "정류소의 노드 ID 조회")
     public ApiResponse<String> getNodeId
         (
-            @RequestParam("cityName") String cityCode, // 도시 코드
+            @RequestParam("cityName") String cityName, // 도시 이름
             @RequestParam("name") String name // 정류소 이름
         ) throws IOException {
 
-        String nodeId = busStopService.버스정류장_노드_ID_조회(cityCode, name);
+        String nodeId = busStopService.버스정류장_노드_ID_조회(cityName, name);
         return ApiResponse.createSuccessWithData(nodeId, "버스정류장 노드 ID 조회에 성공했습니다.");
     }
 }

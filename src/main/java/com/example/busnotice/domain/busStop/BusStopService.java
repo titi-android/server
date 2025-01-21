@@ -32,6 +32,7 @@ public class BusStopService {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final CityCodeRepository cityCodeRepository;
 
     @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_조회(String cityName) throws UnsupportedEncodingException {
@@ -83,8 +84,12 @@ public class BusStopService {
 
 
     @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")
-    public String 버스정류장_노드_ID_조회(String cityCode, String busStopName)
+    public String 버스정류장_노드_ID_조회(String cityName, String busStopName)
         throws IOException {
+        String cityCode = cityCodeRepository.findByName(cityName)
+            .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
+            .getCode();
+
         // 서울인 경우만 따로 처리
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";

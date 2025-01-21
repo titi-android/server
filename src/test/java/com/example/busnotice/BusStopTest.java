@@ -182,20 +182,6 @@ public class BusStopTest {
 
     @Test
     void 서울_특정_노드_ID에_도착하는_모든_버스들_정보_조회() throws UnsupportedEncodingException {
-//        String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
-//        String encodedNodeId = URLEncoder.encode("03228", StandardCharsets.UTF_8.toString());
-//        String encodedServiceKey = URLEncoder.encode(serviceKey,
-//            StandardCharsets.UTF_8.toString());
-//        URI uri = URI.create(
-//            String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
-//                encodedServiceKey, encodedNodeId));
-//
-//        // WebClient 호출
-//        SeoulBusStationArriveResponse result = webClient.get().uri(uri).retrieve()
-//            .bodyToMono(SeoulBusStationArriveResponse.class).block();
-//        List<SeoulBusStationArriveResponse.Item> itemList = result.getMsgBody().getItemList();
-//        System.out.println("result.toString() = " + result.toString());
-
         String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
         String encodedNodeId = URLEncoder.encode("03228", StandardCharsets.UTF_8.toString());
         String encodedServiceKey = URLEncoder.encode(serviceKey,
