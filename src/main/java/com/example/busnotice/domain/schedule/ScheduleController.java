@@ -92,11 +92,12 @@ public class ScheduleController {
     @GetMapping("/v2/schedules/today")
     @Operation(
         summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
-        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환"
     )
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfTodayV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws UnsupportedEncodingException {
+        System.out.println("DayConverter.getTodayAsString() = " + DayConverter.getTodayAsString());
         List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
             userDetails.getId(), DayConverter.getTodayAsString());
         String msg = scheduleResponsesList.isEmpty()
@@ -108,7 +109,7 @@ public class ScheduleController {
     @GetMapping("/v2/schedules/days")
     @Operation(
         summary = "특정 요일의 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
-        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+        description = "오늘 스케줄이 없는 경우 빈 리스트를 반환"
     )
     public ApiResponse<List<ScheduleResponses>> getAllSchedulesOfDaysV2(
         @RequestParam("days") String days,
@@ -125,7 +126,7 @@ public class ScheduleController {
     @GetMapping("/v1/schedules/now")
     @Operation(
         summary = "현재 스케줄의 가장 빠른 버스 정보 조회",
-        description = "현재 스케줄이 없는 경우 null 을 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+        description = "현재 스케줄이 없는 경우 null 을 반환"
     )
     public ApiResponse<ScheduleResponse> getCurrentSchedule(
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -141,7 +142,7 @@ public class ScheduleController {
     @GetMapping("/v2/schedules/now")
     @Operation(
         summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
-        description = "현재 스케줄이 없는 경우 null 을 반환, startTime, endTime 은 실제로는 배열 형식 [hour, minute]"
+        description = "현재 스케줄이 없는 경우 null 을 반환"
     )
     public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
         @AuthenticationPrincipal CustomUserDetails userDetails
