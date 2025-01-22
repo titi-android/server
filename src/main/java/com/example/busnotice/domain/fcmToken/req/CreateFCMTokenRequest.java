@@ -7,7 +7,7 @@ public record CreateFCMTokenRequest(
     String token
 ) {
 
-    private FCMToken toEntity(User user) {
+    public FCMToken toEntity(User user) {
         return new FCMToken(user, this.token);
     }
 }

@@ -1,21 +1,27 @@
 package com.example.busnotice.domain.fcmToken;
 
 import com.example.busnotice.domain.fcmToken.req.CreateFCMTokenRequest;
+import com.example.busnotice.domain.schedule.ScheduleService;
+import com.example.busnotice.domain.schedule.res.ScheduleResponses;
+import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.SendResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +33,7 @@ public class FCMService {
 
     private final FCMRepository fcmRepository;
     private final UserRepository userRepository;
+    private final ScheduleService scheduleService;
 
     @Transactional
     public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
@@ -35,49 +42,86 @@ public class FCMService {
         );
 
         Optional<FCMToken> optionalFCMToken = fcmRepository.findByUser(user);
-        // 기존 토큰 존재하는 경우
+        // 기존 토큰 존재하는 경우 업데이트
         if (optionalFCMToken.isPresent()) {
             FCMToken fcmToken = optionalFCMToken.get();
             fcmToken.update(createFCMTokenRequest.token());
             return;
         }
-        // 그렇지 않은 경우
-        fcmRepository.save(new FCMToken(user, createFCMTokenRequest.token()));
+        // 그렇지 않은 경우 새로 생성
+        fcmRepository.save(createFCMTokenRequest.toEntity(user));
     }
 
-    public void sendNotification(String token) {
+    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
+    public void sendNotification() throws UnsupportedEncodingException {
+        List<FCMToken> allTokens = fcmRepository.findAll();
+        List<UserNotificationData> notifications = new ArrayList<>();
 
-        Map<String, String> data = new HashMap<>();
-        data.put("test title", String.valueOf("test content")); // 이상 상황(Info) ID
+        for (FCMToken token : allTokens) {
+            ScheduleResponses sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
+                token.getUser().getId());
 
-        // FCM에 보낼 메시지 빌드
-        MulticastMessage fcmMessage = MulticastMessage.builder()
-            .addToken(token)
-            .putAllData(data) // 추가 데이터
-            .build();
+            if (sr != null) {
+                BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0) : new BusInfoDto(0, 0, "", "", "", "", "", "");
+                BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1) : new BusInfoDto(0, 0, "", "", "", "", "", "");
 
-        log.info("fcmMessage: {}", fcmMessage);
+                notifications.add(new UserNotificationData(
+                    token.getToken(),
+                    sr.name(),
+                    sr.days(),
+                    sr.busStopName(),
+                    fb.routeno(), fb.arrprevstationcnt(), fb.arrprevstationcnt(),
+                    sb.routeno(), sb.arrprevstationcnt(), sb.arrprevstationcnt()));
+            }
+        }
+
+        if (notifications.isEmpty()) {
+            log.warn("보낼 FCM 토큰이 없습니다. 알림 전송을 중단합니다.");
+            return;
+        }
+
+        Map<String, Message> tokenToMessageMap = notifications.stream()
+            .collect(Collectors.toMap(
+                UserNotificationData::token,
+                notification -> Message.builder()
+                    .setToken(notification.token())
+                    .putData("scheduleName", notification.scheduleName())
+                    .putData("days", notification.days())
+                    .putData("busStopName", notification.busStopName())
+                    .putData("firstBusName", notification.firstBusName())
+                    .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))
+                    .putData("firstArrTime", String.valueOf(notification.firstArrTime()))
+                    .putData("secondBusName", notification.secondBusName())
+                    .putData("secondArrPrevStCnt", String.valueOf(notification.secondArrPrevStCnt()))
+                    .putData("secondArrTime", String.valueOf(notification.secondArrTime()))
+                    .build(),
+                (existing, replacement) -> existing
+            ));
+
         try {
-            // 메시지 전송
-            BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(fcmMessage);
-            List<String> successfulIds = new ArrayList<>();
-            List<String> failedIds = new ArrayList<>();
+            BatchResponse response = FirebaseMessaging.getInstance().sendAll(new ArrayList<>(tokenToMessageMap.values()));
 
-            for (SendResponse sendResponse : response.getResponses()) {
+            List<String> successfulTokens = new ArrayList<>();
+            List<String> failedTokens = new ArrayList<>();
+            List<String> tokenList = new ArrayList<>(tokenToMessageMap.keySet());
+
+            for (int i = 0; i < response.getResponses().size(); i++) {
+                SendResponse sendResponse = response.getResponses().get(i);
                 if (sendResponse.isSuccessful()) {
-                    successfulIds.add(sendResponse.getMessageId());
+                    successfulTokens.add(tokenList.get(i));
                 } else {
-                    failedIds.add(sendResponse.getException().getMessage());
+                    failedTokens.add(tokenList.get(i) + " - " + sendResponse.getException().getMessage());
                 }
             }
 
-            System.out.println(
-                "Successfully sent messages with IDs: " + String.join(", ", successfulIds));
-            if (!failedIds.isEmpty()) {
-                System.err.println("Failed to send messages: " + String.join(", ", failedIds));
+            log.info("메시지 전송 성공: {}개", successfulTokens.size());
+            if (!failedTokens.isEmpty()) {
+                log.error("메시지 전송 실패: {}", String.join(", ", failedTokens));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FirebaseMessagingException e) {
+            log.error("FCM 메시지 전송 실패 - 전체 실패 발생", e);
         }
     }
+
+
 }

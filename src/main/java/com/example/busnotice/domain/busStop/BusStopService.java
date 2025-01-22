@@ -34,7 +34,7 @@ public class BusStopService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final CityCodeRepository cityCodeRepository;
 
-    @Cacheable(value = "cityCodes", key = "#p0")
+//    @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_API_조회(String cityName) throws UnsupportedEncodingException {
         // 서울인 경우만 따로 처리
         if (cityName.contains("서울")) {

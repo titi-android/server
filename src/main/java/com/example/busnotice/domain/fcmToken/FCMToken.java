@@ -19,7 +19,7 @@ public class FCMToken {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(unique = true, name = "user_id")
     private User user;
 
     @Column
