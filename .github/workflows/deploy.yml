@@ -27,6 +27,9 @@ jobs:
           cat src/main/resources/application.yaml
         shell: bash
 
+      - name: Create Firebase Directory
+        run: mkdir -p src/main/resources/firebase
+
       - name: Create Firebase service account file
         uses: jsdaniell/create-json@v1.2.3
         with:
