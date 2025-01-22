@@ -40,4 +40,4 @@ out/
 application.properties
 
 ### firebase
-firebase_service_key.json
+firebase-service-key.json

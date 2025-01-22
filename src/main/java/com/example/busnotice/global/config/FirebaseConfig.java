@@ -15,7 +15,7 @@ public class FirebaseConfig {
     public FirebaseApp firebaseApp() throws IOException {
         // 클래스패스에서 파일을 읽어옵니다.
         ClassPathResource serviceAccountResource = new ClassPathResource(
-            "firebase/firebase_service_key.json");
+            "firebase/firebase-service-key.json");
 
         // 리소스를 InputStream으로 읽어옵니다.
         GoogleCredentials credentials = GoogleCredentials.fromStream(

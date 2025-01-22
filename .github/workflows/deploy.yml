@@ -27,6 +27,13 @@ jobs:
           cat src/main/resources/application.yaml
         shell: bash
 
+      - name: Create Firebase service account file
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "firebase-service-key.json"
+          json: ${{ secrets.FIREBASE_SERVICE_KEY }}
+          dir: "src/main/resources/firebase"
+
       - name: Grant execute permission for Gradle Wrapper
         run: chmod +x ./gradlew
 
