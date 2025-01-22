@@ -52,16 +52,19 @@ public class FCMService {
         fcmRepository.save(createFCMTokenRequest.toEntity(user));
     }
 
-    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
+//    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
+//    @Transactional(readOnly = true)  // 트랜잭션 적용
     public void sendNotification() throws UnsupportedEncodingException {
         List<FCMToken> allTokens = fcmRepository.findAll();
         List<UserNotificationData> notifications = new ArrayList<>();
 
         for (FCMToken token : allTokens) {
+            log.info("토큰의 유저 이름: {}", token.getUser().getName());
             ScheduleResponses sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
                 token.getUser().getId());
 
             if (sr != null) {
+                log.info("{} 의 현재 스케줄이 존재합니다: {}", token.getUser().getName(), sr);
                 BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0) : new BusInfoDto(0, 0, "", "", "", "", "", "");
                 BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1) : new BusInfoDto(0, 0, "", "", "", "", "", "");
 
@@ -72,6 +75,9 @@ public class FCMService {
                     sr.busStopName(),
                     fb.routeno(), fb.arrprevstationcnt(), fb.arrprevstationcnt(),
                     sb.routeno(), sb.arrprevstationcnt(), sb.arrprevstationcnt()));
+            }
+            else{
+                log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
             }
         }
 
