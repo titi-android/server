@@ -52,8 +52,8 @@ public class FCMService {
         fcmRepository.save(createFCMTokenRequest.toEntity(user));
     }
 
-//    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
-//    @Transactional(readOnly = true)  // 트랜잭션 적용
+    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
+    @Transactional(readOnly = true)  // 트랜잭션 적용
     public void sendNotification() throws UnsupportedEncodingException {
         List<FCMToken> allTokens = fcmRepository.findAll();
         List<UserNotificationData> notifications = new ArrayList<>();
@@ -65,8 +65,10 @@ public class FCMService {
 
             if (sr != null) {
                 log.info("{} 의 현재 스케줄이 존재합니다: {}", token.getUser().getName(), sr);
-                BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0) : new BusInfoDto(0, 0, "", "", "", "", "", "");
-                BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1) : new BusInfoDto(0, 0, "", "", "", "", "", "");
+                BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0)
+                    : new BusInfoDto(0, 0, "", "", "", "", "", "");
+                BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1)
+                    : new BusInfoDto(0, 0, "", "", "", "", "", "");
 
                 notifications.add(new UserNotificationData(
                     token.getToken(),
@@ -75,8 +77,8 @@ public class FCMService {
                     sr.busStopName(),
                     fb.routeno(), fb.arrprevstationcnt(), fb.arrprevstationcnt(),
                     sb.routeno(), sb.arrprevstationcnt(), sb.arrprevstationcnt()));
-            }
-            else{
+                System.out.println("sb = " + sb.toString());
+            } else {
                 log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
             }
         }
@@ -95,17 +97,23 @@ public class FCMService {
                     .putData("days", notification.days()) // 요일 ex) 월요일
                     .putData("busStopName", notification.busStopName()) // 버스정류장 이름
                     .putData("firstBusName", notification.firstBusName()) // 첫번째 도착 예정 버스 이름(없으면 "")
-                    .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))  // 잔여 정류장 수
-                    .putData("firstArrTime", String.valueOf(notification.firstArrTime())) // 예정 도착 소요 시간(초 단위)
-                    .putData("secondBusName", notification.secondBusName()) // 두번째 도착 예정 버스 이름(없으면 "")
-                    .putData("secondArrPrevStCnt", String.valueOf(notification.secondArrPrevStCnt())) // 잔여 정류장 수
-                    .putData("secondArrTime", String.valueOf(notification.secondArrTime())) // 예정 도착 소요 시간(초 단위)
+                    .putData("firstArrPrevStCnt",
+                        String.valueOf(notification.firstArrPrevStCnt()))  // 잔여 정류장 수
+                    .putData("firstArrTime",
+                        String.valueOf(notification.firstArrTime())) // 예정 도착 소요 시간(초 단위)
+                    .putData("secondBusName",
+                        notification.secondBusName()) // 두번째 도착 예정 버스 이름(없으면 "")
+                    .putData("secondArrPrevStCnt",
+                        String.valueOf(notification.secondArrPrevStCnt())) // 잔여 정류장 수
+                    .putData("secondArrTime",
+                        String.valueOf(notification.secondArrTime())) // 예정 도착 소요 시간(초 단위)
                     .build(),
                 (existing, replacement) -> existing
             ));
 
         try {
-            BatchResponse response = FirebaseMessaging.getInstance().sendAll(new ArrayList<>(tokenToMessageMap.values()));
+            BatchResponse response = FirebaseMessaging.getInstance()
+                .sendAll(new ArrayList<>(tokenToMessageMap.values()));
 
             List<String> successfulTokens = new ArrayList<>();
             List<String> failedTokens = new ArrayList<>();
@@ -116,7 +124,8 @@ public class FCMService {
                 if (sendResponse.isSuccessful()) {
                     successfulTokens.add(tokenList.get(i));
                 } else {
-                    failedTokens.add(tokenList.get(i) + " - " + sendResponse.getException().getMessage());
+                    failedTokens.add(
+                        tokenList.get(i) + " - " + sendResponse.getException().getMessage());
                 }
             }
 

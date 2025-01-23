@@ -11,4 +11,6 @@ public record UserNotificationData(
     String secondBusName,
     int secondArrPrevStCnt,
     int secondArrTime
-) {}
+) {
+
+}

@@ -38,7 +38,7 @@ public class Schedule {
 
     @Column(nullable = false)
     private String days; // 요일
-    
+
     @Column(nullable = false)
     private String regionName; // 지역 이름
 
@@ -53,7 +53,8 @@ public class Schedule {
     @OneToOne(cascade = CascadeType.REMOVE)
     private BusStop busStop;
 
-    public Schedule(User user, String scheduleName, String days, String regionName, LocalTime startTime,
+    public Schedule(User user, String scheduleName, String days, String regionName,
+        LocalTime startTime,
         LocalTime endTime, BusStop busStop) {
         this.user = user;
         this.name = scheduleName;
@@ -78,14 +79,6 @@ public class Schedule {
     ) {
         return new Schedule(
             user, scheduleName, days, regionName, startTime, endTime, busStop
-        );
-    }
-
-    public ScheduleInfoResponse toInfoResponse(BusStop busStop) {
-        return new ScheduleInfoResponse(
-            this.id, this.name, this.days, this.startTime, this.endTime,
-            busStop.getName(),
-            busStop.getBusList().stream().map(Bus::getName).toList()
         );
     }
 

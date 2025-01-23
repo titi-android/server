@@ -75,7 +75,7 @@ public class ScheduleService {
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId, userId)
             .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
-        return schedule.toInfoResponse(schedule.getBusStop());
+        return ScheduleInfoResponse.fromEntity(schedule);
     }
 
     @Transactional
@@ -143,7 +143,7 @@ public class ScheduleService {
         List<String> busNames = getBusNames(busStop);
         Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(currentSchedule.getRegionName(),
             busStop.getNodeId(), busNames);
-        if(fastestBus == null){
+        if (fastestBus == null) {
             return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
                 currentSchedule.getDays(),
                 currentSchedule.getStartTime(),

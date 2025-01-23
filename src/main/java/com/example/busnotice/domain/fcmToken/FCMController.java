@@ -19,7 +19,7 @@ public class FCMController {
     public ApiResponse<String> createFCMToken(
         @RequestBody CreateFCMTokenRequest createFCMTokenRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
+    ) {
         fcmService.createFCMToken(userDetails.getId(), createFCMTokenRequest);
         return ApiResponse.createSuccess("FCM 토큰이 등록되었습니다.");
     }

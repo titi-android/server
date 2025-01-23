@@ -7,7 +7,6 @@ import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
 import com.example.busnotice.domain.busStop.BusStopService;
-import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import java.io.UnsupportedEncodingException;

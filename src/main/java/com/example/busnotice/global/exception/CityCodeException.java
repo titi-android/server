@@ -2,7 +2,7 @@ package com.example.busnotice.global.exception;
 
 import com.example.busnotice.global.code.StatusCode;
 
-public class CityCodeException extends RuntimeException{
+public class CityCodeException extends RuntimeException {
 
 
     private final StatusCode statusCode;
