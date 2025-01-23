@@ -3,6 +3,7 @@ package com.example.busnotice.global.handler;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.BusinessException;
+import com.example.busnotice.global.exception.CityCodeException;
 import com.example.busnotice.global.exception.GeneralException;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
@@ -31,6 +32,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusStopException.class)
     public ApiResponse<Void> busStopException(BusStopException e) {
+        return ApiResponse.createFail(e.getStatusCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(CityCodeException.class)
+    public ApiResponse<Void> CityCodeException(CityCodeException e) {
         return ApiResponse.createFail(e.getStatusCode(), e.getMessage());
     }
 

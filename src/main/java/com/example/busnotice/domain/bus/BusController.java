@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.bus;
 
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
+import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BusController {
 
     private final BusService busService;
+    private final CityCodeRepository cityCodeRepository;
 
     @Operation(
         summary = "특정 노드에 도착 예정인 모든 버스 정보 조회",
@@ -27,10 +29,10 @@ public class BusController {
     )
     @GetMapping("/node/arrive/info")
     public ApiResponse<List<Item>> getNodeArriveInfo(
-        @RequestParam("cityCode") String cityCode, // 도시 코드
+        @RequestParam("cityName") String cityName, // 도시 코드
         @RequestParam("nodeId") String nodeId // 노드 ID
     ) throws UnsupportedEncodingException {
-        List<Item> items = busService.특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityCode, nodeId);
+        List<Item> items = busService.특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityName, nodeId);
         String msg = items.isEmpty()
             ? "현재 도착 예정인 버스가 존재하지 않습니다."
             : "현재 도착 예정인 버스가 존재합니다.";
@@ -51,21 +53,21 @@ public class BusController {
     @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름 조회")
     @GetMapping("/node/bus-names/all")
     public List<String> getBusNamesOfNode(
-        @RequestParam("cityCode") String cityCode,
+        @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId
     ) throws UnsupportedEncodingException {
-        List<String> busNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityCode, nodeId);
+        List<String> busNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
         return busNames;
     }
 
     @Operation(summary = "특정 노드를 경유하는 버스들이 맞는지 확인")
     @GetMapping("/node/bus-names/check")
     public ApiResponse<String> getBusNamesOfNode(
-        @RequestParam("cityCode") String cityCode,
+        @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId,
         @RequestParam("routeNo") List<String> busList
     ) throws UnsupportedEncodingException {
-        List<String> allBusNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityCode, nodeId);
+        List<String> allBusNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
         boolean isValid = allBusNames.containsAll(busList.stream().map(String::trim).toList());
         return isValid
             ? ApiResponse.createSuccess("올바른 버스 목록입니다.")

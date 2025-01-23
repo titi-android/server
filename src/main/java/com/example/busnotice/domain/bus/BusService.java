@@ -6,13 +6,14 @@ import com.example.busnotice.domain.bus.res.BusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
+import com.example.busnotice.domain.busStop.BusStopService;
+import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -34,9 +35,11 @@ public class BusService {
     private String serviceKey;
 
     private final WebClient webClient;
+    private final BusStopService busStopService;
 
-    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityCode, String nodeId)
+    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityName, String nodeId)
         throws UnsupportedEncodingException {
+        String cityCode = busStopService.도시코드_DB_조회(cityName);
         // 서울의 경우는 따로 처리
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
@@ -114,9 +117,10 @@ public class BusService {
     }
 
     @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
-    public List<String> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityCode, String nodeId)
+    public List<String> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId)
         throws UnsupportedEncodingException {
-        log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityCode, nodeId);
+        log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityName, nodeId);
+        String cityCode = busStopService.도시코드_DB_조회(cityName);
 
         // 서울인 경우만 따로 처리
         if (cityCode.equals("11")) {

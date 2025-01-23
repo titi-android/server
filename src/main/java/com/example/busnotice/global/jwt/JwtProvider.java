@@ -19,7 +19,7 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final Long validityInSecs = 3600000L; // 1h
+    private final Long validityInSecs = 86400000L; // 1일 (24시간)
     private final CustomUserDetailsService customUserDetailsService;
 
     public String createToken(String username) {

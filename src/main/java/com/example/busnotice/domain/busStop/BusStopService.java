@@ -87,6 +87,7 @@ public class BusStopService {
         String cityCode = cityCodeRepository.findByName(cityName.trim())
             .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
             .getCode();
+
         return cityCode;
     }
 
