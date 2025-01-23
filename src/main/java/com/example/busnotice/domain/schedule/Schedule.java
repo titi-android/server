@@ -38,6 +38,9 @@ public class Schedule {
 
     @Column(nullable = false)
     private String days; // 요일
+    
+    @Column(nullable = false)
+    private String regionName; // 지역 이름
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "HH:mm")
@@ -50,11 +53,12 @@ public class Schedule {
     @OneToOne(cascade = CascadeType.REMOVE)
     private BusStop busStop;
 
-    public Schedule(User user, String scheduleName, String days, LocalTime startTime,
+    public Schedule(User user, String scheduleName, String days, String regionName, LocalTime startTime,
         LocalTime endTime, BusStop busStop) {
         this.user = user;
         this.name = scheduleName;
         this.days = days;
+        this.regionName = regionName;
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
@@ -67,12 +71,13 @@ public class Schedule {
         User user,
         String scheduleName,
         String days,
+        String regionName,
         LocalTime startTime,
         LocalTime endTime,
         BusStop busStop
     ) {
         return new Schedule(
-            user, scheduleName, days, startTime, endTime, busStop
+            user, scheduleName, days, regionName, startTime, endTime, busStop
         );
     }
 

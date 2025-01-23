@@ -68,7 +68,7 @@ public class ScheduleTest {
         busRepository.saveAll(busList);
         // 스케줄 생성 후 생성한 버스 정류장 등록
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
-            createScheduleRequest.days(),
+            createScheduleRequest.days(), createScheduleRequest.regionName(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         Schedule savedSchedule = scheduleRepository.save(schedule);
         System.out.println("savedSchedule = " + savedSchedule);

@@ -67,7 +67,7 @@ public class ScheduleService {
         busRepository.saveAll(buses);
         // 스케줄 생성 후 생성한 버스 정류장 등록
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
-            createScheduleRequest.days(),
+            createScheduleRequest.days(), createScheduleRequest.regionName(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         scheduleRepository.save(schedule);
     }
@@ -141,7 +141,7 @@ public class ScheduleService {
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
         List<String> busNames = getBusNames(busStop);
-        Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(busStop.getCityCode(),
+        Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(currentSchedule.getRegionName(),
             busStop.getNodeId(), busNames);
         if(fastestBus == null){
             return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
@@ -168,7 +168,8 @@ public class ScheduleService {
         BusStop busStop = currentSchedule.getBusStop();
         // 현재 스케줄의 버스정류장에 등록된 버스들
         List<String> busNames = getBusNames(busStop);
-        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(busStop.getCityCode(),
+        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
+            currentSchedule.getRegionName(),
             busStop.getNodeId(),
             busNames);
         // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
@@ -194,7 +195,7 @@ public class ScheduleService {
         List<ScheduleResponse> scheduleResponses = new ArrayList<>();
         for (Schedule s : schedules) {
             List<String> busNames = getBusNames(s.getBusStop());
-            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getBusStop().getCityCode(),
+            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getRegionName(),
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
                 item.toScheduleResponse(s.getId(), s.getName(), s.getDays(), s.getStartTime(),
@@ -213,7 +214,7 @@ public class ScheduleService {
         for (Schedule s : schedules) {
             List<String> busNames = getBusNames(s.getBusStop());
             List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
-                s.getBusStop().getCityCode(),
+                s.getRegionName(),
                 s.getBusStop().getNodeId(), busNames);
 
             // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬

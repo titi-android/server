@@ -91,15 +91,15 @@ public class FCMService {
                 UserNotificationData::token,
                 notification -> Message.builder()
                     .setToken(notification.token())
-                    .putData("scheduleName", notification.scheduleName())
-                    .putData("days", notification.days())
-                    .putData("busStopName", notification.busStopName())
-                    .putData("firstBusName", notification.firstBusName())
-                    .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))
-                    .putData("firstArrTime", String.valueOf(notification.firstArrTime()))
-                    .putData("secondBusName", notification.secondBusName())
-                    .putData("secondArrPrevStCnt", String.valueOf(notification.secondArrPrevStCnt()))
-                    .putData("secondArrTime", String.valueOf(notification.secondArrTime()))
+                    .putData("scheduleName", notification.scheduleName()) // 스케줄 이름
+                    .putData("days", notification.days()) // 요일 ex) 월요일
+                    .putData("busStopName", notification.busStopName()) // 버스정류장 이름
+                    .putData("firstBusName", notification.firstBusName()) // 첫번째 도착 예정 버스 이름(없으면 "")
+                    .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))  // 잔여 정류장 수
+                    .putData("firstArrTime", String.valueOf(notification.firstArrTime())) // 예정 도착 소요 시간(초 단위)
+                    .putData("secondBusName", notification.secondBusName()) // 두번째 도착 예정 버스 이름(없으면 "")
+                    .putData("secondArrPrevStCnt", String.valueOf(notification.secondArrPrevStCnt())) // 잔여 정류장 수
+                    .putData("secondArrTime", String.valueOf(notification.secondArrTime())) // 예정 도착 소요 시간(초 단위)
                     .build(),
                 (existing, replacement) -> existing
             ));

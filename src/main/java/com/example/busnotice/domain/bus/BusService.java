@@ -87,9 +87,9 @@ public class BusService {
         return Collections.emptyList();
     }
 
-    public List<Item> 특정_노드_ID에_도착하는_특정_버스들_정보_조회(String cityCode, String nodeId,
+    public List<Item> 특정_노드_ID에_도착하는_특정_버스들_정보_조회(String cityName, String nodeId,
         List<String> busList) throws UnsupportedEncodingException {
-        List<Item> items = 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityCode, nodeId);
+        List<Item> items = 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityName, nodeId);
         System.out.println("items = " + items);
         // 특정 routeno 에 해당하는 item 필터링
         List<BusArrInfosDto.Item> filteredItems = items.stream()
@@ -99,18 +99,18 @@ public class BusService {
         return filteredItems;
     }
 
-    public Item 특정_노드_ID에_가장_빨리_도착하는_버스_조회(String cityCode, String nodeId, List<String> busList)
+    public Item 특정_노드_ID에_가장_빨리_도착하는_버스_조회(String cityName, String nodeId, List<String> busList)
         throws UnsupportedEncodingException {
-        List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityCode, nodeId, busList);
+        List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityName, nodeId, busList);
         Item fastestBus = items.stream()
             .min(Comparator.comparingInt(Item::getArrtime)) // arrtime 기준으로 최소값 찾기
             .orElse(null);
         return fastestBus;
     }
 
-    public List<Item> 특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(String cityCode, String nodeId,
+    public List<Item> 특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(String cityName, String nodeId,
         List<String> busList) throws UnsupportedEncodingException {
-        List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityCode, nodeId, busList);
+        List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityName, nodeId, busList);
         List<Item> sortedItems = items.stream().sorted(Comparator.comparingInt(Item::getArrtime))
             .collect(Collectors.toList());
         return sortedItems.stream().limit(2).collect(Collectors.toList());
