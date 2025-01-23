@@ -95,7 +95,7 @@ public class ScheduleService {
         // 도시 코드
         String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
         // 수정한 스케줄상의 버스 정류장의 node id
-        String newNodeId = busStopService.버스정류장_노드_ID_조회(cityCode,
+        String newNodeId = busStopService.버스정류장_노드_ID_조회(updateScheduleRequest.regionName(),
             updateScheduleRequest.busStopName());
         // 스케줄상의 기존 버스 정류장 엔티티
         BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();

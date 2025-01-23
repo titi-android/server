@@ -75,9 +75,11 @@ public class FCMService {
                     sr.name(),
                     sr.days(),
                     sr.busStopName(),
-                    fb.routeno(), fb.arrprevstationcnt(), fb.arrprevstationcnt(),
-                    sb.routeno(), sb.arrprevstationcnt(), sb.arrprevstationcnt()));
-                System.out.println("sb = " + sb.toString());
+                    fb.routeno(), fb.arrprevstationcnt(), fb.arrtime(),
+                    sb.routeno(), sb.arrprevstationcnt(), sb.arrtime()));
+                for (UserNotificationData notification : notifications) {
+                    System.out.println("notification = " + notification);
+                }
             } else {
                 log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
             }
