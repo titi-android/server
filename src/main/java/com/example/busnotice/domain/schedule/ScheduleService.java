@@ -71,6 +71,7 @@ public class ScheduleService {
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
             createScheduleRequest.days(), createScheduleRequest.regionName(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
+        System.out.println("schedule.toString() = " + schedule.toString());
         scheduleRepository.save(schedule);
     }
 
