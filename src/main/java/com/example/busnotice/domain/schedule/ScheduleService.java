@@ -72,7 +72,11 @@ public class ScheduleService {
             createScheduleRequest.days(), createScheduleRequest.regionName(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
         System.out.println("schedule.toString() = " + schedule.toString());
-        scheduleRepository.save(schedule);
+        log.info("schedule.toString(): {}", schedule);
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        System.out.println("savedSchedule = " + savedSchedule);
+        log.info("savedSchedule.toString(): {}", savedSchedule);
+
     }
 
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
