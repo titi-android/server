@@ -4,6 +4,7 @@ import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,12 +43,12 @@ public class Schedule {
     @Column(nullable = false)
     private String regionName; // 지역 이름
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "HH:mm")
+    @Column(columnDefinition = "TIME", nullable = false)
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "HH:mm")
+    @Column(columnDefinition = "TIME", nullable = false)
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     @OneToOne(cascade = CascadeType.REMOVE)
