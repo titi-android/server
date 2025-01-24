@@ -76,68 +76,122 @@ public class FCMService {
                     sr.days(),
                     sr.busStopName(),
                     fb.routeno(), fb.arrprevstationcnt(), fb.arrtime(),
-                    sb.routeno(), sb.arrprevstationcnt(), sb.arrtime()));
-                for (UserNotificationData notification : notifications) {
-                    System.out.println("notification = " + notification);
-                }
+                    sb.routeno(), sb.arrprevstationcnt(), sb.arrtime()
+                ));
             } else {
                 log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
             }
         }
 
         if (notifications.isEmpty()) {
-            log.warn("보낼 FCM 토큰이 없습니다. 알림 전송을 중단합니다.");
+            log.warn("현재 시간대의 스케줄을 보유한 유저가 존재하지 않습니다. 알림 전송을 중단합니다.");
             return;
         }
 
-        Map<String, Message> tokenToMessageMap = notifications.stream()
-            .collect(Collectors.toMap(
-                UserNotificationData::token,
-                notification -> Message.builder()
-                    .setToken(notification.token())
-                    .putData("scheduleName", notification.scheduleName()) // 스케줄 이름
-                    .putData("days", notification.days()) // 요일 ex) 월요일
-                    .putData("busStopName", notification.busStopName()) // 버스정류장 이름
-                    .putData("firstBusName", notification.firstBusName()) // 첫번째 도착 예정 버스 이름(없으면 "")
-                    .putData("firstArrPrevStCnt",
-                        String.valueOf(notification.firstArrPrevStCnt()))  // 잔여 정류장 수
-                    .putData("firstArrTime",
-                        String.valueOf(notification.firstArrTime())) // 예정 도착 소요 시간(초 단위)
-                    .putData("secondBusName",
-                        notification.secondBusName()) // 두번째 도착 예정 버스 이름(없으면 "")
-                    .putData("secondArrPrevStCnt",
-                        String.valueOf(notification.secondArrPrevStCnt())) // 잔여 정류장 수
-                    .putData("secondArrTime",
-                        String.valueOf(notification.secondArrTime())) // 예정 도착 소요 시간(초 단위)
-                    .build(),
-                (existing, replacement) -> existing
-            ));
+        for (UserNotificationData notification : notifications) {
+            Message message = Message.builder()
+                .setToken(notification.token())
+                .putData("scheduleName", notification.scheduleName())
+                .putData("days", notification.days())
+                .putData("busStopName", notification.busStopName())
+                .putData("firstBusName", notification.firstBusName())
+                .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))
+                .putData("firstArrTime", String.valueOf(notification.firstArrTime()))
+                .putData("secondBusName", notification.secondBusName())
+                .putData("secondArrPrevStCnt", String.valueOf(notification.secondArrPrevStCnt()))
+                .putData("secondArrTime", String.valueOf(notification.secondArrTime()))
+                .build();
 
-        try {
-            BatchResponse response = FirebaseMessaging.getInstance()
-                .sendAll(new ArrayList<>(tokenToMessageMap.values()));
-
-            List<String> successfulTokens = new ArrayList<>();
-            List<String> failedTokens = new ArrayList<>();
-            List<String> tokenList = new ArrayList<>(tokenToMessageMap.keySet());
-
-            for (int i = 0; i < response.getResponses().size(); i++) {
-                SendResponse sendResponse = response.getResponses().get(i);
-                if (sendResponse.isSuccessful()) {
-                    successfulTokens.add(tokenList.get(i));
-                } else {
-                    failedTokens.add(
-                        tokenList.get(i) + " - " + sendResponse.getException().getMessage());
-                }
+            try {
+                String response = FirebaseMessaging.getInstance().send(message);
+                log.info("메시지 전송 성공: {}, 토큰: {}", response, notification.token());
+            } catch (FirebaseMessagingException e) {
+                log.error("메시지 전송 실패: {}, 토큰: {}", e.getMessage(), notification.token());
             }
-
-            log.info("메시지 전송 성공: {}개", successfulTokens.size());
-            if (!failedTokens.isEmpty()) {
-                log.error("메시지 전송 실패: {}", String.join(", ", failedTokens));
-            }
-        } catch (FirebaseMessagingException e) {
-            log.error("FCM 메시지 전송 실패 - 전체 실패 발생", e);
         }
+//        List<FCMToken> allTokens = fcmRepository.findAll();
+//        List<UserNotificationData> notifications = new ArrayList<>();
+//
+//        for (FCMToken token : allTokens) {
+//            log.info("토큰의 유저 이름: {}", token.getUser().getName());
+//            ScheduleResponses sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
+//                token.getUser().getId());
+//
+//            if (sr != null) {
+//                log.info("{} 의 현재 스케줄이 존재합니다: {}", token.getUser().getName(), sr);
+//                BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0)
+//                    : new BusInfoDto(0, 0, "", "", "", "", "", "");
+//                BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1)
+//                    : new BusInfoDto(0, 0, "", "", "", "", "", "");
+//
+//                notifications.add(new UserNotificationData(
+//                    token.getToken(),
+//                    sr.name(),
+//                    sr.days(),
+//                    sr.busStopName(),
+//                    fb.routeno(), fb.arrprevstationcnt(), fb.arrtime(),
+//                    sb.routeno(), sb.arrprevstationcnt(), sb.arrtime()));
+//                for (UserNotificationData notification : notifications) {
+//                    System.out.println("notification = " + notification);
+//                }
+//            } else {
+//                log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
+//            }
+//        }
+//
+//        if (notifications.isEmpty()) {
+//            log.warn("현재 시간의 스케줄을 설정한 유저가 존재하지 않습니다. 알림 전송을 중단합니다.");
+//            return;
+//        }
+//
+//        Map<String, Message> tokenToMessageMap = notifications.stream()
+//            .collect(Collectors.toMap(
+//                UserNotificationData::token,
+//                notification -> Message.builder()
+//                    .setToken(notification.token())
+//                    .putData("scheduleName", notification.scheduleName()) // 스케줄 이름
+//                    .putData("days", notification.days()) // 요일 ex) 월요일
+//                    .putData("busStopName", notification.busStopName()) // 버스정류장 이름
+//                    .putData("firstBusName", notification.firstBusName()) // 첫번째 도착 예정 버스 이름(없으면 "")
+//                    .putData("firstArrPrevStCnt",
+//                        String.valueOf(notification.firstArrPrevStCnt()))  // 잔여 정류장 수
+//                    .putData("firstArrTime",
+//                        String.valueOf(notification.firstArrTime())) // 예정 도착 소요 시간(초 단위)
+//                    .putData("secondBusName",
+//                        notification.secondBusName()) // 두번째 도착 예정 버스 이름(없으면 "")
+//                    .putData("secondArrPrevStCnt",
+//                        String.valueOf(notification.secondArrPrevStCnt())) // 잔여 정류장 수
+//                    .putData("secondArrTime",
+//                        String.valueOf(notification.secondArrTime())) // 예정 도착 소요 시간(초 단위)
+//                    .build(),
+//                (existing, replacement) -> existing
+//            ));
+//
+//        try {
+//            BatchResponse response = FirebaseMessaging.getInstance()
+//                .sendAll(new ArrayList<>(tokenToMessageMap.values()));
+//
+//            List<String> successfulTokens = new ArrayList<>();
+//            List<String> failedTokens = new ArrayList<>();
+//            List<String> tokenList = new ArrayList<>(tokenToMessageMap.keySet());
+//
+//            for (int i = 0; i < response.getResponses().size(); i++) {
+//                SendResponse sendResponse = response.getResponses().get(i);
+//                if (sendResponse.isSuccessful()) {
+//                    successfulTokens.add(tokenList.get(i));
+//                } else {
+//                    failedTokens.add(
+//                        tokenList.get(i) + " - " + sendResponse.getException().getMessage());
+//                }
+//            }
+//
+//            log.info("메시지 전송 성공: {}개", successfulTokens.size());
+//            if (!failedTokens.isEmpty()) {
+//                log.error("메시지 전송 실패: {}", String.join(", ", failedTokens));
+//            }
+//        } catch (FirebaseMessagingException e) {
+//            log.error("FCM 메시지 전송 실패 - 전체 실패 발생", e);
+//        }
     }
 
 

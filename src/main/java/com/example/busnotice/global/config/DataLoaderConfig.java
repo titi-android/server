@@ -159,6 +159,7 @@ public class DataLoaderConfig {
                     cityCodeRepository.save(cityCode);
                 }
             });
+            // TODO 배치 처리
         };
     }
 }

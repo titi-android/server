@@ -79,7 +79,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-admin:8.1.0'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 }
 // Querydsl 설정부
