@@ -4,6 +4,7 @@ import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,5 +36,17 @@ public class BusStopController {
 
         String nodeId = busStopService.버스정류장_노드_ID_조회(cityName, name);
         return ApiResponse.createSuccessWithData(nodeId, "버스정류장 노드 ID 조회에 성공했습니다.");
+    }
+
+    @GetMapping("/node/name")
+    @Operation(summary = "버스정류장 목록 조회")
+    public ApiResponse<List<String>> getNodeNames
+        (
+            @RequestParam("cityName") String cityName, // 도시 이름
+            @RequestParam("name") String name // 정류소 이름
+        ) throws IOException {
+        List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회(cityName,
+            name);
+        return ApiResponse.createSuccessWithData(busNames, "해당 이름을 포함하는 버스정류장 목록 조회에 성공했습니다.");
     }
 }
