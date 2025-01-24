@@ -37,7 +37,8 @@ public class SecurityConfig {
                             "/api/v2/schedules/**",
                             "/api/v1/cityCode",
                             "/api/v1/node/**",
-                            "/api/v1/fcm/**"
+                            "/api/v1/fcm/**",
+                            "/api/v1/test/**"
                         ).permitAll()
                         .anyRequest().authenticated()
             )
