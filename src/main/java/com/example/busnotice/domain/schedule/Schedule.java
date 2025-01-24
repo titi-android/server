@@ -1,8 +1,6 @@
 package com.example.busnotice.domain.schedule;
 
-import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.busStop.BusStop;
-import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
@@ -18,7 +16,6 @@ import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Getter

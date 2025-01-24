@@ -31,10 +31,10 @@ public class BusStopController {
     public ApiResponse<String> getNodeId
         (
             @RequestParam("cityName") String cityName, // 도시 이름
-            @RequestParam("name") String name // 정류소 이름
+            @RequestParam("busStopName") String busStopName // 정류소 이름
         ) throws IOException {
 
-        String nodeId = busStopService.버스정류장_노드_ID_조회(cityName, name);
+        String nodeId = busStopService.버스정류장_노드_ID_조회(cityName, busStopName);
         return ApiResponse.createSuccessWithData(nodeId, "버스정류장 노드 ID 조회에 성공했습니다.");
     }
 
@@ -43,10 +43,10 @@ public class BusStopController {
     public ApiResponse<List<String>> getNodeNames
         (
             @RequestParam("cityName") String cityName, // 도시 이름
-            @RequestParam("name") String name // 정류소 이름
+            @RequestParam("busStopName") String busStopName // 정류소 이름
         ) throws IOException {
         List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회(cityName,
-            name);
+            busStopName);
         return ApiResponse.createSuccessWithData(busNames, "해당 이름을 포함하는 버스정류장 목록 조회에 성공했습니다.");
     }
 }

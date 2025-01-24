@@ -128,11 +128,13 @@ public class BusStopService {
         String encodedCityCode = URLEncoder.encode(cityCode,
             StandardCharsets.UTF_8.toString());
         String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8.toString());
-        String encodedNumOfRows = URLEncoder.encode(String.valueOf(100), StandardCharsets.UTF_8.toString());
+        String encodedNumOfRows = URLEncoder.encode(String.valueOf(100),
+            StandardCharsets.UTF_8.toString());
         String encodedServiceKey = URLEncoder.encode(serviceKey,
             StandardCharsets.UTF_8.toString());
-        URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&numOfRows=%s&_type=json", url,
-            encodedServiceKey, encodedCityCode, encodedName, encodedNumOfRows));
+        URI uri = URI.create(
+            String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&numOfRows=%s&_type=json", url,
+                encodedServiceKey, encodedCityCode, encodedName, encodedNumOfRows));
 
         // WebClient 호출 - 해당 지역의 해당 이름이 포함된 버스정류장을 모두 조회
         BusStopsDto result = webClient.get()

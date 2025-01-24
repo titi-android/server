@@ -1,7 +1,6 @@
 package com.example.busnotice.domain.schedule.res;
 
 import com.example.busnotice.domain.bus.Bus;
-import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.schedule.Schedule;
 import java.time.LocalTime;
 import java.util.List;
