@@ -83,7 +83,7 @@ public class FCMService {
         }
 
         if (notifications.isEmpty()) {
-            log.warn("현재 시간대의 스케줄을 보유한 유저가 존재하지 않습니다. 알림 전송을 중단합니다.");
+            log.warn("현재 시간대의 스케줄을 보유한 유저가 존재하지 않습니다. 알림 전송을 중단합니다..");
             return;
         }
 
