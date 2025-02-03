@@ -38,6 +38,7 @@ out/
 
 ### properties
 application.properties
+application.yml
 
 ### firebase
 firebase-service-key.json

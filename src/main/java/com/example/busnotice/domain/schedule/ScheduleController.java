@@ -78,6 +78,16 @@ public class ScheduleController {
         return ApiResponse.createSuccess("스케줄이 삭제되었습니다.");
     }
 
+    @PutMapping("/v1/schedules/alarm/{scheduleId}")
+    @Operation(summary = "스케줄 알림 여부 수정")
+    public ApiResponse<Void> updateAlarm(
+        @PathVariable("scheduleId") Long scheduleId,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        boolean isAlarmOn = scheduleService.updateAlarm(userDetails.getId(), scheduleId);
+        String msg = isAlarmOn ? "알림이 켜졌습니다." : "알림이 꺼졌습니다.";
+        return ApiResponse.createSuccess(msg);
+    }
 
     //    @GetMapping("/v1/schedules/today")
     @Operation(summary = "오늘 모든 스케줄의 가장 빠른 버스 정보 조회")

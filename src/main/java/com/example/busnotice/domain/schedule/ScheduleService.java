@@ -296,4 +296,12 @@ public class ScheduleService {
         return busStop.getBusList().stream().map(Bus::getName).toList();
     }
 
+    public boolean updateAlarm(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+            () -> new ScheduleException(StatusCode.NOT_FOUND, "해당 ID의 스케줄이 존재하지 않습니다."));
+        if (schedule.getUser().getId() != userId) {
+            throw new ScheduleException(StatusCode.BAD_REQUEST, "유저가 해당 스케줄의 주인이 아닙니다.");
+        }
+        return schedule.updateAlarm();
+    }
 }

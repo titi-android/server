@@ -51,6 +51,9 @@ public class Schedule {
     @OneToOne(cascade = CascadeType.REMOVE)
     private BusStop busStop;
 
+    @Column(nullable = false)
+    private Boolean isAlarmOn;
+
     public Schedule(User user, String scheduleName, String days, String regionName,
         LocalTime startTime,
         LocalTime endTime, BusStop busStop) {
@@ -61,6 +64,7 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
+        this.isAlarmOn = true;
     }
 
     public Schedule() {
@@ -87,5 +91,10 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
+    }
+
+    public boolean updateAlarm() {
+        this.isAlarmOn = !this.isAlarmOn;
+        return this.isAlarmOn;
     }
 }

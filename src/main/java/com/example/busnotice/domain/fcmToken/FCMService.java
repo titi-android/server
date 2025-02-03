@@ -1,7 +1,9 @@
 package com.example.busnotice.domain.fcmToken;
 
 import com.example.busnotice.domain.fcmToken.req.CreateFCMTokenRequest;
+import com.example.busnotice.domain.schedule.Schedule;
 import com.example.busnotice.domain.schedule.ScheduleService;
+import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
 import com.example.busnotice.domain.user.User;
@@ -30,6 +32,7 @@ public class FCMService {
     private final FCMRepository fcmRepository;
     private final UserRepository userRepository;
     private final ScheduleService scheduleService;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
@@ -58,8 +61,11 @@ public class FCMService {
             log.info("토큰의 유저 이름: {}", token.getUser().getName());
             ScheduleResponses sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
                 token.getUser().getId());
-
-            if (sr != null) {
+            Schedule schedule = scheduleRepository.findById(sr.id()).get();
+            if (!schedule.getIsAlarmOn()) {
+                log.info("{} 의 현재 스케줄이 존재하나, 알림 전송 대상이 아닙니다. : {}", token.getUser().getName(), sr);
+            }
+            else if (sr != null) {
                 if (sr.busInfos().isEmpty())
                     log.info("{} 의 현재 스케줄이 존재하나, 도착 예정인 버스가 없습니다. : {}", token.getUser().getName(), sr);
                 else
