@@ -27,6 +27,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         List<String> excludePaths = Arrays.asList(
             "/api/v1/users/signup",
             "/api/v1/users/login",
+            "/api/v1/users/refresh",
             "/h2-console",
             "/swagger-ui", "/swagger-resource", "/v3/api-docs"
         );

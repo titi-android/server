@@ -5,6 +5,7 @@ import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.BusinessException;
 import com.example.busnotice.global.exception.CityCodeException;
 import com.example.busnotice.global.exception.GeneralException;
+import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
@@ -48,5 +49,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GeneralException.class)
     public ApiResponse<Void> GeneralException(GeneralException e) {
         return ApiResponse.createFail(StatusCode.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+
+    @ExceptionHandler(RefreshTokenException.class)
+    public ApiResponse<Void> RefreshTokenException(RefreshTokenException e) {
+        return ApiResponse.createFail(StatusCode.BAD_REQUEST, e.getMessage());
     }
 }

@@ -3,6 +3,7 @@ package com.example.busnotice.domain.user;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
+import com.example.busnotice.global.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,15 @@ public class UserService {
         userRepository.save(new User(name, passwordEncoder.encode(password)));
     }
 
-    public String login(String name, String password) {
+    public TokenResponse login(String name, String password) {
         User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
             StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserException(StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다.");
         }
-        return jwtProvider.createToken(name);
+        String accessToken = jwtProvider.createAccessToken(name);
+        String refreshToken = jwtProvider.createRefreshToken();
+        return new TokenResponse(accessToken, refreshToken);
     }
 
 }

@@ -83,7 +83,7 @@ public class ScheduleController {
     public ApiResponse<Void> updateAlarm(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
+    ) {
         boolean isAlarmOn = scheduleService.updateAlarm(userDetails.getId(), scheduleId);
         String msg = isAlarmOn ? "알림이 켜졌습니다." : "알림이 꺼졌습니다.";
         return ApiResponse.createSuccess(msg);

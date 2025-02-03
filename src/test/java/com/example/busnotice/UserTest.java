@@ -1,14 +1,13 @@
 package com.example.busnotice;
 
-import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.domain.user.UserService;
 import com.example.busnotice.global.jwt.JwtProvider;
+import com.example.busnotice.global.jwt.TokenResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -17,8 +16,6 @@ public class UserTest {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -33,15 +30,15 @@ public class UserTest {
     @Test
     public void LoginSuccess() {
         userService.signUp(name, password);
-        String token = userService.login(name, password);
-        System.out.println("token = " + token);
+        TokenResponse tr = userService.login(name, password);
+        System.out.println("tr = " + tr);
     }
 
     @Test
     public void getUsernameFromJwt() {
         userService.signUp(name, password);
-        String jwt = userService.login(name, password);
+        TokenResponse tr = userService.login(name, password);
 
-        Assertions.assertThat(name).isEqualTo(jwtProvider.getUsername(jwt));
+        Assertions.assertThat(name).isEqualTo(jwtProvider.getUsername(tr.accessToken()));
     }
 }

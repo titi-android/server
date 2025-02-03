@@ -61,15 +61,19 @@ public class FCMService {
             log.info("토큰의 유저 이름: {}", token.getUser().getName());
             ScheduleResponses sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
                 token.getUser().getId());
-            Schedule schedule = scheduleRepository.findById(sr.id()).get();
-            if (!schedule.getIsAlarmOn()) {
-                log.info("{} 의 현재 스케줄이 존재하나, 알림 전송 대상이 아닙니다. : {}", token.getUser().getName(), sr);
-            }
-            else if (sr != null) {
-                if (sr.busInfos().isEmpty())
-                    log.info("{} 의 현재 스케줄이 존재하나, 도착 예정인 버스가 없습니다. : {}", token.getUser().getName(), sr);
-                else
-                    log.info("{} 의 현재 스케줄이 존재하며, 도착 예정인 버스가 존재합니다. : {}", token.getUser().getName(), sr);
+            if (sr != null) {
+                Schedule schedule = scheduleRepository.findById(sr.id()).get();
+                if (!schedule.getIsAlarmOn()) {
+                    log.info("{} 의 현재 스케줄이 존재하나, 알림 전송 대상이 아닙니다. : {}", token.getUser().getName(),
+                        sr);
+                    continue;
+                } else if (sr.busInfos().isEmpty()) {
+                    log.info("{} 의 현재 스케줄이 존재하나, 도착 예정인 버스가 없습니다. : {}", token.getUser().getName(),
+                        sr);
+                } else {
+                    log.info("{} 의 현재 스케줄이 존재하며, 도착 예정인 버스가 존재합니다. : {}", token.getUser().getName(),
+                        sr);
+                }
                 BusInfoDto fb = sr.busInfos().size() > 0 ? sr.busInfos().get(0)
                     : new BusInfoDto(0, 0, "", "", "", "", "", "");
                 BusInfoDto sb = sr.busInfos().size() > 1 ? sr.busInfos().get(1)
