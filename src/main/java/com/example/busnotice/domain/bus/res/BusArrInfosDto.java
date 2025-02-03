@@ -2,6 +2,8 @@ package com.example.busnotice.domain.bus.res;
 
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
+import com.example.busnotice.util.BusArrInfosDtoItemsDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.Data;
@@ -37,6 +39,7 @@ public class BusArrInfosDto {
     @Data
     public static class Items {
 
+        @JsonDeserialize(using = BusArrInfosDtoItemsDeserializer.class)
         private List<Item> item;
     }
 
