@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.CreateScheduleRequestV2;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
@@ -40,6 +41,16 @@ public class ScheduleController {
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws IOException {
         scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
+        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
+    }
+
+    @PostMapping("/v2/schedules")
+    @Operation(summary = "스케줄 등록")
+    public ApiResponse<Void> createScheduleV2(
+        @RequestBody CreateScheduleRequestV2 createScheduleRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws IOException {
+        scheduleService.createScheduleV2(userDetails.getId(), createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
 

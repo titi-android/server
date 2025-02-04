@@ -9,6 +9,7 @@ import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.CreateScheduleRequestV2;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
@@ -58,6 +59,41 @@ public class ScheduleService {
         // 스케줄상의 버스 정류장의 node id
         String nodeId = busStopService.버스정류장_노드_ID_조회(createScheduleRequest.regionName(),
             createScheduleRequest.busStopName());
+        // 스케줄상의 버스 정류장 생성
+        BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
+        busStopRepository.save(busStop);
+        // 해당 스케줄상의 버스 정류장에 버스 목록 등록
+        List<String> busNames = createScheduleRequest.busList();
+        List<Bus> buses = busNames.stream().map(busName -> Bus.toEntity(busStop, busName)).toList();
+        busRepository.saveAll(buses);
+        // 스케줄 생성 후 생성한 버스 정류장 등록
+        System.out.println(
+            "createScheduleRequest startTime = " + createScheduleRequest.startTime());
+        System.out.println("createScheduleRequest endTime = " + createScheduleRequest.endTime());
+        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
+            createScheduleRequest.days(), createScheduleRequest.regionName(),
+            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
+        System.out.println("schedule.toString() = " + schedule.toString());
+        log.info("schedule.toString(): {}", schedule);
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        System.out.println("savedSchedule = " + savedSchedule);
+        log.info("savedSchedule.toString(): {}", savedSchedule);
+
+    }
+
+    @Transactional
+    public void createScheduleV2(Long userId, CreateScheduleRequestV2 createScheduleRequest)
+        throws IOException {
+        User user = getUserById(userId);
+
+        // 겹치는 스케줄 있는지 확인
+        새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.days(), createScheduleRequest.startTime(),
+            createScheduleRequest.endTime());
+
+        // 도시 코드
+        String cityCode = busStopService.도시코드_DB_조회(createScheduleRequest.regionName());
+        // 스케줄상의 버스 정류장의 node id
+        String nodeId = createScheduleRequest.nodeId();
         // 스케줄상의 버스 정류장 생성
         BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
         busStopRepository.save(busStop);
