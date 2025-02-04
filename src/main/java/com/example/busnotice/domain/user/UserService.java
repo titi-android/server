@@ -4,6 +4,7 @@ import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,11 @@ public class UserService {
         }
         String accessToken = jwtProvider.createAccessToken(name);
         String refreshToken = jwtProvider.createRefreshToken();
+        // 기존 리프레시 토큰 존재 시 삭제
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);
+        if(optionalRefreshToken.isPresent()){
+            refreshTokenRepository.delete(optionalRefreshToken.get());
+        }
         // 리프레시 토큰 저장
         refreshTokenRepository.save(new RefreshToken(user, refreshToken));
         return new TokenResponse(accessToken, refreshToken);
