@@ -1,6 +1,6 @@
 package com.example.busnotice.util;
 
-import static com.example.busnotice.domain.bus.res.BusArrInfosDto.*;
+import static com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;

@@ -1,5 +1,10 @@
 package com.example.busnotice.global.jwt;
 
+import com.example.busnotice.domain.user.RefreshToken;
+import com.example.busnotice.domain.user.RefreshTokenRepository;
+import com.example.busnotice.domain.user.res.RefreshTokenResponse;
+import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.security.CustomUserDetails;
 import com.example.busnotice.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
@@ -23,6 +28,7 @@ public class JwtProvider {
     private final Long refreshValidityInSecs = 7L * 86400000L; // 7일 (1주일)
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     // 엑세스 토큰 발급
     public String createAccessToken(String username) {
@@ -93,11 +99,22 @@ public class JwtProvider {
         }
     }
 
-//    public String recreateAccessToken(String refreshToken) {
-//        boolean isRefreshTokenExpired = isRefreshTokenExpired(refreshToken);
-//        if(isRefreshTokenExpired){
-//            throw new RefreshTokenException(StatusCode.BAD_REQUEST, "리프레시 토큰이 만료되었스니다.");
-//        }
-//        user
-//    }
+    public RefreshTokenResponse recreateAccessToken(String refreshToken) {
+        // 유저에게 등록된 리프레시 토큰인지 확인
+        RefreshToken existsRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+            .orElseThrow(
+                () -> new RefreshTokenException(StatusCode.BAD_REQUEST,
+                    "해당 유저의 리프레시 토큰이 DB에 존재하지 않습니다."));
+        if (!existsRefreshToken.equals(refreshToken)) {
+            new RefreshTokenException(StatusCode.BAD_REQUEST, "해당 유저에게 등록된 리프레시 토큰이 아닙니다.");
+        }
+        // 만료된 리프레시 토큰인지 확인
+        if (isRefreshTokenExpired(refreshToken)) {
+            throw new RefreshTokenException(StatusCode.BAD_REQUEST, "리프레시 토큰이 만료되었습다.");
+        }
+        // 해당 리프레시 토큰의 유저 정보를 통해 다시 엑세스 토큰 생성
+        String accessToken = createAccessToken(existsRefreshToken.getUser().getName());
+        return new RefreshTokenResponse(accessToken);
+    }
+
 }

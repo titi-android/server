@@ -7,6 +7,7 @@ import com.example.busnotice.global.jwt.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,9 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
+    @Transactional
     public void signUp(String name, String password) {
         if (userRepository.existsByName(name)) {
             throw new UserException(StatusCode.CONFLICT, "이미 존재하는 이름입니다.");
@@ -23,6 +26,7 @@ public class UserService {
         userRepository.save(new User(name, passwordEncoder.encode(password)));
     }
 
+    @Transactional
     public TokenResponse login(String name, String password) {
         User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
             StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
@@ -31,6 +35,8 @@ public class UserService {
         }
         String accessToken = jwtProvider.createAccessToken(name);
         String refreshToken = jwtProvider.createRefreshToken();
+        // 리프레시 토큰 저장
+        refreshTokenRepository.save(new RefreshToken(user, refreshToken));
         return new TokenResponse(accessToken, refreshToken);
     }
 

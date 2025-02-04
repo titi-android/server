@@ -2,6 +2,7 @@ package com.example.busnotice.domain.user;
 
 import com.example.busnotice.domain.user.req.LoginRequest;
 import com.example.busnotice.domain.user.req.SignUpRequest;
+import com.example.busnotice.domain.user.res.RefreshTokenResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,11 +43,13 @@ public class UserController {
         return ApiResponse.createSuccessWithData(tokenResponse, "로그인에 성공했습니다.");
     }
 
-//    @PostMapping("/users/refresh")
-//    @Operation(summary = "엑세스 토큰 재발급")
-//    public ApiResponse<String> recreateAccessToken(
-//        @RequestBody AccessTokenRequest accessTokenRequest
-//    ) {
-//        jwtProvider.recreateAccessToken(accessTokenRequest.refreshToken());
-//    }
+    @PostMapping("/users/refresh")
+    @Operation(summary = "엑세스 토큰 재발급")
+    public ApiResponse<RefreshTokenResponse> recreateAccessToken(
+        @RequestHeader("Refresh-Token") String refreshToken
+    ) {
+        RefreshTokenResponse refreshTokenResponse = jwtProvider.recreateAccessToken(refreshToken);
+        return ApiResponse.createSuccessWithData(refreshTokenResponse,
+            "엑세스 토큰이 재발급 되었습니다.");
+    }
 }

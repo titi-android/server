@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.busStop;
 
+import com.example.busnotice.domain.bus.res.BusInfosResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +27,7 @@ public class BusStopController {
         return ApiResponse.createSuccessWithData(cityCodes, "도시코드 조회에 성공했습니다.");
     }
 
-    @GetMapping("/node/id")
+    @GetMapping("/nodes/id")
     @Operation(summary = "정류소의 노드 ID 조회")
     public ApiResponse<String> getNodeId
         (
@@ -38,15 +39,29 @@ public class BusStopController {
         return ApiResponse.createSuccessWithData(nodeId, "버스정류장 노드 ID 조회에 성공했습니다.");
     }
 
-    @GetMapping("/node/name")
+    @GetMapping("/nodes/names")
     @Operation(summary = "버스정류장 목록 조회")
     public ApiResponse<List<String>> getNodeNames
         (
             @RequestParam("cityName") String cityName, // 도시 이름
             @RequestParam("busStopName") String busStopName // 정류소 이름
         ) throws IOException {
-        List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회(cityName,
+        List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_이름만_반환(cityName,
             busStopName);
-        return ApiResponse.createSuccessWithData(busNames, "해당 이름을 포함하는 버스정류장 목록 조회에 성공했습니다.");
+        return ApiResponse.createSuccessWithData(busNames, "해당 이름을 포함하는 버스정류장 목록(이름) 조회에 성공했습니다.");
+    }
+
+    @GetMapping("/nodes/infos")
+    @Operation(summary = "버스정류장 목록 조회")
+    public ApiResponse<BusInfosResponse> getNodeInfos
+        (
+            @RequestParam("cityName") String cityName, // 도시 이름
+            @RequestParam("busStopName") String busStopName // 정류소 이름
+        ) throws IOException {
+        BusInfosResponse busInfosResponse = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(
+            cityName,
+            busStopName);
+        return ApiResponse.createSuccessWithData(busInfosResponse,
+            "해당 이름을 포함하는 버스정류장 목록(모든 정보) 조회에 성공했습니다.");
     }
 }
