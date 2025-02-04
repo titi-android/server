@@ -38,7 +38,7 @@ public class UserService {
         String refreshToken = jwtProvider.createRefreshToken();
         // 기존 리프레시 토큰 존재 시 삭제
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);
-        if(optionalRefreshToken.isPresent()){
+        if (optionalRefreshToken.isPresent()) {
             refreshTokenRepository.delete(optionalRefreshToken.get());
             refreshTokenRepository.flush();
         }

@@ -1,8 +1,7 @@
 package com.example.busnotice.domain.schedule;
 
-import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequestV2;
-import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.UpdateScheduleRequestV2;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
@@ -34,15 +33,15 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
-    @PostMapping("/v1/schedules")
-    @Operation(summary = "스케줄 등록")
-    public ApiResponse<Void> createSchedule(
-        @RequestBody CreateScheduleRequest createScheduleRequest,
-        @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws IOException {
-        scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
-        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
-    }
+//    @PostMapping("/v1/schedules")
+//    @Operation(summary = "스케줄 등록")
+//    public ApiResponse<Void> createSchedule(
+//        @RequestBody CreateScheduleRequest createScheduleRequest,
+//        @AuthenticationPrincipal CustomUserDetails userDetails
+//    ) throws IOException {
+//        scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
+//        return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
+//    }
 
     @PostMapping("/v2/schedules")
     @Operation(summary = "스케줄 등록")
@@ -68,16 +67,28 @@ public class ScheduleController {
 
     }
 
-    @PutMapping("/v1/schedules/{scheduleId}")
+//    @PutMapping("/v1/schedules/{scheduleId}")
+//    @Operation(summary = "스케줄 수정")
+//    public ApiResponse<Void> updateSchedule(
+//        @PathVariable("scheduleId") Long scheduleId,
+//        @RequestBody UpdateScheduleRequest updateScheduleRequest,
+//        @AuthenticationPrincipal CustomUserDetails userDetails
+//    ) throws IOException {
+//        scheduleService.updateSchedule(userDetails.getId(), scheduleId, updateScheduleRequest);
+//        return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
+//    }
+
+    @PutMapping("/v2/schedules/{scheduleId}")
     @Operation(summary = "스케줄 수정")
     public ApiResponse<Void> updateSchedule(
         @PathVariable("scheduleId") Long scheduleId,
-        @RequestBody UpdateScheduleRequest updateScheduleRequest,
+        @RequestBody UpdateScheduleRequestV2 updateScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws IOException {
         scheduleService.updateSchedule(userDetails.getId(), scheduleId, updateScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
     }
+
 
     @DeleteMapping("/v1/schedules/{scheduleId}")
     @Operation(summary = "스케줄 삭제")

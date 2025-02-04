@@ -82,7 +82,7 @@ public class FCMService {
                 notifications.add(new UserNotificationData(
                     token.getToken(),
                     sr.name(),
-                    sr.days(),
+                    sr.daysList(),
                     sr.busStopName(),
                     fb.routeno(), fb.arrprevstationcnt(), fb.arrtime(),
                     sb.routeno(), sb.arrprevstationcnt(), sb.arrtime()
@@ -101,7 +101,7 @@ public class FCMService {
             Message message = Message.builder()
                 .setToken(notification.token())
                 .putData("scheduleName", notification.scheduleName())
-                .putData("days", notification.days())
+                .putData("days", notification.days().toString())
                 .putData("busStopName", notification.busStopName())
                 .putData("firstBusName", notification.firstBusName())
                 .putData("firstArrPrevStCnt", String.valueOf(notification.firstArrPrevStCnt()))

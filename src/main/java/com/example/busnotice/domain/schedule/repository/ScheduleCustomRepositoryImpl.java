@@ -24,7 +24,7 @@ public class ScheduleCustomRepositoryImpl implements ScheduleCustomRepository {
             .where(
                 schedule.user.eq(user),
                 schedule.startTime.loe(now).and(schedule.endTime.goe(now)),
-                schedule.days.eq(today)
+                schedule.daysList.any().eq(today)
             )
             .fetchOne());
     }
@@ -35,7 +35,7 @@ public class ScheduleCustomRepositoryImpl implements ScheduleCustomRepository {
             .selectFrom(schedule)
             .where(
                 schedule.user.eq(user),
-                schedule.days.eq(today)
+                schedule.daysList.any().eq(today)
             )
             .fetch();
         return schedules;

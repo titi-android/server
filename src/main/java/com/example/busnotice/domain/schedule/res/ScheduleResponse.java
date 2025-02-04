@@ -2,11 +2,12 @@ package com.example.busnotice.domain.schedule.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
+import java.util.List;
 
 public record ScheduleResponse(
     Long id,
     String name,
-    String days,
+    List<String> days,
 
     @Schema(type = "array", example = "[0,0]")
     LocalTime startTime,

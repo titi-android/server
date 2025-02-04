@@ -72,13 +72,13 @@ public class BusArrInfosDto {
         }
 
         // Item 객체를 NowScheduleResponse로 변환
-        public ScheduleResponse toScheduleResponse(Long id, String name, String days,
+        public ScheduleResponse toScheduleResponse(Long id, String name, List<String> daysList,
             LocalTime startTime,
             LocalTime endTime) {
             return new ScheduleResponse(
                 id,
                 name,
-                days,
+                daysList,
                 startTime,
                 endTime,
                 new ScheduleResponse.BusInfoDto(this.arrprevstationcnt,

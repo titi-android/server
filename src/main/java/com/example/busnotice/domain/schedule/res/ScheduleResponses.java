@@ -7,7 +7,7 @@ import java.util.List;
 public record ScheduleResponses(
     Long id,
     String name,
-    String days,
+    List<String> daysList,
 
     @Schema(type = "array", example = "[0,0]")
     LocalTime startTime,

@@ -1,9 +1,11 @@
 package com.example.busnotice.domain.fcmToken;
 
+import java.util.List;
+
 public record UserNotificationData(
     String token,
     String scheduleName,
-    String days,
+    List<String> days,
     String busStopName,
     String firstBusName,
     int firstArrPrevStCnt,
