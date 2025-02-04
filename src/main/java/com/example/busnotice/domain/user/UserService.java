@@ -40,6 +40,7 @@ public class UserService {
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);
         if(optionalRefreshToken.isPresent()){
             refreshTokenRepository.delete(optionalRefreshToken.get());
+            refreshTokenRepository.flush();
         }
         // 리프레시 토큰 저장
         refreshTokenRepository.save(new RefreshToken(user, refreshToken));
