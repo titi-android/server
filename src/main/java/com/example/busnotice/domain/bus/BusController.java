@@ -27,7 +27,7 @@ public class BusController {
         summary = "특정 노드에 도착 예정인 모든 버스 정보 조회",
         description = "도착 예정인 버스가 없는 경우 빈 리스트를 반환"
     )
-    @GetMapping("/node/arrive/info")
+    @GetMapping("/nodes/arrive/info")
     public ApiResponse<List<Item>> getNodeArriveInfo(
         @RequestParam("cityName") String cityName, // 도시 코드
         @RequestParam("nodeId") String nodeId // 노드 ID
@@ -40,7 +40,7 @@ public class BusController {
     }
 
     @Operation(summary = "특정 노드에 도착 예정인 특정 버스들의 가장 빠른 정보 조회")
-//    @GetMapping("/node/arrive/info/specific")
+//    @GetMapping("/nodes/arrive/info/specific")
     public Item getNodeSpecificArriveInfo(
         @RequestParam("cityCode") String cityCode,
         @RequestParam("nodeId") String nodeId,
@@ -51,7 +51,7 @@ public class BusController {
     }
 
     @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름 조회")
-    @GetMapping("/node/bus-names/all")
+    @GetMapping("/nodes/bus-names/all")
     public List<String> getBusNamesOfNode(
         @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId
@@ -61,7 +61,7 @@ public class BusController {
     }
 
     @Operation(summary = "특정 노드를 경유하는 버스들이 맞는지 확인")
-    @GetMapping("/node/bus-names/check")
+    @GetMapping("/nodes/bus-names/check")
     public ApiResponse<String> getBusNamesOfNode(
         @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId,
