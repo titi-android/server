@@ -4,12 +4,17 @@ import com.example.busnotice.domain.user.RefreshToken;
 import com.example.busnotice.domain.user.RefreshTokenRepository;
 import com.example.busnotice.domain.user.res.RefreshTokenResponse;
 import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.JwtAuthenticationException;
 import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.security.CustomUserDetails;
 import com.example.busnotice.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,18 +66,30 @@ public class JwtProvider {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        try {
+            return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new JwtAuthenticationException("토큰이 만료되었습니다.");
+        } catch (SignatureException e) {
+            throw new JwtAuthenticationException("서명이 올바르지 않습니다.");
+        } catch (MalformedJwtException e) {
+            throw new JwtAuthenticationException("토큰 형식이 올바르지 않습니다.");
+        } catch (UnsupportedJwtException e) {
+            throw new JwtAuthenticationException("지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            throw new JwtAuthenticationException("잘못된 JWT 토큰입니다.");
+        }
     }
 
     public String extractToken(String bearerToken) {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7); // "Bearer "를 제외하고 나머지 값만 반환
         }
-        throw new IllegalArgumentException("유효하지 않은 형식의 bearer 토큰값입니다.");
+        throw new JwtAuthenticationException("유효하지 않은 형식의 bearer 토큰값입니다.");
     }
 
     public Authentication getAuthentication(String token) {

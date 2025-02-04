@@ -7,7 +7,7 @@ import java.util.List;
 
 public record UpdateScheduleRequest(
     String name, // 스케줄 이름
-    String days, // 요일
+    List<String> daysList, // 요일
 
     @Schema(type = "string", example = "00:00")
     @JsonFormat(pattern = "HH:mm")

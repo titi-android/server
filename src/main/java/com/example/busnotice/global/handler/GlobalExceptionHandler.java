@@ -10,6 +10,7 @@ import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
 import java.io.UnsupportedEncodingException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -54,5 +55,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RefreshTokenException.class)
     public ApiResponse<Void> RefreshTokenException(RefreshTokenException e) {
         return ApiResponse.createFail(StatusCode.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ApiResponse<Void> handleAuthenticationException(AuthenticationException e) {
+        return ApiResponse.createFail(StatusCode.UNAUTHORIZED, e.getMessage());
     }
 }

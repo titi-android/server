@@ -8,8 +8,8 @@ import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
-import com.example.busnotice.domain.schedule.req.CreateScheduleRequestV2;
-import com.example.busnotice.domain.schedule.req.UpdateScheduleRequestV2;
+import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponses;
@@ -45,49 +45,13 @@ public class ScheduleService {
     private final BusService busService;
     private final BusStopService busStopService;
 
-//    @Transactional
-//    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
-//        throws IOException {
-//        User user = getUserById(userId);
-//
-//        // 겹치는 스케줄 있는지 확인
-//        새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.days(), createScheduleRequest.startTime(),
-//            createScheduleRequest.endTime());
-//
-//        // 도시 코드
-//        String cityCode = busStopService.도시코드_DB_조회(createScheduleRequest.regionName());
-//        // 스케줄상의 버스 정류장의 node id
-//        String nodeId = busStopService.버스정류장_노드_ID_조회(createScheduleRequest.regionName(),
-//            createScheduleRequest.busStopName());
-//        // 스케줄상의 버스 정류장 생성
-//        BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
-//        busStopRepository.save(busStop);
-//        // 해당 스케줄상의 버스 정류장에 버스 목록 등록
-//        List<String> busNames = createScheduleRequest.busList();
-//        List<Bus> buses = busNames.stream().map(busName -> Bus.toEntity(busStop, busName)).toList();
-//        busRepository.saveAll(buses);
-//        // 스케줄 생성 후 생성한 버스 정류장 등록
-//        System.out.println(
-//            "createScheduleRequest startTime = " + createScheduleRequest.startTime());
-//        System.out.println("createScheduleRequest endTime = " + createScheduleRequest.endTime());
-//        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
-//            createScheduleRequest.days(), createScheduleRequest.regionName(),
-//            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
-//        System.out.println("schedule.toString() = " + schedule.toString());
-//        log.info("schedule.toString(): {}", schedule);
-//        Schedule savedSchedule = scheduleRepository.save(schedule);
-//        System.out.println("savedSchedule = " + savedSchedule);
-//        log.info("savedSchedule.toString(): {}", savedSchedule);
-//
-//    }
-
     @Transactional
-    public void createScheduleV2(Long userId, CreateScheduleRequestV2 createScheduleRequest)
+    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
         throws IOException {
         User user = getUserById(userId);
 
         // 겹치는 스케줄 있는지 확인
-        새_스케줄_생성시_겹침_유무_파악_V2(user, createScheduleRequest.daysList(),
+        새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.daysList(),
             createScheduleRequest.startTime(),
             createScheduleRequest.endTime());
 
@@ -123,48 +87,9 @@ public class ScheduleService {
         return ScheduleInfoResponse.fromEntity(schedule);
     }
 
-//    @Transactional
-//    public void updateSchedule(Long userId, Long scheduleId,
-//        UpdateScheduleRequest updateScheduleRequest)
-//        throws IOException {
-//        User user = getUserById(userId);
-//        Schedule existSchedule = scheduleRepository.findById(scheduleId)
-//            .orElseThrow(() -> new ScheduleException(
-//                StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
-//
-//        // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
-//        기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.days(),
-//            updateScheduleRequest.startTime(),
-//            updateScheduleRequest.endTime());
-//
-//        // 도시 코드
-//        String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
-//        // 수정한 스케줄상의 버스 정류장의 node id
-//        String newNodeId = busStopService.버스정류장_노드_ID_조회(updateScheduleRequest.regionName(),
-//            updateScheduleRequest.busStopName());
-//        // 스케줄상의 기존 버스 정류장 엔티티
-//        BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();
-//        // 해당 버스 정류장에 등록된 버스들 삭제
-//        List<Long> busIds = existBusStop.getBusList().stream().map(bus -> bus.getId()).toList();
-//        busRepository.deleteAllById(busIds);
-//        // 버스 정류장 업데이트 및 버스 생성
-//        List<String> busNames = updateScheduleRequest.busList();
-//        List<Bus> newBuses = busNames.stream().map(busName -> Bus.toEntity(existBusStop, busName))
-//            .toList();
-//        busRepository.saveAll(newBuses);
-//        existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);
-//        // 최종적으로 스케줄 업데이트
-//        existSchedule.update(
-//            updateScheduleRequest.name(),
-//            updateScheduleRequest.days(),
-//            updateScheduleRequest.startTime(),
-//            updateScheduleRequest.endTime(),
-//            existBusStop);
-//    }
-
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId,
-        UpdateScheduleRequestV2 updateScheduleRequest)
+        UpdateScheduleRequest updateScheduleRequest)
         throws IOException {
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
@@ -172,7 +97,7 @@ public class ScheduleService {
                 StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
 
         // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
-        기존_스케줄_수정시_겹침_유무_파악_V2(user, scheduleId, updateScheduleRequest.daysList(),
+        기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
             updateScheduleRequest.startTime(),
             updateScheduleRequest.endTime());
 
@@ -317,19 +242,7 @@ public class ScheduleService {
             Comparator.comparing(responses -> responses.startTime())).toList();
     }
 
-//    private void 새_스케줄_생성시_겹침_유무_파악(User user, String days, LocalTime startTime,
-//        LocalTime endTime) {
-//        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
-//
-//        for (Schedule s : schedules) {
-//            if (요일_겹침_유무(s.getDays(), days) && 시간대_겹침_유무(startTime, endTime, s.getStartTime(),
-//                s.getEndTime())) {
-//                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
-//            }
-//        }
-//    }
-
-    private boolean 새_스케줄_생성시_겹침_유무_파악_V2(User user, List<String> newDays, LocalTime newStartTime,
+    private boolean 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
         LocalTime newEndTime) {
         List<Schedule> schedules = scheduleRepository.findAllByUser(user);
 
@@ -352,21 +265,7 @@ public class ScheduleService {
         return false; // 겹치는 스케줄 없음
     }
 
-//    private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, String days,
-//        LocalTime startTime,
-//        LocalTime endTime) {
-//        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
-//
-//        for (Schedule es : schedules) {
-//            if (scheduleId != es.getId()
-//                && 요일_겹침_유무(days, es.getDays())
-//                && 시간대_겹침_유무(startTime, endTime, es.getStartTime(), es.getEndTime())) {
-//                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
-//            }
-//        }
-//    }
-
-    private void 기존_스케줄_수정시_겹침_유무_파악_V2(User user, Long scheduleId, List<String> daysList,
+    private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, List<String> daysList,
         LocalTime startTime, LocalTime endTime) {
         List<Schedule> schedules = scheduleRepository.findAllByUser(user);
         for (Schedule existingSchedule : schedules) {
@@ -391,16 +290,6 @@ public class ScheduleService {
         return scheduleRepository.findAllByUserAndDays(user, days);
     }
 
-    //    private boolean 시간대_겹침_유무(LocalTime startTime, LocalTime endTime,
-//        LocalTime existStartTime, LocalTime existEndTime) {
-//        return (startTime.isBefore(existEndTime) && endTime.isAfter(existStartTime));
-//    }
-//
-//
-//    private boolean 요일_겹침_유무(String newDays, String existDays) {
-//        return newDays.equals(existDays);
-//    }
-//
     public Optional<Schedule> getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
         return scheduleRepository.findByCurrentTimeAndDay(user,
