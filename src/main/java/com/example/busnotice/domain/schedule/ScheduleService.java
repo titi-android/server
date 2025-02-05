@@ -67,16 +67,11 @@ public class ScheduleService {
         List<Bus> buses = busNames.stream().map(busName -> Bus.toEntity(busStop, busName)).toList();
         busRepository.saveAll(buses);
         // 스케줄 생성 후 생성한 버스 정류장 등록
-        System.out.println(
-            "createScheduleRequest startTime = " + createScheduleRequest.startTime());
-        System.out.println("createScheduleRequest endTime = " + createScheduleRequest.endTime());
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
             createScheduleRequest.daysList(), createScheduleRequest.regionName(),
-            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop);
-        System.out.println("schedule.toString() = " + schedule.toString());
-        log.info("schedule.toString(): {}", schedule);
+            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop,
+            createScheduleRequest.isAlarmOn());
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        System.out.println("savedSchedule = " + savedSchedule);
         log.info("savedSchedule.toString(): {}", savedSchedule);
 
     }
@@ -123,7 +118,9 @@ public class ScheduleService {
             updateScheduleRequest.daysList(),
             updateScheduleRequest.startTime(),
             updateScheduleRequest.endTime(),
-            existBusStop);
+            existBusStop,
+            updateScheduleRequest.isAlarmOn()
+        );
     }
 
     @Transactional

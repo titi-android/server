@@ -61,7 +61,7 @@ public class Schedule {
 
     public Schedule(User user, String scheduleName, List<String> daysList, String regionName,
         LocalTime startTime,
-        LocalTime endTime, BusStop busStop) {
+        LocalTime endTime, BusStop busStop, Boolean isAlarmOn) {
         this.user = user;
         this.name = scheduleName;
         this.daysList = daysList;
@@ -69,7 +69,7 @@ public class Schedule {
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
-        this.isAlarmOn = true;
+        this.isAlarmOn = isAlarmOn;
     }
 
     public Schedule() {
@@ -82,20 +82,22 @@ public class Schedule {
         String regionName,
         LocalTime startTime,
         LocalTime endTime,
-        BusStop busStop
+        BusStop busStop,
+        Boolean isAlarmOn
     ) {
         return new Schedule(
-            user, scheduleName, daysList, regionName, startTime, endTime, busStop
+            user, scheduleName, daysList, regionName, startTime, endTime, busStop, isAlarmOn
         );
     }
 
     public void update(String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
-        BusStop busStop) {
+        BusStop busStop, Boolean isAlarmOn) {
         this.name = name;
         this.daysList = daysList;
         this.startTime = startTime;
         this.endTime = endTime;
         this.busStop = busStop;
+        this.isAlarmOn = isAlarmOn;
     }
 
     public boolean updateAlarm() {
