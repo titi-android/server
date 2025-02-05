@@ -40,7 +40,7 @@ public class BusStopController {
     }
 
     @GetMapping("/nodes/names")
-    @Operation(summary = "버스정류장 목록 조회")
+    @Operation(summary = "버스정류장 목록(이름만) 조회")
     public ApiResponse<List<String>> getNodeNames
         (
             @RequestParam("cityName") String cityName, // 도시 이름
@@ -52,7 +52,7 @@ public class BusStopController {
     }
 
     @GetMapping("/nodes/infos")
-    @Operation(summary = "버스정류장 목록 조회")
+    @Operation(summary = "버스정류장 목록(모든 정보) 조회")
     public ApiResponse<BusInfosResponse> getNodeInfos
         (
             @RequestParam("cityName") String cityName, // 도시 이름
