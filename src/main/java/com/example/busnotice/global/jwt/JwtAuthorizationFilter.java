@@ -1,7 +1,6 @@
 package com.example.busnotice.global.jwt;
 
-import com.example.busnotice.global.exception.JwtAuthenticationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.busnotice.global.security.CustomAuthenticationEntryPoint;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final CustomAuthenticationEntryPoint entryPoint;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -40,6 +41,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
         // 검증 거쳐야하는 PATH 인 경우
         System.out.println("검증 필요");
+
         try {
             String bearerToken = request.getHeader("Authorization");
             String token = jwtProvider.extractToken(bearerToken);
@@ -48,38 +50,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
-        } catch (JwtAuthenticationException e) {
+        } catch (AuthenticationException e) { // 인증 관련 예외 잡기
+            request.setAttribute("exceptionMessage", e.getMessage());
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            ErrorResponse errorResponse = new ErrorResponse(401, null, e.getMessage());
-
-            try {
-                response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-//            여기서 바로 응답하는 것 말고, AuthenticationEntryPoint 에서 처리하는 방법
-//            에러 로그 보여서 사용 취소
-//            catch (JwtAuthenticationException e) {
-//                request.setAttribute("exceptionMessage", e.getMessage());
-//                throw e;
-//            }
+            // AuthenticationEntryPoint 직접 호출하여 예외 처리 (throw 하지 않음)
+            entryPoint.commence(request, response, e);
         }
-
     }
-
-    private record ErrorResponse<T>(
-        int status,
-        T data,
-        String message
-    ) {
-
-    }
-
-
 }
+

@@ -9,6 +9,7 @@ import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.format.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,7 +59,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ApiResponse<Void> handleAuthenticationException(AuthenticationException e) {
-        return ApiResponse.createFail(StatusCode.UNAUTHORIZED, e.getMessage());
+    public ApiResponse<Void> handleAuthenticationException(HttpServletRequest request,
+        AuthenticationException e) {
+        return ApiResponse.createFail(StatusCode.UNAUTHORIZED,
+            (String) request.getAttribute("exceptionMessage"));
     }
 }
