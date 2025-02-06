@@ -52,7 +52,7 @@ public class BusService {
             // WebClient 호출 - 서울의 해당 노드 ID 에 도착하는 모든 버스들 조회 (운행종료 포함)
             SeoulBusArrInfosDto result = webClient.get().uri(uri).retrieve()
                 .bodyToMono(SeoulBusArrInfosDto.class).block();
-//            System.out.println("result.toString() = " + result.toString());
+            System.out.println("(서울)특정_노드_ID에_도착하는_모든_버스들_정보_조회: " + result.toString());
 
             List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
             List<Item> items = itemList.stream().map(i -> i.toGeneralItem())
@@ -75,12 +75,19 @@ public class BusService {
         // WebClient 호출 - 해당 지역의 해당 노드 ID 에 도착 예정인 모든 버스들 조회
         BusArrInfosDto result = webClient.get().uri(uri).retrieve()
             .bodyToMono(BusArrInfosDto.class).block();
-
+        System.out.println("(전국)특정_노드_ID에_도착하는_모든_버스들_정보_조회: " + result.toString());
         if (result != null && result.getResponse() != null && result.getResponse().getBody() != null
             && result.getResponse().getBody().getItems() != null) {
 
             List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
-                .getItem();
+                .getItem()
+                .stream()
+                .map(item -> {
+                    item.setRoutetp( item.getRoutetp().substring(0, 2));
+                    return item;
+                })
+                .toList();
+
             return items;
         }
         return Collections.emptyList();

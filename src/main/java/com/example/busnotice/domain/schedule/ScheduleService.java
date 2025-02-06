@@ -239,7 +239,7 @@ public class ScheduleService {
             Comparator.comparing(responses -> responses.startTime())).toList();
     }
 
-    private boolean 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
+    private void 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
         LocalTime newEndTime) {
         List<Schedule> schedules = scheduleRepository.findAllByUser(user);
 
@@ -256,10 +256,9 @@ public class ScheduleService {
                 s.getStartTime()));
             // 둘 다 겹치면 충돌 발생
             if (isTimeOverlap) {
-                return true; // 겹치는 스케줄 존재
+                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
             }
         }
-        return false; // 겹치는 스케줄 없음
     }
 
     private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, List<String> daysList,
