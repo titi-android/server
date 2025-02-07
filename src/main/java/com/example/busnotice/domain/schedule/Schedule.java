@@ -101,7 +101,9 @@ public class Schedule {
     }
 
     public boolean updateAlarm() {
+        System.out.println("기존 알림 상태 = " + this.isAlarmOn);
         this.isAlarmOn = !this.isAlarmOn;
+        System.out.println("수정된 알림 상태 = " + this.isAlarmOn);
         return this.isAlarmOn;
     }
 }

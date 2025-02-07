@@ -52,8 +52,7 @@ public class ScheduleService {
 
         // 겹치는 스케줄 있는지 확인
         새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.daysList(),
-            createScheduleRequest.startTime(),
-            createScheduleRequest.endTime());
+            createScheduleRequest.startTime(), createScheduleRequest.endTime());
 
         // 도시 코드
         String cityCode = busStopService.도시코드_DB_조회(createScheduleRequest.regionName());
@@ -84,17 +83,14 @@ public class ScheduleService {
 
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId,
-        UpdateScheduleRequest updateScheduleRequest)
-        throws IOException {
+        UpdateScheduleRequest updateScheduleRequest) throws IOException {
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleException(
-                StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
+            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
 
         // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
         기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
-            updateScheduleRequest.startTime(),
-            updateScheduleRequest.endTime());
+            updateScheduleRequest.startTime(), updateScheduleRequest.endTime());
 
         // 도시 코드
         String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
@@ -113,14 +109,9 @@ public class ScheduleService {
         busRepository.saveAll(newBuses);
         existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);
         // 최종적으로 스케줄 업데이트
-        existSchedule.update(
-            updateScheduleRequest.name(),
-            updateScheduleRequest.daysList(),
-            updateScheduleRequest.startTime(),
-            updateScheduleRequest.endTime(),
-            existBusStop,
-            updateScheduleRequest.isAlarmOn()
-        );
+        existSchedule.update(updateScheduleRequest.name(), updateScheduleRequest.daysList(),
+            updateScheduleRequest.startTime(), updateScheduleRequest.endTime(), existBusStop,
+            updateScheduleRequest.isAlarmOn());
     }
 
     @Transactional
@@ -151,14 +142,12 @@ public class ScheduleService {
             busStop.getNodeId(), busNames);
         if (fastestBus == null) {
             return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-                currentSchedule.getDaysList(),
-                currentSchedule.getStartTime(),
-                currentSchedule.getEndTime(), null);
+                currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+                currentSchedule.getEndTime(), null, currentSchedule.getIsAlarmOn());
         }
         return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-            currentSchedule.getDaysList(),
-            currentSchedule.getStartTime(),
-            currentSchedule.getEndTime());
+            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+            currentSchedule.getEndTime(), currentSchedule.getIsAlarmOn());
     }
 
     public ScheduleResponses 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
@@ -175,21 +164,17 @@ public class ScheduleService {
         // 현재 스케줄의 버스정류장에 등록된 버스들
         List<String> busNames = getBusNames(busStop);
         List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
-            currentSchedule.getRegionName(),
-            busStop.getNodeId(),
-            busNames);
+            currentSchedule.getRegionName(), busStop.getNodeId(), busNames);
         // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
         List<BusInfoDto> busInfoDtos = items.stream().map(
-            i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(),
-                i.getNodeid(), i.getNodenm(), i.getRouteid(), i.getRouteno(),
-                i.getRoutetp(), i.getVehicletp())
-        ).toList();
+                i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(), i.getNodeid(),
+                    i.getNodenm(), i.getRouteid(), i.getRouteno(), i.getRoutetp(), i.getVehicletp()))
+            .toList();
         // 요일과 시간대는 필드에 직접 주입
         return new ScheduleResponses(currentSchedule.getId(), currentSchedule.getName(),
-            currentSchedule.getDaysList(),
-            currentSchedule.getStartTime(),
-            currentSchedule.getEndTime()
-            , busStop.getName(), busInfoDtos);
+            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+            currentSchedule.getEndTime(), busStop.getName(), busInfoDtos,
+            currentSchedule.getIsAlarmOn());
     }
 
     public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
@@ -205,7 +190,7 @@ public class ScheduleService {
                 s.getBusStop().getNodeId(), busNames);
             scheduleResponses.add(
                 item.toScheduleResponse(s.getId(), s.getName(), s.getDaysList(), s.getStartTime(),
-                    s.getEndTime()));
+                    s.getEndTime(), s.getIsAlarmOn()));
         }
         return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
             .toList();
@@ -219,24 +204,21 @@ public class ScheduleService {
         List<ScheduleResponses> scheduleResponsesList = new ArrayList<>();
         for (Schedule s : schedules) {
             List<String> busNames = getBusNames(s.getBusStop());
-            List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
-                s.getRegionName(),
+            List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(s.getRegionName(),
                 s.getBusStop().getNodeId(), busNames);
 
             // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
             List<BusInfoDto> busInfoDtos = items.stream().map(
                 item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
                     item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
-                    item.getRoutetp(), item.getVehicletp())
-            ).toList();
+                    item.getRoutetp(), item.getVehicletp())).toList();
             ScheduleResponses scheduleResponses = new ScheduleResponses(s.getId(), s.getName(),
-                s.getDaysList(),
-                s.getStartTime(), s.getEndTime()
-                , s.getBusStop().getName(), busInfoDtos);
+                s.getDaysList(), s.getStartTime(), s.getEndTime(), s.getBusStop().getName(),
+                busInfoDtos, s.getIsAlarmOn());
             scheduleResponsesList.add(scheduleResponses);
         }
-        return scheduleResponsesList.stream().sorted(
-            Comparator.comparing(responses -> responses.startTime())).toList();
+        return scheduleResponsesList.stream()
+            .sorted(Comparator.comparing(responses -> responses.startTime())).toList();
     }
 
     private void 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
@@ -273,8 +255,9 @@ public class ScheduleService {
             boolean isDayOverlap = existingSchedule.getDaysList().stream()
                 .anyMatch(daysList::contains);
             // 3. 시간대가 겹치는지 확인
-            boolean isTimeOverlap = startTime.isBefore(existingSchedule.getEndTime()) &&
-                endTime.isAfter(existingSchedule.getStartTime());
+            boolean isTimeOverlap =
+                startTime.isBefore(existingSchedule.getEndTime()) && endTime.isAfter(
+                    existingSchedule.getStartTime());
             // 4. 둘 다 겹치면 예외 발생
             if (isDayOverlap && isTimeOverlap) {
                 throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
@@ -288,8 +271,7 @@ public class ScheduleService {
 
     public Optional<Schedule> getCurrentSchedule(User user) {
         String today = DayConverter.getTodayAsString();
-        return scheduleRepository.findByCurrentTimeAndDay(user,
-            today, LocalTime.now());
+        return scheduleRepository.findByCurrentTimeAndDay(user, today, LocalTime.now());
     }
 
     private User getUserById(Long userId) {
@@ -301,6 +283,7 @@ public class ScheduleService {
         return busStop.getBusList().stream().map(Bus::getName).toList();
     }
 
+    @Transactional
     public boolean updateAlarm(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
             () -> new ScheduleException(StatusCode.NOT_FOUND, "해당 ID의 스케줄이 존재하지 않습니다."));

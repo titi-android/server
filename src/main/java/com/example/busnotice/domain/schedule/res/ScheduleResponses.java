@@ -17,7 +17,9 @@ public record ScheduleResponses(
 
     String busStopName,
 
-    List<BusInfoDto> busInfos
+    List<BusInfoDto> busInfos,
+
+    Boolean isAlarmOn
 ) {
 
     public record BusInfoDto(

@@ -74,7 +74,7 @@ public class BusArrInfosDto {
         // Item 객체를 NowScheduleResponse로 변환
         public ScheduleResponse toScheduleResponse(Long id, String name, List<String> daysList,
             LocalTime startTime,
-            LocalTime endTime) {
+            LocalTime endTime, Boolean isAlarmOn) {
             return new ScheduleResponse(
                 id,
                 name,
@@ -88,7 +88,8 @@ public class BusArrInfosDto {
                     this.routeid,
                     this.routeno,
                     this.routetp,
-                    this.vehicletp)
+                    this.vehicletp),
+                isAlarmOn
             );
         }
 

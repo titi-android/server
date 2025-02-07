@@ -14,7 +14,8 @@ public record ScheduleResponse(
 
     @Schema(type = "array", example = "[0,0]")
     LocalTime endTime,
-    BusInfoDto busInfo
+    BusInfoDto busInfo,
+    Boolean isAlarmOn
 ) {
 
     public record BusInfoDto(
