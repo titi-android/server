@@ -12,14 +12,15 @@ public record ScheduleInfoResponse(
     LocalTime startTime,
     LocalTime endTime,
     String busStopName,
-    List<String> busNames
+    List<String> busNames,
+    boolean isAlarmOn
 ) {
 
     public static ScheduleInfoResponse fromEntity(Schedule s) {
         return new ScheduleInfoResponse(
             s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(),
             s.getBusStop().getName(),
-            s.getBusStop().getBusList().stream().map(Bus::getName).toList()
+            s.getBusStop().getBusList().stream().map(Bus::getName).toList(), s.getIsAlarmOn()
         );
     }
 }
