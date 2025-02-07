@@ -11,6 +11,7 @@ public record ScheduleInfoResponse(
     List<String> days,
     LocalTime startTime,
     LocalTime endTime,
+    String regionName,
     String busStopName,
     List<String> busNames,
     boolean isAlarmOn
@@ -18,7 +19,7 @@ public record ScheduleInfoResponse(
 
     public static ScheduleInfoResponse fromEntity(Schedule s) {
         return new ScheduleInfoResponse(
-            s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(),
+            s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(), s.getRegionName(),
             s.getBusStop().getName(),
             s.getBusStop().getBusList().stream().map(Bus::getName).toList(), s.getIsAlarmOn()
         );
