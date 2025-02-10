@@ -123,7 +123,7 @@ public class BusService {
         return sortedItems.stream().limit(2).collect(Collectors.toList());
     }
 
-//    @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
+    @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
     public List<BusNameAndTypeResponse> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId)
         throws UnsupportedEncodingException {
         log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityName, nodeId);
