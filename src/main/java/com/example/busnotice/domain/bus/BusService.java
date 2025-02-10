@@ -3,6 +3,7 @@ package com.example.busnotice.domain.bus;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.domain.bus.res.BusInfosDto;
+import com.example.busnotice.domain.bus.res.BusNameAndTypeResponse;
 import com.example.busnotice.domain.bus.res.SeoulBusArrInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
@@ -122,8 +123,8 @@ public class BusService {
         return sortedItems.stream().limit(2).collect(Collectors.toList());
     }
 
-    @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
-    public List<String> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId)
+//    @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
+    public List<BusNameAndTypeResponse> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId)
         throws UnsupportedEncodingException {
         log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityName, nodeId);
         String cityCode = busStopService.도시코드_DB_조회(cityName);
@@ -146,10 +147,26 @@ public class BusService {
                 throw new BusStopException(StatusCode.NOT_FOUND,
                     "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
             }
-            List<String> busNames = result.getMsgBody().getItemList().stream()
-                .map(i -> i.getBusRouteNm()).toList();
-            System.out.println("bus names: " + busNames);
-            return busNames;
+            List<BusNameAndTypeResponse> list = result.getMsgBody().getItemList().stream()
+                .map(i -> {
+                        String routeType = "";
+                        switch (i.getBusRouteType()) {
+                            case 1: routeType = "공항"; break;
+                            case 2: routeType = "마을"; break;
+                            case 3: routeType = "간선"; break;
+                            case 4: routeType = "지선"; break;
+                            case 5: routeType = "순환"; break;
+                            case 6: routeType = "광역"; break;
+                            case 7: routeType = "인천"; break;
+                            case 8: routeType = "경기"; break;
+                            case 9: routeType = "폐지"; break;
+                            case 0: routeType = "공용"; break;
+                            default: routeType = "알수없음"; // 예외 처리
+                                 }
+                        return new BusNameAndTypeResponse(i.getBusRouteNm(), routeType);
+                    }
+                ).toList();
+            return list;
         }
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
@@ -173,10 +190,10 @@ public class BusService {
         }
 
         // routeno 리스트 추출
-        List<String> busNames = result.getResponse().getBody().getItems().getItem().stream()
-            .map(BusInfosDto.Item::getRouteNo).toList();
-        System.out.println("bus names: " + busNames);
-        return busNames;
+        List<BusNameAndTypeResponse> list = result.getResponse().getBody().getItems().getItem().stream()
+            .map(i -> new BusNameAndTypeResponse(i.getRouteNo(),i.getRouteTp().substring(0, 2))
+            ).toList();
+        return list;
     }
 
 }

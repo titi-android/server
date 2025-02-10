@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.bus;
 
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
+import com.example.busnotice.domain.bus.res.BusNameAndTypeResponse;
 import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.format.ApiResponse;
@@ -50,14 +51,14 @@ public class BusController {
         return item;
     }
 
-    @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름 조회")
+    @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름과 종류 조회")
     @GetMapping("/nodes/bus-names/all")
-    public List<String> getBusNamesOfNode(
+    public List<BusNameAndTypeResponse> getBusNamesOfNode(
         @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId
     ) throws UnsupportedEncodingException {
-        List<String> busNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
-        return busNames;
+        List<BusNameAndTypeResponse> busNameAndTypeList = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
+        return busNameAndTypeList;
     }
 
     @Operation(summary = "특정 노드를 경유하는 버스들이 맞는지 확인")
@@ -67,8 +68,9 @@ public class BusController {
         @RequestParam("nodeId") String nodeId,
         @RequestParam("routeNo") List<String> busList
     ) throws UnsupportedEncodingException {
-        List<String> allBusNames = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
-        boolean isValid = allBusNames.containsAll(busList.stream().map(String::trim).toList());
+        List<BusNameAndTypeResponse> busNameAndTypeResponses = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
+        List<String> busNames = busNameAndTypeResponses.stream().map(bnt -> bnt.name()).toList();
+        boolean isValid = busNames.containsAll(busList.stream().map(String::trim).toList());
         return isValid
             ? ApiResponse.createSuccess("올바른 버스 목록입니다.")
             : ApiResponse.createFail(StatusCode.BAD_REQUEST, "해당 정류장에 속한 버스 노선이 아닙니다.");
