@@ -1,7 +1,9 @@
 package com.example.busnotice.domain.bus.res;
 
+import com.example.busnotice.util.BusInfosDtoItemsDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import lombok.Data;
 import lombok.ToString;
@@ -47,7 +49,7 @@ public class BusInfosDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Items {
 
-        @JsonProperty("item")
+        @JsonDeserialize(using = BusInfosDtoItemsDeserializer.class)
         private List<Item> item;
     }
 

@@ -40,7 +40,7 @@ public class RedisConfig {
             BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType("java.util") // 컬렉션 타입 허용
                 .allowIfSubType("java.lang") // 기본 타입 허용
-                .allowIfSubType("com.example") // 사용자 정의 클래스 허용
+                .allowIfSubType("com.example") // 사용자 정의 클래스 허용, 이게 있어야 객체 캐싱 가능
                 .build(),
             DefaultTyping.EVERYTHING // 모든 객체에 타입 정보 추가
         );
