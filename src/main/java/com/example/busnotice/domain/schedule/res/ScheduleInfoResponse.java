@@ -14,15 +14,26 @@ public record ScheduleInfoResponse(
     String regionName,
     String busStopName,
     String nodeId,
-    List<String> busNames,
+    List<BusInfo> busInfos,
     boolean isAlarmOn
 ) {
 
     public static ScheduleInfoResponse fromEntity(Schedule s) {
+        List<Bus> busList = s.getBusStop().getBusList();
+        List<BusInfo> busInfos = busList.stream().map(b -> new BusInfo(b.getName(), b.getType()))
+            .toList();
         return new ScheduleInfoResponse(
-            s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(), s.getRegionName(),
+            s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(),
+            s.getRegionName(),
             s.getBusStop().getName(), s.getBusStop().getNodeId(),
-            s.getBusStop().getBusList().stream().map(Bus::getName).toList(), s.getIsAlarmOn()
+            busInfos, s.getIsAlarmOn()
         );
+    }
+
+    public record BusInfo(
+        String name,
+        String type
+    ) {
+
     }
 }

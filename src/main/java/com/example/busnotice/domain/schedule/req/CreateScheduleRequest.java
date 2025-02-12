@@ -7,7 +7,6 @@ import java.util.List;
 
 public record CreateScheduleRequest(
     String name, // 스케줄 이름
-
     List<String> daysList,  // 요일 리스트
     @Schema(type = "string", example = "00:00")
     @JsonFormat(pattern = "HH:mm")
