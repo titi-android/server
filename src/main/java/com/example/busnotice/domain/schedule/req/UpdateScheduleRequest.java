@@ -19,8 +19,11 @@ public record UpdateScheduleRequest(
     String regionName, // 지역 이름
     String busStopName, // 버스 정류장 이름
     String nodeId, // 노드 ID
-    List<String> busList, // 버스 종류
+    List<BusInfo> busInfos, // 버스 종류
     Boolean isAlarmOn // 잠금화면 알림 여부
 ) {
-
+    public record BusInfo(
+        String name,
+        String type
+    ) {}
 }

@@ -27,15 +27,19 @@ public class Bus {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String type;
+
     public Bus() {
     }
 
-    public Bus(BusStop busStop, String name) {
+    public Bus(BusStop busStop, String name, String type) {
         this.busStop = busStop;
         this.name = name;
+        this.type = type;
     }
 
-    public static Bus toEntity(BusStop busStop, String name) {
-        return new Bus(busStop, name);
+    public static Bus toEntity(BusStop busStop, String name, String type) {
+        return new Bus(busStop, name, type);
     }
 }

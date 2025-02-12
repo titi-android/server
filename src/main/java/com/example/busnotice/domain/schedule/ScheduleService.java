@@ -62,8 +62,9 @@ public class ScheduleService {
         BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
         busStopRepository.save(busStop);
         // 해당 스케줄상의 버스 정류장에 버스 목록 등록
-        List<String> busNames = createScheduleRequest.busList();
-        List<Bus> buses = busNames.stream().map(busName -> Bus.toEntity(busStop, busName)).toList();
+        List<CreateScheduleRequest.BusInfo> busInfos = createScheduleRequest.busInfos();
+        List<Bus> buses = busInfos.stream()
+            .map(busInfo -> Bus.toEntity(busStop, busInfo.name(), busInfo.type())).toList();
         busRepository.saveAll(buses);
         // 스케줄 생성 후 생성한 버스 정류장 등록
         Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
@@ -103,8 +104,10 @@ public class ScheduleService {
         List<Long> busIds = existBusStop.getBusList().stream().map(bus -> bus.getId()).toList();
         busRepository.deleteAllById(busIds);
         // 버스 정류장 업데이트 및 버스 생성
-        List<String> busNames = updateScheduleRequest.busList();
-        List<Bus> newBuses = busNames.stream().map(busName -> Bus.toEntity(existBusStop, busName))
+        List<UpdateScheduleRequest.BusInfo> busInfos = updateScheduleRequest.busInfos();
+        List<Bus> newBuses = busInfos.stream()
+            .map(busInfo -> Bus.toEntity(existBusStop, busInfo.name(),
+                busInfo.type()))
             .toList();
         busRepository.saveAll(newBuses);
         existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);

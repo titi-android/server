@@ -142,6 +142,7 @@ public class BusService {
             // WebClient 호출 - 서울의 해당 노드 ID 를 경유하는 노선 정보 조회
             SeoulBusInfosDto result = webClient.get().uri(uri).retrieve()
                 .bodyToMono(SeoulBusInfosDto.class).block();
+            log.info("SeoulBusInfosDto: {}", result);
             List<BusRoute> busRoutes = result.getMsgBody().getItemList();
             if (busRoutes == null || busRoutes.isEmpty()) {
                 throw new BusStopException(StatusCode.NOT_FOUND,
@@ -182,6 +183,7 @@ public class BusService {
         // WebClient 호출 - 해당 지역의 해당 노드 ID 를 경유하는 노선 정보 조회
         BusInfosDto result = webClient.get().uri(uri).retrieve()
             .bodyToMono(BusInfosDto.class).block();
+        log.info("BusInfosDto: {}", result);
 
         if (result.getResponse().getBody().getItems().getItem() == null || result.getResponse()
             .getBody().getItems().getItem().isEmpty()) {
