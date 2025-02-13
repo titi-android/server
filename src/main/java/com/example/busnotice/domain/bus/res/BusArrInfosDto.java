@@ -1,10 +1,8 @@
 package com.example.busnotice.domain.bus.res;
 
-import com.example.busnotice.domain.schedule.res.ScheduleResponse;
-import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfoDto.BusArrInfoDto;
 import com.example.busnotice.util.BusArrInfosDtoItemsDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.Data;
 
@@ -72,30 +70,30 @@ public class BusArrInfosDto {
         }
 
         // Item 객체를 NowScheduleResponse로 변환
-        public ScheduleResponse toScheduleResponse(Long id, String name, List<String> daysList,
-            LocalTime startTime,
-            LocalTime endTime, Boolean isAlarmOn) {
-            return new ScheduleResponse(
-                id,
-                name,
-                daysList,
-                startTime,
-                endTime,
-                new ScheduleResponse.BusInfoDto(this.arrprevstationcnt,
-                    this.arrtime,
-                    this.nodeid,
-                    this.nodenm,
-                    this.routeid,
-                    this.routeno,
-                    this.routetp,
-                    this.vehicletp),
-                isAlarmOn
-            );
-        }
+//        public ScheduleResponse toScheduleResponse(Long id, String name, List<String> daysList,
+//            LocalTime startTime,
+//            LocalTime endTime, Boolean isAlarmOn) {
+//            return new ScheduleResponse(
+//                id,
+//                name,
+//                daysList,
+//                startTime,
+//                endTime,
+//                new ScheduleResponse.BusInfoDto(this.arrprevstationcnt,
+//                    this.arrtime,
+//                    this.nodeid,
+//                    this.nodenm,
+//                    this.routeid,
+//                    this.routeno,
+//                    this.routetp,
+//                    this.vehicletp),
+//                isAlarmOn
+//            );
+//        }
 
-        public BusInfoDto toBusInfoDto(int arrprevstationcnt, int arrtime, String nodeid,
+        public BusArrInfoDto toBusInfoDto(int arrprevstationcnt, int arrtime, String nodeid,
             String nodenm, String routeid, String routeno, String routetp, String vehicletp) {
-            return new BusInfoDto(
+            return new BusArrInfoDto(
                 arrprevstationcnt,
                 arrtime,
                 nodeid,

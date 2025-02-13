@@ -13,14 +13,15 @@ import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse;
-import com.example.busnotice.domain.schedule.res.ScheduleResponses;
-import com.example.busnotice.domain.schedule.res.ScheduleResponses.BusInfoDto;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfoDto;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfoDto.BusArrInfoDto;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.util.DayConverter;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
@@ -45,41 +46,46 @@ public class ScheduleService {
     private final BusRepository busRepository;
     private final BusService busService;
     private final BusStopService busStopService;
+    private final EntityManager entityManager;
 
     @Transactional
-    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
-        throws IOException {
+    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest) {
         User user = getUserById(userId);
 
         // 겹치는 스케줄 있는지 확인
         새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.daysList(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime());
 
+        // 스케줄 생성한 후 생성한 도착지 및 버스 정류장 등록
+        CreateScheduleRequest.DestinationInfo crdi = createScheduleRequest.destinationInfo();
+        DestinationInfo destinationInfo = new DestinationInfo(crdi.regionName(), crdi.busStopName(),
+            crdi.nodeId());
+
+        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
+            createScheduleRequest.daysList(), createScheduleRequest.startTime(),
+            createScheduleRequest.endTime(), new ArrayList<>(),
+            destinationInfo, createScheduleRequest.isAlarmOn()); // BusStop 은 나중에 추가
+
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+
+        // BusStop 생성 및 schedule 설정
         List<CreateScheduleRequest.RouteInfo> routeInfos = createScheduleRequest.routeInfos();
         List<BusStop> busStops = new ArrayList<>();
+
         for (CreateScheduleRequest.RouteInfo ri : routeInfos) {
-            // 도시 코드
             String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
             // 버스정류장 생성
             BusStop savedBusStop = busStopRepository.save(
-                BusStop.toEntity(cityCode, ri.busStopName(), ri.nodeId()));
+                BusStop.toEntity(savedSchedule, cityCode, ri.regionName(), ri.busStopName(), ri.nodeId()));
             busStops.add(savedBusStop);
-            // 버스정류장에 버스 목록 등록
+            // 해당 버스정류장에 등록될 버스들 생성
             List<Bus> buses = ri.busInfos().stream()
                 .map(bi -> Bus.toEntity(savedBusStop, bi.name(), bi.type()))
                 .toList();
             busRepository.saveAll(buses);
         }
-        // 스케줄 생성한 후 생성한 도착지 및 버스 정류장 등록
-        CreateScheduleRequest.DestinationInfo crdi = createScheduleRequest.destinationInfo();
-        DestinationInfo destinationInfo = new DestinationInfo(crdi.regionName(), crdi.busStopName(),
-            crdi.nodeId());
-        Schedule sc = Schedule.toEntity(user, createScheduleRequest.name(),
-            createScheduleRequest.daysList(), createScheduleRequest.startTime(),
-            createScheduleRequest.endTime(), busStops,
-            destinationInfo, createScheduleRequest.isAlarmOn());
-        Schedule savedSchedule = scheduleRepository.save(sc);
-        log.info("savedSchedule.toString(): {}", savedSchedule);
+        savedSchedule.setBusStops(busStops);
+        log.info("created schedule: {}", savedSchedule);
     }
 
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
@@ -90,7 +96,7 @@ public class ScheduleService {
 
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId,
-        UpdateScheduleRequest updateScheduleRequest) throws IOException {
+        UpdateScheduleRequest updateScheduleRequest) {
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
@@ -99,20 +105,21 @@ public class ScheduleService {
         기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
             updateScheduleRequest.startTime(), updateScheduleRequest.endTime());
 
-        List<UpdateScheduleRequest.RouteInfo> routeInfos = updateScheduleRequest.routeInfos();
         // 수정 대상 스케줄의 BusStops 및 BusStop 에 등록된 Bus 들 모두 삭제
-        existSchedule.getBusStops()
-            .clear(); // busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
-        List<BusStop> busStops = new ArrayList<>();
+        busStopRepository.deleteAll(existSchedule.getBusStops());// busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
+        entityManager.flush();
+
         // 새로 BusStop 및 Bus 등록
+        List<UpdateScheduleRequest.RouteInfo> routeInfos = updateScheduleRequest.routeInfos();
+        List<BusStop> busStops = new ArrayList<>();
         for (UpdateScheduleRequest.RouteInfo ri : routeInfos) {
             // 도시 코드
             String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
             // 버스정류장 생성
             BusStop savedBusStop = busStopRepository.save(
-                BusStop.toEntity(cityCode, ri.busStopName(), ri.nodeId()));
+                BusStop.toEntity(existSchedule, cityCode, ri.regionName(), ri.busStopName(), ri.nodeId()));
             busStops.add(savedBusStop);
-            // 버스정류장에 버스 목록 등록
+            // 해당 버스정류장에 등록될 버스들 생성
             List<Bus> buses = ri.busInfos().stream()
                 .map(bi -> Bus.toEntity(savedBusStop, bi.name(), bi.type()))
                 .toList();
@@ -142,97 +149,105 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(Long userId)
-        throws UnsupportedEncodingException {
-        User user = getUserById(userId);
-        // 현재 스케줄
-        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-        if (optionalCurrentSchedule.isEmpty()) {
-            return null;
-        }
-        Schedule currentSchedule = optionalCurrentSchedule.get();
-        // 현재 스케줄의 버스정류장
-        BusStop busStop = currentSchedule.getBusStop();
-        // 현재 스케줄의 버스정류장에 등록된 버스들
-        List<String> busNames = getBusNames(busStop);
-        Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(currentSchedule.getRegionName(),
-            busStop.getNodeId(), busNames);
-        if (fastestBus == null) {
-            return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-                currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-                currentSchedule.getEndTime(), null, currentSchedule.getIsAlarmOn());
-        }
-        return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-            currentSchedule.getEndTime(), currentSchedule.getIsAlarmOn());
-    }
+//    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(Long userId)
+//        throws UnsupportedEncodingException {
+//        User user = getUserById(userId);
+//        // 현재 스케줄
+//        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
+//        if (optionalCurrentSchedule.isEmpty()) {
+//            return null;
+//        }
+//        Schedule currentSchedule = optionalCurrentSchedule.get();
+//        // 현재 스케줄의 버스정류장
+//        BusStop busStop = currentSchedule.getBusStop();
+//        // 현재 스케줄의 버스정류장에 등록된 버스들
+//        List<String> busNames = getBusNames(busStop);
+//        Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(currentSchedule.getRegionName(),
+//            busStop.getNodeId(), busNames);
+//        if (fastestBus == null) {
+//            return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
+//                currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+//                currentSchedule.getEndTime(), null, currentSchedule.getIsAlarmOn());
+//        }
+//        return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
+//            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+//            currentSchedule.getEndTime(), currentSchedule.getIsAlarmOn());
+//    }
 
-    public ScheduleResponses 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
-        throws UnsupportedEncodingException {
-        User user = getUserById(userId);
-        // 현재 스케줄
-        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-        if (optionalCurrentSchedule.isEmpty()) {
-            return null;
-        }
-        Schedule currentSchedule = optionalCurrentSchedule.get();
-        // 현재 스케줄의 버스정류장
-        BusStop busStop = currentSchedule.getBusStop();
-        // 현재 스케줄의 버스정류장에 등록된 버스들
-        List<String> busNames = getBusNames(busStop);
-        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
-            currentSchedule.getRegionName(), busStop.getNodeId(), busNames);
-        // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
-        List<BusInfoDto> busInfoDtos = items.stream().map(
-                i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(), i.getNodeid(),
-                    i.getNodenm(), i.getRouteid(), i.getRouteno(), i.getRoutetp(), i.getVehicletp()))
-            .toList();
-        // 요일과 시간대는 필드에 직접 주입
-        return new ScheduleResponses(currentSchedule.getId(), currentSchedule.getName(),
-            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-            currentSchedule.getEndTime(), busStop.getName(), busInfoDtos,
-            currentSchedule.getIsAlarmOn());
-    }
+//    public ScheduleResponses 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
+//        throws UnsupportedEncodingException {
+//        User user = getUserById(userId);
+//        // 현재 스케줄
+//        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
+//        if (optionalCurrentSchedule.isEmpty()) {
+//            return null;
+//        }
+//        Schedule currentSchedule = optionalCurrentSchedule.get();
+//        // 현재 스케줄의 버스정류장
+//        BusStop busStop = currentSchedule.getBusStop();
+//        // 현재 스케줄의 버스정류장에 등록된 버스들
+//        List<String> busNames = getBusNames(busStop);
+//        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
+//            currentSchedule.getRegionName(), busStop.getNodeId(), busNames);
+//        // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
+//        List<BusInfoDto> busInfoDtos = items.stream().map(
+//                i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(), i.getNodeid(),
+//                    i.getNodenm(), i.getRouteid(), i.getRouteno(), i.getRoutetp(), i.getVehicletp()))
+//            .toList();
+//        // 요일과 시간대는 필드에 직접 주입
+//        return new ScheduleResponses(currentSchedule.getId(), currentSchedule.getName(),
+//            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
+//            currentSchedule.getEndTime(), busStop.getName(), busInfoDtos,
+//            currentSchedule.getIsAlarmOn());
+//    }
 
-    public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
-        throws UnsupportedEncodingException {
-        User user = getUserById(userId);
-        String today = DayConverter.getTodayAsString();
-        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
+//    public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
+//        throws UnsupportedEncodingException {
+//        User user = getUserById(userId);
+//        String today = DayConverter.getTodayAsString();
+//        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
+//
+//        List<ScheduleResponse> scheduleResponses = new ArrayList<>();
+//        for (Schedule s : schedules) {
+//            List<String> busNames = getBusNames(s.getBusStop());
+//            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getRegionName(),
+//                s.getBusStop().getNodeId(), busNames);
+//            scheduleResponses.add(
+//                item.toScheduleResponse(s.getId(), s.getName(), s.getDaysList(), s.getStartTime(),
+//                    s.getEndTime(), s.getIsAlarmOn()));
+//        }
+//        return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
+//            .toList();
+//    }
 
-        List<ScheduleResponse> scheduleResponses = new ArrayList<>();
-        for (Schedule s : schedules) {
-            List<String> busNames = getBusNames(s.getBusStop());
-            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getRegionName(),
-                s.getBusStop().getNodeId(), busNames);
-            scheduleResponses.add(
-                item.toScheduleResponse(s.getId(), s.getName(), s.getDaysList(), s.getStartTime(),
-                    s.getEndTime(), s.getIsAlarmOn()));
-        }
-        return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
-            .toList();
-    }
+//
 
-    public List<ScheduleResponses> 특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId, String days)
+    public List<ScheduleResponse> 특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId, String days)
         throws UnsupportedEncodingException {
         User user = getUserById(userId);
         List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, days);
 
-        List<ScheduleResponses> scheduleResponsesList = new ArrayList<>();
+        List<ScheduleResponse> scheduleResponsesList = new ArrayList<>();
         for (Schedule s : schedules) {
-            List<String> busNames = getBusNames(s.getBusStop());
-            List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(s.getRegionName(),
-                s.getBusStop().getNodeId(), busNames);
-
-            // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
-            List<BusInfoDto> busInfoDtos = items.stream().map(
-                item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
-                    item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
-                    item.getRoutetp(), item.getVehicletp())).toList();
-            ScheduleResponses scheduleResponses = new ScheduleResponses(s.getId(), s.getName(),
-                s.getDaysList(), s.getStartTime(), s.getEndTime(), s.getBusStop().getName(),
-                busInfoDtos, s.getIsAlarmOn());
-            scheduleResponsesList.add(scheduleResponses);
+            List<BusStop> busStops = s.getBusStops();
+            List<BusStopArrInfoDto> busStopArrInfoDtos = new ArrayList<>();
+            List<BusArrInfoDto> busArrInfoDtos;
+            for (BusStop bs : busStops) {
+                List<String> busNames = bs.getBusList().stream().map(b -> b.getName()).toList();
+                List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(bs.getRegionName(),
+                    bs.getNodeId(), busNames);
+                // 버스 도착 정보 추출
+                busArrInfoDtos = items.stream().map(
+                    item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
+                        item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
+                        item.getRoutetp(), item.getVehicletp())).toList();
+                // 버스정류장 정보 추출
+                busStopArrInfoDtos.add(new BusStopArrInfoDto(bs.getName(), busArrInfoDtos));
+            }
+            ScheduleResponse scheduleResponse = new ScheduleResponse(s.getId(), s.getName(),
+                s.getDaysList(), s.getStartTime(), s.getEndTime(), busStopArrInfoDtos,
+                s.getIsAlarmOn());
+            scheduleResponsesList.add(scheduleResponse);
         }
         return scheduleResponsesList.stream()
             .sorted(Comparator.comparing(responses -> responses.startTime())).toList();

@@ -32,16 +32,21 @@ public class BusStop {
     private String cityCode;
 
     @Column(nullable = false)
+    private String regionName;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private String nodeId;
 
-    @OneToMany(mappedBy = "busStop", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "busStop", cascade = CascadeType.REMOVE)
     private List<Bus> busList;
 
-    public BusStop(String cityCode, String name, String nodeId) {
+    public BusStop(Schedule schedule, String cityCode, String regionName, String name, String nodeId) {
+        this.schedule = schedule;
         this.cityCode = cityCode;
+        this.regionName = regionName;
         this.name = name;
         this.nodeId = nodeId;
     }
@@ -50,8 +55,8 @@ public class BusStop {
 
     }
 
-    public static BusStop toEntity(String cityCode, String name, String nodeId) {
-        return new BusStop(cityCode, name, nodeId);
+    public static BusStop toEntity(Schedule schedule, String cityCode, String regionName, String name, String nodeId) {
+        return new BusStop(schedule, cityCode, regionName, name, nodeId);
     }
 
     public void update(String cityCode, String name, String nodeId,

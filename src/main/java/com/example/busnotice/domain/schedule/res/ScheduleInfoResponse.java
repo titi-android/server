@@ -1,6 +1,6 @@
 package com.example.busnotice.domain.schedule.res;
 
-import com.example.busnotice.domain.bus.Bus;
+import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.schedule.Schedule;
 import java.time.LocalTime;
 import java.util.List;
@@ -11,28 +11,51 @@ public record ScheduleInfoResponse(
     List<String> days,
     LocalTime startTime,
     LocalTime endTime,
-    String regionName,
-    String busStopName,
-    String nodeId,
-    List<BusInfo> busInfos,
+    List<BusStopInfo> busStops,
+    DestinationInfo destinationInfo,
     boolean isAlarmOn
 ) {
 
+
     public static ScheduleInfoResponse fromEntity(Schedule s) {
-        List<Bus> busList = s.getBusStop().getBusList();
-        List<BusInfo> busInfos = busList.stream().map(b -> new BusInfo(b.getName(), b.getType()))
-            .toList();
+        List<BusStop> busStops = s.getBusStops();
+        List<BusStopInfo> busStopInfos = busStops.stream().map(busStop -> {
+            List<BusInfo> busInfos = busStop.getBusList().stream()
+                .map(bus -> new BusInfo(bus.getName(), bus.getType())).toList();
+            return new BusStopInfo(busStop.getCityCode(), busStop.getRegionName(),
+                busStop.getName(),
+                busStop.getNodeId(), busInfos);
+        }).toList();
+        DestinationInfo destinationInfo = new DestinationInfo(s.getDestinationInfo().regionName,
+            s.getDestinationInfo().busStopName, s.getDestinationInfo().nodeId);
         return new ScheduleInfoResponse(
             s.getId(), s.getName(), s.getDaysList(), s.getStartTime(), s.getEndTime(),
-            s.getRegionName(),
-            s.getBusStop().getName(), s.getBusStop().getNodeId(),
-            busInfos, s.getIsAlarmOn()
+            busStopInfos,
+            destinationInfo, s.getIsAlarmOn()
         );
+    }
+
+    public record BusStopInfo(
+        String cityCode,
+        String regionName,
+        String busStopName,
+        String nodeId,
+        List<BusInfo> busInfos
+    ) {
+
     }
 
     public record BusInfo(
         String name,
         String type
+    ) {
+
+    }
+
+    public record DestinationInfo(
+        String regionName,
+        String busStopName,
+        String nodeId
     ) {
 
     }

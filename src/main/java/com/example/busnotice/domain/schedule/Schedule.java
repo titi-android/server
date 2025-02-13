@@ -52,7 +52,7 @@ public class Schedule {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
     private List<BusStop> busStops;
 
     @Embedded
@@ -82,9 +82,9 @@ public class Schedule {
     })
     public static class DestinationInfo {
 
-        String regionName;
-        String busStopName;
-        String nodeId;
+        public String regionName;
+        public String busStopName;
+        public String nodeId;
 
         public DestinationInfo(String regionName, String busStopName, String nodeId) {
             this.regionName = regionName;
@@ -116,7 +116,7 @@ public class Schedule {
     }
 
     public void update(String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
-        List<BusStop> busStop, DestinationInfo destinationInfo, Boolean isAlarmOn) {
+        List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
         this.name = name;
         this.daysList = daysList;
         this.startTime = startTime;
