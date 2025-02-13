@@ -123,19 +123,19 @@ public class ScheduleController {
         return ApiResponse.createSuccessWithData(scheduleResponses, msg);
     }
 
-//    @GetMapping("/v2/schedules/now")
-//    @Operation(
-//        summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
-//        description = "현재 스케줄이 없는 경우 null 을 반환"
-//    )
-//    public ApiResponse<ScheduleResponses> getCurrentScheduleV2(
-//        @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) throws UnsupportedEncodingException {
-//        ScheduleResponses scheduleResponses = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-//            userDetails.getId());
-//        String msg = (scheduleResponses == null)
-//            ? "현재 스케줄이 존재하지 않습니다."
-//            : "현재 스케줄이 존재합니다.";
-//        return ApiResponse.createSuccessWithData(scheduleResponses, msg);
-//    }
+    @GetMapping("/v2/schedules/now")
+    @Operation(
+        summary = "현재 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
+        description = "현재 스케줄이 없는 경우 null 을 반환"
+    )
+    public ApiResponse<ScheduleResponse> getCurrentScheduleV2(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws UnsupportedEncodingException {
+        ScheduleResponse scheduleResponse = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
+            userDetails.getId());
+        String msg = (scheduleResponse == null)
+            ? "현재 스케줄이 존재하지 않습니다."
+            : "현재 스케줄이 존재합니다.";
+        return ApiResponse.createSuccessWithData(scheduleResponse, msg);
+    }
 }

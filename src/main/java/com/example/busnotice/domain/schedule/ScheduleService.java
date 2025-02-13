@@ -149,78 +149,37 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-//    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_버스_정보(Long userId)
-//        throws UnsupportedEncodingException {
-//        User user = getUserById(userId);
-//        // 현재 스케줄
-//        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-//        if (optionalCurrentSchedule.isEmpty()) {
-//            return null;
-//        }
-//        Schedule currentSchedule = optionalCurrentSchedule.get();
-//        // 현재 스케줄의 버스정류장
-//        BusStop busStop = currentSchedule.getBusStop();
-//        // 현재 스케줄의 버스정류장에 등록된 버스들
-//        List<String> busNames = getBusNames(busStop);
-//        Item fastestBus = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(currentSchedule.getRegionName(),
-//            busStop.getNodeId(), busNames);
-//        if (fastestBus == null) {
-//            return new ScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-//                currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-//                currentSchedule.getEndTime(), null, currentSchedule.getIsAlarmOn());
-//        }
-//        return fastestBus.toScheduleResponse(currentSchedule.getId(), currentSchedule.getName(),
-//            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-//            currentSchedule.getEndTime(), currentSchedule.getIsAlarmOn());
-//    }
 
-//    public ScheduleResponses 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
-//        throws UnsupportedEncodingException {
-//        User user = getUserById(userId);
-//        // 현재 스케줄
-//        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
-//        if (optionalCurrentSchedule.isEmpty()) {
-//            return null;
-//        }
-//        Schedule currentSchedule = optionalCurrentSchedule.get();
-//        // 현재 스케줄의 버스정류장
-//        BusStop busStop = currentSchedule.getBusStop();
-//        // 현재 스케줄의 버스정류장에 등록된 버스들
-//        List<String> busNames = getBusNames(busStop);
-//        List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
-//            currentSchedule.getRegionName(), busStop.getNodeId(), busNames);
-//        // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
-//        List<BusInfoDto> busInfoDtos = items.stream().map(
-//                i -> i.toBusInfoDto(i.getArrprevstationcnt(), i.getArrtime(), i.getNodeid(),
-//                    i.getNodenm(), i.getRouteid(), i.getRouteno(), i.getRoutetp(), i.getVehicletp()))
-//            .toList();
-//        // 요일과 시간대는 필드에 직접 주입
-//        return new ScheduleResponses(currentSchedule.getId(), currentSchedule.getName(),
-//            currentSchedule.getDaysList(), currentSchedule.getStartTime(),
-//            currentSchedule.getEndTime(), busStop.getName(), busInfoDtos,
-//            currentSchedule.getIsAlarmOn());
-//    }
+    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
+        throws UnsupportedEncodingException {
+        User user = getUserById(userId);
+        // 현재 스케줄
+        Optional<Schedule> optionalCurrentSchedule = getCurrentSchedule(user);
+        if (optionalCurrentSchedule.isEmpty()) {
+            return null;
+        }
 
-//    public List<ScheduleResponse> 오늘_스케줄들의_가장_빨리_도착하는_버스_정보(Long userId)
-//        throws UnsupportedEncodingException {
-//        User user = getUserById(userId);
-//        String today = DayConverter.getTodayAsString();
-//        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, today);
-//
-//        List<ScheduleResponse> scheduleResponses = new ArrayList<>();
-//        for (Schedule s : schedules) {
-//            List<String> busNames = getBusNames(s.getBusStop());
-//            Item item = busService.특정_노드_ID에_가장_빨리_도착하는_버스_조회(s.getRegionName(),
-//                s.getBusStop().getNodeId(), busNames);
-//            scheduleResponses.add(
-//                item.toScheduleResponse(s.getId(), s.getName(), s.getDaysList(), s.getStartTime(),
-//                    s.getEndTime(), s.getIsAlarmOn()));
-//        }
-//        return scheduleResponses.stream().sorted(Comparator.comparing(ScheduleResponse::startTime))
-//            .toList();
-//    }
+        Schedule cs = optionalCurrentSchedule.get();
+        List<BusStopArrInfoDto> busStopArrInfoDtos = new ArrayList<>();
+        List<BusArrInfoDto> busArrInfoDtos;
 
-//
+        for (BusStop bs : cs.getBusStops()) {
+            List<String> busNames = bs.getBusList().stream().map(b -> b.getName()).toList();
+            List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(bs.getRegionName(),
+                bs.getNodeId(), busNames);
+            // 버스 도착 정보 추출
+            busArrInfoDtos = items.stream().map(
+                item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
+                    item.getNodeid(), item.getNodenm(), item.getRouteid(), item.getRouteno(),
+                    item.getRoutetp(), item.getVehicletp())).toList();
+            // 버스정류장 정보 추출
+            busStopArrInfoDtos.add(new BusStopArrInfoDto(bs.getName(), busArrInfoDtos));
+        }
+        ScheduleResponse scheduleResponse = new ScheduleResponse(cs.getId(), cs.getName(),
+            cs.getDaysList(), cs.getStartTime(), cs.getEndTime(), busStopArrInfoDtos,
+            cs.getIsAlarmOn());
+        return scheduleResponse;
+    }
 
     public List<ScheduleResponse> 특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId, String days)
         throws UnsupportedEncodingException {
