@@ -42,3 +42,10 @@ application.yml
 
 ### firebase
 firebase-service-key.json
+/src/main/generated/com/example/busnotice/domain/bus/QBus.java
+/src/main/generated/com/example/busnotice/domain/busStop/QBusStop.java
+/src/main/generated/com/example/busnotice/domain/busStop/QCityCode.java
+/src/main/generated/com/example/busnotice/domain/fcmToken/QFCMToken.java
+/src/main/generated/com/example/busnotice/domain/user/QRefreshToken.java
+/src/main/generated/com/example/busnotice/domain/schedule/QSchedule.java
+/src/main/generated/com/example/busnotice/domain/user/QUser.java

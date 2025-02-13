@@ -14,15 +14,33 @@ public record CreateScheduleRequest(
     @Schema(type = "string", example = "00:00")
     @JsonFormat(pattern = "HH:mm")
     LocalTime endTime, // 마치는 시간
-    String regionName, // 지역 이름
-    String busStopName, // 버스 정류장 이름
-    String nodeId, // 노드 ID
-    List<BusInfo> busInfos, // 버스 종류
+    List<RouteInfo> routeInfos,
+    DestinationInfo destinationInfo,
     Boolean isAlarmOn // 잠금화면 알림 여부
 ) {
 
-    public record BusInfo(
-        String name,
-        String type
-    ) {}
+    public record RouteInfo(
+        String regionName,
+        String busStopName,
+        String nodeId,
+        List<BusInfo> busInfos
+    ) {
+
+        public record BusInfo(
+            String name,
+            String type
+        ) {
+
+        }
+    }
+
+    public record DestinationInfo(
+        String regionName,
+        String busStopName,
+        String nodeId
+
+    ) {
+
+    }
+
 }

@@ -101,17 +101,38 @@ public class SeoulBusArrInfosDto {
             }
             String routeType = "";
             switch (this.routeType) {
-                case 1: routeType = "공항"; break;
-                case 2: routeType = "마을"; break;
-                case 3: routeType = "간선"; break;
-                case 4: routeType = "지선"; break;
-                case 5: routeType = "순환"; break;
-                case 6: routeType = "광역"; break;
-                case 7: routeType = "인천"; break;
-                case 8: routeType = "경기"; break;
-                case 9: routeType = "폐지"; break;
-                case 0: routeType = "공용"; break;
-                default: routeType = "알수없음"; // 예외 처리
+                case 1:
+                    routeType = "공항";
+                    break;
+                case 2:
+                    routeType = "마을";
+                    break;
+                case 3:
+                    routeType = "간선";
+                    break;
+                case 4:
+                    routeType = "지선";
+                    break;
+                case 5:
+                    routeType = "순환";
+                    break;
+                case 6:
+                    routeType = "광역";
+                    break;
+                case 7:
+                    routeType = "인천";
+                    break;
+                case 8:
+                    routeType = "경기";
+                    break;
+                case 9:
+                    routeType = "폐지";
+                    break;
+                case 0:
+                    routeType = "공용";
+                    break;
+                default:
+                    routeType = "알수없음"; // 예외 처리
             }
             return new BusArrInfosDto.Item(
                 arrivalInfo.arrprevstationcnt, // arrprevstationcnt

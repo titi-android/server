@@ -84,7 +84,7 @@ public class BusService {
                 .getItem()
                 .stream()
                 .map(item -> {
-                    item.setRoutetp( item.getRoutetp().substring(0, 2));
+                    item.setRoutetp(item.getRoutetp().substring(0, 2));
                     return item;
                 })
                 .toList();
@@ -152,18 +152,39 @@ public class BusService {
                 .map(i -> {
                         String routeType = "";
                         switch (i.getBusRouteType()) {
-                            case 1: routeType = "공항"; break;
-                            case 2: routeType = "마을"; break;
-                            case 3: routeType = "간선"; break;
-                            case 4: routeType = "지선"; break;
-                            case 5: routeType = "순환"; break;
-                            case 6: routeType = "광역"; break;
-                            case 7: routeType = "인천"; break;
-                            case 8: routeType = "경기"; break;
-                            case 9: routeType = "폐지"; break;
-                            case 0: routeType = "공용"; break;
-                            default: routeType = "알수없음"; // 예외 처리
-                                 }
+                            case 1:
+                                routeType = "공항";
+                                break;
+                            case 2:
+                                routeType = "마을";
+                                break;
+                            case 3:
+                                routeType = "간선";
+                                break;
+                            case 4:
+                                routeType = "지선";
+                                break;
+                            case 5:
+                                routeType = "순환";
+                                break;
+                            case 6:
+                                routeType = "광역";
+                                break;
+                            case 7:
+                                routeType = "인천";
+                                break;
+                            case 8:
+                                routeType = "경기";
+                                break;
+                            case 9:
+                                routeType = "폐지";
+                                break;
+                            case 0:
+                                routeType = "공용";
+                                break;
+                            default:
+                                routeType = "알수없음"; // 예외 처리
+                        }
                         return new BusNameAndTypeResponse(i.getBusRouteNm(), routeType);
                     }
                 ).toList();
@@ -192,8 +213,9 @@ public class BusService {
         }
 
         // routeno 리스트 추출
-        List<BusNameAndTypeResponse> list = result.getResponse().getBody().getItems().getItem().stream()
-            .map(i -> new BusNameAndTypeResponse(i.getRouteNo(),i.getRouteTp().substring(0, 2))
+        List<BusNameAndTypeResponse> list = result.getResponse().getBody().getItems().getItem()
+            .stream()
+            .map(i -> new BusNameAndTypeResponse(i.getRouteNo(), i.getRouteTp().substring(0, 2))
             ).toList();
         return list;
     }

@@ -7,6 +7,7 @@ import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.busStop.BusStopRepository;
 import com.example.busnotice.domain.busStop.BusStopService;
+import com.example.busnotice.domain.schedule.Schedule.DestinationInfo;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
@@ -54,26 +55,31 @@ public class ScheduleService {
         새_스케줄_생성시_겹침_유무_파악(user, createScheduleRequest.daysList(),
             createScheduleRequest.startTime(), createScheduleRequest.endTime());
 
-        // 도시 코드
-        String cityCode = busStopService.도시코드_DB_조회(createScheduleRequest.regionName());
-        // 스케줄상의 버스 정류장의 node id
-        String nodeId = createScheduleRequest.nodeId();
-        // 스케줄상의 버스 정류장 생성
-        BusStop busStop = BusStop.toEntity(cityCode, createScheduleRequest.busStopName(), nodeId);
-        busStopRepository.save(busStop);
-        // 해당 스케줄상의 버스 정류장에 버스 목록 등록
-        List<CreateScheduleRequest.BusInfo> busInfos = createScheduleRequest.busInfos();
-        List<Bus> buses = busInfos.stream()
-            .map(busInfo -> Bus.toEntity(busStop, busInfo.name(), busInfo.type())).toList();
-        busRepository.saveAll(buses);
-        // 스케줄 생성 후 생성한 버스 정류장 등록
-        Schedule schedule = Schedule.toEntity(user, createScheduleRequest.name(),
-            createScheduleRequest.daysList(), createScheduleRequest.regionName(),
-            createScheduleRequest.startTime(), createScheduleRequest.endTime(), busStop,
-            createScheduleRequest.isAlarmOn());
-        Schedule savedSchedule = scheduleRepository.save(schedule);
+        List<CreateScheduleRequest.RouteInfo> routeInfos = createScheduleRequest.routeInfos();
+        List<BusStop> busStops = new ArrayList<>();
+        for (CreateScheduleRequest.RouteInfo ri : routeInfos) {
+            // 도시 코드
+            String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
+            // 버스정류장 생성
+            BusStop savedBusStop = busStopRepository.save(
+                BusStop.toEntity(cityCode, ri.busStopName(), ri.nodeId()));
+            busStops.add(savedBusStop);
+            // 버스정류장에 버스 목록 등록
+            List<Bus> buses = ri.busInfos().stream()
+                .map(bi -> Bus.toEntity(savedBusStop, bi.name(), bi.type()))
+                .toList();
+            busRepository.saveAll(buses);
+        }
+        // 스케줄 생성한 후 생성한 도착지 및 버스 정류장 등록
+        CreateScheduleRequest.DestinationInfo crdi = createScheduleRequest.destinationInfo();
+        DestinationInfo destinationInfo = new DestinationInfo(crdi.regionName(), crdi.busStopName(),
+            crdi.nodeId());
+        Schedule sc = Schedule.toEntity(user, createScheduleRequest.name(),
+            createScheduleRequest.daysList(), createScheduleRequest.startTime(),
+            createScheduleRequest.endTime(), busStops,
+            destinationInfo, createScheduleRequest.isAlarmOn());
+        Schedule savedSchedule = scheduleRepository.save(sc);
         log.info("savedSchedule.toString(): {}", savedSchedule);
-
     }
 
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
@@ -93,28 +99,36 @@ public class ScheduleService {
         기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
             updateScheduleRequest.startTime(), updateScheduleRequest.endTime());
 
-        // 도시 코드
-        String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
-        // 수정한 스케줄상의 버스 정류장의 node id
-        String newNodeId = busStopService.버스정류장_노드_ID_조회(updateScheduleRequest.regionName(),
-            updateScheduleRequest.busStopName());
-        // 스케줄상의 기존 버스 정류장 엔티티
-        BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();
-        // 해당 버스 정류장에 등록된 버스들 삭제
-        List<Long> busIds = existBusStop.getBusList().stream().map(bus -> bus.getId()).toList();
-        busRepository.deleteAllById(busIds);
-        // 버스 정류장 업데이트 및 버스 생성
-        List<UpdateScheduleRequest.BusInfo> busInfos = updateScheduleRequest.busInfos();
-        List<Bus> newBuses = busInfos.stream()
-            .map(busInfo -> Bus.toEntity(existBusStop, busInfo.name(),
-                busInfo.type()))
-            .toList();
-        busRepository.saveAll(newBuses);
-        existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);
-        // 최종적으로 스케줄 업데이트
-        existSchedule.update(updateScheduleRequest.name(), updateScheduleRequest.daysList(),
-            updateScheduleRequest.startTime(), updateScheduleRequest.endTime(), existBusStop,
-            updateScheduleRequest.isAlarmOn());
+        List<UpdateScheduleRequest.RouteInfo> routeInfos = updateScheduleRequest.routeInfos();
+        // 수정 대상 스케줄의 BusStops 및 BusStop 에 등록된 Bus 들 모두 삭제
+        existSchedule.getBusStops()
+            .clear(); // busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
+        List<BusStop> busStops = new ArrayList<>();
+        // 새로 BusStop 및 Bus 등록
+        for (UpdateScheduleRequest.RouteInfo ri : routeInfos) {
+            // 도시 코드
+            String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
+            // 버스정류장 생성
+            BusStop savedBusStop = busStopRepository.save(
+                BusStop.toEntity(cityCode, ri.busStopName(), ri.nodeId()));
+            busStops.add(savedBusStop);
+            // 버스정류장에 버스 목록 등록
+            List<Bus> buses = ri.busInfos().stream()
+                .map(bi -> Bus.toEntity(savedBusStop, bi.name(), bi.type()))
+                .toList();
+            busRepository.saveAll(buses);
+        }
+        // 스케줄 생성한 후 생성한 도착지 및 버스 정류장 등록
+        UpdateScheduleRequest.DestinationInfo crdi = updateScheduleRequest.destinationInfo();
+        DestinationInfo destinationInfo = new DestinationInfo(crdi.regionName(), crdi.busStopName(),
+            crdi.nodeId());
+        // 스케줄 업데이트
+        existSchedule.update(
+            updateScheduleRequest.name(),
+            updateScheduleRequest.daysList(),
+            updateScheduleRequest.startTime(), updateScheduleRequest.endTime(),
+            busStops, destinationInfo, updateScheduleRequest.isAlarmOn()
+        );
     }
 
     @Transactional

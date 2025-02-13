@@ -2,7 +2,6 @@ package com.example.busnotice.util;
 
 import com.example.busnotice.domain.bus.res.BusInfosDto;
 import com.example.busnotice.domain.bus.res.BusInfosDto.Item;
-import com.example.busnotice.domain.busStop.res.BusStopsDto;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;

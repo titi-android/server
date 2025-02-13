@@ -57,7 +57,8 @@ public class BusController {
         @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId
     ) throws UnsupportedEncodingException {
-        List<BusNameAndTypeResponse> busNameAndTypeList = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
+        List<BusNameAndTypeResponse> busNameAndTypeList = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(
+            cityName, nodeId);
         return busNameAndTypeList;
     }
 
@@ -68,7 +69,8 @@ public class BusController {
         @RequestParam("nodeId") String nodeId,
         @RequestParam("routeNo") List<String> busList
     ) throws UnsupportedEncodingException {
-        List<BusNameAndTypeResponse> busNameAndTypeResponses = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(cityName, nodeId);
+        List<BusNameAndTypeResponse> busNameAndTypeResponses = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(
+            cityName, nodeId);
         List<String> busNames = busNameAndTypeResponses.stream().map(bnt -> bnt.name()).toList();
         boolean isValid = busNames.containsAll(busList.stream().map(String::trim).toList());
         return isValid
