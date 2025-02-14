@@ -46,8 +46,7 @@ public class ScheduleService {
     private final BusStopService busStopService;
 
     @Transactional
-    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest)
-        throws IOException {
+    public void createSchedule(Long userId, CreateScheduleRequest createScheduleRequest) {
         User user = getUserById(userId);
 
         // 겹치는 스케줄 있는지 확인
@@ -73,7 +72,6 @@ public class ScheduleService {
             createScheduleRequest.isAlarmOn());
         Schedule savedSchedule = scheduleRepository.save(schedule);
         log.info("savedSchedule.toString(): {}", savedSchedule);
-
     }
 
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
@@ -99,7 +97,7 @@ public class ScheduleService {
         String newNodeId = busStopService.버스정류장_노드_ID_조회(updateScheduleRequest.regionName(),
             updateScheduleRequest.busStopName());
         // 스케줄상의 기존 버스 정류장 엔티티
-        BusStop existBusStop = busStopRepository.findById(existSchedule.getBusStop().getId()).get();
+        BusStop existBusStop = existSchedule.getBusStop();
         // 해당 버스 정류장에 등록된 버스들 삭제
         List<Long> busIds = existBusStop.getBusList().stream().map(bus -> bus.getId()).toList();
         busRepository.deleteAllById(busIds);
