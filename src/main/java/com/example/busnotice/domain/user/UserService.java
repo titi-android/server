@@ -34,7 +34,7 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserException(StatusCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
         }
-        String accessToken = jwtProvider.createAccessToken(name);
+        String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken();
         // 기존 리프레시 토큰 존재 시 삭제
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);

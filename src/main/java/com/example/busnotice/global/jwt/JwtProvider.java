@@ -36,8 +36,8 @@ public class JwtProvider {
     private final RefreshTokenRepository refreshTokenRepository;
 
     // 엑세스 토큰 발급
-    public String createAccessToken(String username) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createAccessToken(Long userId) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         Date now = new Date();
         Date validity = new Date(now.getTime() + accessValidityInSecs);
 
@@ -61,8 +61,8 @@ public class JwtProvider {
             .compact();
     }
 
-    public String getUsername(String token) {
-        return getClaims(token).getSubject();
+    public String getUserId(String token) {
+        return getClaims(token).getSubject(); // 유저의 ID를 String 형태로 반환
     }
 
     private Claims getClaims(String token) {
@@ -94,7 +94,7 @@ public class JwtProvider {
 
     public Authentication getAuthentication(String token) {
         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(
-            getUsername(token)
+            getUserId(token)
         );
 
         return new UsernamePasswordAuthenticationToken(customUserDetails,
@@ -130,7 +130,7 @@ public class JwtProvider {
             throw new RefreshTokenException(StatusCode.BAD_REQUEST, "리프레시 토큰이 만료되었습다.");
         }
         // 해당 리프레시 토큰의 유저 정보를 통해 다시 엑세스 토큰 생성
-        String accessToken = createAccessToken(existsRefreshToken.getUser().getName());
+        String accessToken = createAccessToken(Long.valueOf(existsRefreshToken.getUser().getId()));
         return new RefreshTokenResponse(accessToken);
     }
 
