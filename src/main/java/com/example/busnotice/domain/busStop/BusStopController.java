@@ -3,6 +3,9 @@ package com.example.busnotice.domain.busStop;
 import com.example.busnotice.domain.bus.res.BusInfosResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +25,9 @@ public class BusStopController {
 
     @GetMapping("/cityCode")
     @Operation(summary = "도시 이름으로 도시 코드 조회")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "CITY_CODE401", description = "해당 이름과 매칭되는 도시코드가 존재하지 않습니다."),
+    })
     public ApiResponse<String> getCityCode(@RequestParam("cityName") String cityName) {
         String cityCodes = busStopService.도시코드_DB_조회(cityName);
         return ApiResponse.createSuccessWithData(cityCodes, "도시코드 조회에 성공했습니다.");
@@ -29,6 +35,9 @@ public class BusStopController {
 
     @GetMapping("/nodes/id")
     @Operation(summary = "정류소의 노드 ID 조회")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "BUS_STOP401", description = "해당 이름을 포함하는 버스정류장이 존재하지 않습니다."),
+    })
     public ApiResponse<String> getNodeId
         (
             @RequestParam("cityName") String cityName, // 도시 이름

@@ -3,6 +3,7 @@ package com.example.busnotice.global.jwt;
 import com.example.busnotice.domain.user.RefreshToken;
 import com.example.busnotice.domain.user.RefreshTokenRepository;
 import com.example.busnotice.domain.user.res.RefreshTokenResponse;
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.JwtAuthenticationException;
 import com.example.busnotice.global.exception.RefreshTokenException;
@@ -120,14 +121,13 @@ public class JwtProvider {
         // 유저에게 등록된 리프레시 토큰인지 확인
         RefreshToken existsRefreshToken = refreshTokenRepository.findByToken(refreshToken)
             .orElseThrow(
-                () -> new RefreshTokenException(StatusCode.NOT_FOUND,
-                    "해당 유저의 리프레시 토큰이 DB에 존재하지 않습니다."));
+                () -> new RefreshTokenException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
         if (!existsRefreshToken.equals(refreshToken)) {
-            new RefreshTokenException(StatusCode.BAD_REQUEST, "해당 유저에게 등록된 리프레시 토큰이 아닙니다.");
+            new RefreshTokenException(ErrorCode.REFRESH_TOKEN_INVALID);
         }
         // 만료된 리프레시 토큰인지 확인
         if (isRefreshTokenExpired(refreshToken)) {
-            throw new RefreshTokenException(StatusCode.BAD_REQUEST, "리프레시 토큰이 만료되었습다.");
+            throw new RefreshTokenException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
         // 해당 리프레시 토큰의 유저 정보를 통해 다시 엑세스 토큰 생성
         String accessToken = createAccessToken(Long.valueOf(existsRefreshToken.getUser().getId()));

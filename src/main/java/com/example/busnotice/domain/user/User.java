@@ -36,4 +36,8 @@ public class User {
 
     public User() {
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

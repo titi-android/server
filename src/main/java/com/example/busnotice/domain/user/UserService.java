@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.user;
 
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
@@ -22,17 +23,16 @@ public class UserService {
     @Transactional
     public void signUp(String name, String password) {
         if (userRepository.existsByName(name)) {
-            throw new UserException(StatusCode.CONFLICT, "이미 존재하는 이름입니다.");
+            throw new UserException(ErrorCode.USER_DUPLICATED_NAME);
         }
         userRepository.save(new User(name, passwordEncoder.encode(password)));
     }
 
     @Transactional
     public TokenResponse login(String name, String password) {
-        User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
-            StatusCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        User user = userRepository.findByName(name).orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserException(StatusCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+            throw new UserException(ErrorCode.USER_INVALID_PASSWORD);
         }
         String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken();
@@ -47,4 +47,13 @@ public class UserService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    @Transactional
+    public void updateProfile(Long userId, String name) {
+        User user = userRepository.findById(userId).get();
+        Optional<User> anotherUser = userRepository.findByNameWithoutMe(userId, name);
+        if (anotherUser.isPresent()) {
+            throw new UserException(ErrorCode.USER_DUPLICATED_NAME);
+        }
+        user.updateName(name);
+    }
 }

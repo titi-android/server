@@ -9,6 +9,9 @@ import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
 import com.example.busnotice.util.DayConverter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -35,10 +38,13 @@ public class ScheduleController {
 
     @PostMapping("/v2/schedules")
     @Operation(summary = "스케줄 등록")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SCHEDULE402", description = "겹치는 스케줄이 존재합니다."),
+    })
     public ApiResponse<Void> createScheduleV2(
         @RequestBody CreateScheduleRequest createScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws IOException {
+    ) {
         scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
@@ -47,6 +53,9 @@ public class ScheduleController {
     @Operation(
         summary = "스케줄 조회"
     )
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SCHEDULE401", description = "해당 ID의 스케줄이 존재하지 않습니다."),
+    })
     public ApiResponse<ScheduleInfoResponse> getSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
@@ -59,6 +68,9 @@ public class ScheduleController {
 
     @PutMapping("/v2/schedules/{scheduleId}")
     @Operation(summary = "스케줄 수정")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SCHEDULE402", description = "겹치는 스케줄이 존재합니다."),
+    })
     public ApiResponse<Void> updateSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @RequestBody UpdateScheduleRequest updateScheduleRequest,
@@ -71,6 +83,9 @@ public class ScheduleController {
 
     @DeleteMapping("/v1/schedules/{scheduleId}")
     @Operation(summary = "스케줄 삭제")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SCHEDULE401", description = "해당 ID의 스케줄이 존재하지 않습니다."),
+    })
     public ApiResponse<Void> deleteSchedule(
         @PathVariable("scheduleId") Long scheduleId,
         @AuthenticationPrincipal CustomUserDetails userDetails
