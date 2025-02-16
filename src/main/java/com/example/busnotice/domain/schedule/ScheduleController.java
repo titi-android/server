@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.index.qual.SameLen;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -126,9 +129,11 @@ public class ScheduleController {
         System.out.println("DayConverter.getTodayAsString() = " + DayConverter.getTodayAsString());
         List<ScheduleResponses> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
             userDetails.getId(), DayConverter.getTodayAsString());
+
         String msg = scheduleResponsesList.isEmpty()
             ? "오늘 스케줄이 존재하지 않습니다."
             : "오늘 스케줄이 존재합니다.";
+        log.info("getAllSchedulesOfTodayV2 CONTROLLER: {}", scheduleResponsesList.toString());
         return ApiResponse.createSuccessWithData(scheduleResponsesList, msg);
     }
 

@@ -205,7 +205,7 @@ public class ScheduleService {
             List<String> busNames = getBusNames(s.getBusStop());
             List<Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(s.getRegionName(),
                 s.getBusStop().getNodeId(), busNames);
-
+            log.info("service items: {}", items);
             // 버스 도착 정보만 배열로 따로 빼서 오름차순 정렬
             List<BusInfoDto> busInfoDtos = items.stream().map(
                 item -> item.toBusInfoDto(item.getArrprevstationcnt(), item.getArrtime(),
@@ -216,6 +216,7 @@ public class ScheduleService {
                 busInfoDtos, s.getIsAlarmOn());
             scheduleResponsesList.add(scheduleResponses);
         }
+        log.info("service: {}", scheduleResponsesList);
         return scheduleResponsesList.stream()
             .sorted(Comparator.comparing(responses -> responses.startTime())).toList();
     }

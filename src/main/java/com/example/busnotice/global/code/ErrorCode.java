@@ -1,7 +1,5 @@
 package com.example.busnotice.global.code;
 
-import com.google.api.Http;
-import javax.swing.text.html.HTML;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -37,10 +35,12 @@ public enum ErrorCode {
     ACCESS_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "JWT403", "엑세스 토큰 형식이 올바르지 않습니다."),
     ACCESS_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT404", "지원되지 않는 엑세스 토큰입니다."),
     ACCESS_TOKEN_ILLEGAL_ARGUMENT(HttpStatus.UNAUTHORIZED, "JWT405", "잘못된 엑세스 토큰입니다."),
-    ACCESS_TOKEN_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT406", "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
+    ACCESS_TOKEN_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT406",
+        "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
 
     // ETC
-    UNSUPPORTED_ENCODING(HttpStatus.INTERNAL_SERVER_ERROR, "UNSUPPORTED_ENCODING", "지원되지 않는 인코딩 형식입니다.");
+    UNSUPPORTED_ENCODING(HttpStatus.INTERNAL_SERVER_ERROR, "UNSUPPORTED_ENCODING",
+        "지원되지 않는 인코딩 형식입니다.");
 
 
     private final HttpStatus httpStatus;
