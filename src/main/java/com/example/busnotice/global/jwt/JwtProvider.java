@@ -74,15 +74,15 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
         } catch (ExpiredJwtException e) {
-            throw new JwtAuthenticationException("토큰이 만료되었습니다.");
+            throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException e) {
-            throw new JwtAuthenticationException("서명이 올바르지 않습니다.");
+            throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_SIGNATURE_INVALID);
         } catch (MalformedJwtException e) {
-            throw new JwtAuthenticationException("토큰 형식이 올바르지 않습니다.");
+            throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_MALFORMED);
         } catch (UnsupportedJwtException e) {
-            throw new JwtAuthenticationException("지원되지 않는 JWT 토큰입니다.");
+            throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_UNSUPPORTED);
         } catch (IllegalArgumentException e) {
-            throw new JwtAuthenticationException("잘못된 JWT 토큰입니다.");
+            throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_ILLEGAL_ARGUMENT);
         }
     }
 
@@ -90,7 +90,7 @@ public class JwtProvider {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7); // "Bearer "를 제외하고 나머지 값만 반환
         }
-        throw new JwtAuthenticationException("유효하지 않은 형식의 bearer 토큰값입니다.");
+        throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_ILLEGAL_ARGUMENT);
     }
 
     public Authentication getAuthentication(String token) {

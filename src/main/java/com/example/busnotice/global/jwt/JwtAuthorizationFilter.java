@@ -1,5 +1,6 @@
 package com.example.busnotice.global.jwt;
 
+import com.example.busnotice.global.exception.JwtAuthenticationException;
 import com.example.busnotice.global.security.CustomAuthenticationEntryPoint;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -50,6 +51,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
+        } catch (JwtAuthenticationException e) {  // ✅ 더 구체적인 예외를 먼저 처리
+            System.out.println("🔥 JwtAuthenticationException 잡힘: " + e.getMessage());
+            request.setAttribute("exceptionMessage", e.getMessage());
+            entryPoint.commence(request, response, e);
         } catch (AuthenticationException e) { // 인증 관련 예외 잡기
             request.setAttribute("exceptionMessage", e.getMessage());
             SecurityContextHolder.clearContext();

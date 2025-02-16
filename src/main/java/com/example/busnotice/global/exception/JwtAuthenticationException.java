@@ -1,18 +1,15 @@
 package com.example.busnotice.global.exception;
 
+import com.example.busnotice.global.code.ErrorCode;
 import org.springframework.security.core.AuthenticationException;
 
 public class JwtAuthenticationException extends AuthenticationException {
 
-    private final String customMessage;
+    private final ErrorCode code;
 
-    public JwtAuthenticationException(String msg) {
-        super(msg);
-        this.customMessage = msg;
+    public JwtAuthenticationException(ErrorCode code) {
+        super(code.getMessage());
+        this.code = code;
     }
 
-    @Override
-    public String getMessage() {
-        return customMessage;
-    }
 }
