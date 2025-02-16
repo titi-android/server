@@ -6,6 +6,9 @@ import com.example.busnotice.domain.busStop.CityCodeRepository;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -22,13 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class BusController {
 
     private final BusService busService;
-    private final CityCodeRepository cityCodeRepository;
 
+    @GetMapping("/nodes/arrive/info")
     @Operation(
         summary = "특정 노드에 도착 예정인 모든 버스 정보 조회",
         description = "도착 예정인 버스가 없는 경우 빈 리스트를 반환"
     )
-    @GetMapping("/nodes/arrive/info")
     public ApiResponse<List<Item>> getNodeArriveInfo(
         @RequestParam("cityName") String cityName, // 도시 코드
         @RequestParam("nodeId") String nodeId // 노드 ID
@@ -73,6 +75,6 @@ public class BusController {
         boolean isValid = busNames.containsAll(busList.stream().map(String::trim).toList());
         return isValid
             ? ApiResponse.createSuccess("올바른 버스 목록입니다.")
-            : ApiResponse.createFail(StatusCode.BAD_REQUEST, "해당 정류장에 속한 버스 노선이 아닙니다.");
+            : ApiResponse.createSuccess("해당 정류장에 속한 버스 노선이 아닙니다.");
     }
 }

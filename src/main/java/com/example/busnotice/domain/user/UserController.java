@@ -1,15 +1,22 @@
 package com.example.busnotice.domain.user;
 
+import com.example.busnotice.domain.user.req.FeedBackRequest;
 import com.example.busnotice.domain.user.req.LoginRequest;
 import com.example.busnotice.domain.user.req.SignUpRequest;
+import com.example.busnotice.domain.user.req.UpdateNameRequest;
 import com.example.busnotice.domain.user.res.RefreshTokenResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
+import com.example.busnotice.global.security.CustomUserDetails;
+import com.example.busnotice.util.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,18 +30,27 @@ public class UserController {
 
     private final UserService userService;
     private final JwtProvider jwtProvider;
+    private final EmailService emailService;
+
 
     @PostMapping("/users/signup")
     @Operation(summary = "회원 가입")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "이미 존재하는 이름입니다."),
+    })
     public ApiResponse<Void> signUp(
         @RequestBody SignUpRequest signUpRequest
     ) {
         userService.signUp(signUpRequest.name(), signUpRequest.password());
-        return ApiResponse.createSuccess("회원가입에 성공했습니다.");
+        return ApiResponse.createSuccess("회원가입 성공");
     }
 
     @PostMapping("/users/login")
     @Operation(summary = "로그인")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER402", description = "존재하지 않는 유저입니다."),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER403", description = "비밀번호가 일치하지 않습니다."),
+    })
     public ApiResponse<TokenResponse> login(
         @RequestBody LoginRequest loginRequest
     ) {
@@ -45,6 +61,11 @@ public class UserController {
 
     @PostMapping("/users/refresh")
     @Operation(summary = "엑세스 토큰 재발급")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REFRESH401", description = "리프레시 토큰이 DB에 존재하지 않습니다."),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REFRESH402", description = "해당 유저에 등록된 리프레시과 일치하지 않습니다."),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "REFRESH403", description = "리프레시 토큰이 만료되었습니다."),
+    })
     public ApiResponse<RefreshTokenResponse> recreateAccessToken(
         @RequestHeader("Refresh-Token") String refreshToken
     ) {
@@ -52,4 +73,28 @@ public class UserController {
         return ApiResponse.createSuccessWithData(refreshTokenResponse,
             "엑세스 토큰이 재발급 되었습니다.");
     }
+
+    @PostMapping("/users/feed-back")
+    @Operation(summary = "문의 사항 이메일 전송")
+    public ApiResponse<String> sendFeedBack(
+        @RequestBody FeedBackRequest feedBackRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        emailService.sendMailNotice(userDetails.getUsername(), feedBackRequest.title(), feedBackRequest.content());
+        return ApiResponse.createSuccess("문의 메일이 전송되었습니다.");
+    }
+
+    @PutMapping("/users/name")
+    @Operation(summary = "닉네임 수정")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "이미 존재하는 이름입니다."),
+    })
+    public ApiResponse<String> updateProfile(
+        @RequestBody UpdateNameRequest updateNameRequest,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        userService.updateProfile(userDetails.getId(), updateNameRequest.name());
+        return ApiResponse.createSuccess("프로필 수정이 완료되었습니다.");
+    }
+
 }

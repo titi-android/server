@@ -1,17 +1,18 @@
 package com.example.busnotice.global.exception;
 
+import com.example.busnotice.domain.schedule.Schedule;
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 
 public class ScheduleException extends RuntimeException {
 
-    private final StatusCode statusCode;
+    private final ErrorCode code;
 
-    public ScheduleException(StatusCode statusCode, String message) {
-        super(message);
-        this.statusCode = statusCode;
+    public ScheduleException(ErrorCode code) {
+        this.code = code;
     }
 
-    public StatusCode getStatusCode() {
-        return statusCode;
+    public ErrorCode getErrorCode() {
+        return code;
     }
 }
