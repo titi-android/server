@@ -55,6 +55,10 @@ public class BusService {
                 .bodyToMono(SeoulBusArrInfosDto.class).block();
             System.out.println("(서울)특정_노드_ID에_도착하는_모든_버스들_정보_조회: " + result.toString());
 
+            if (result.getMsgBody().getItemList() == null) {
+                return Collections.emptyList();
+            }
+
             List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
             List<Item> items = itemList.stream().map(i -> i.toGeneralItem())
                 .filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime))
@@ -77,21 +81,20 @@ public class BusService {
         BusArrInfosDto result = webClient.get().uri(uri).retrieve()
             .bodyToMono(BusArrInfosDto.class).block();
         System.out.println("(전국)특정_노드_ID에_도착하는_모든_버스들_정보_조회: " + result.toString());
-        if (result != null && result.getResponse() != null && result.getResponse().getBody() != null
-            && result.getResponse().getBody().getItems() != null) {
 
-            List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
-                .getItem()
-                .stream()
-                .map(item -> {
-                    item.setRoutetp( item.getRoutetp().substring(0, 2));
-                    return item;
-                })
-                .toList();
-
-            return items;
+        if (result.getResponse().getBody().getItems() == null) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+
+        List<BusArrInfosDto.Item> items = result.getResponse().getBody().getItems()
+            .getItem()
+            .stream()
+            .map(item -> {
+                item.setRoutetp(item.getRoutetp().substring(0, 2));
+                return item;
+            })
+            .toList();
+        return items;
     }
 
     public List<Item> 특정_노드_ID에_도착하는_특정_버스들_정보_조회(String cityName, String nodeId,
@@ -152,18 +155,39 @@ public class BusService {
                 .map(i -> {
                         String routeType = "";
                         switch (i.getBusRouteType()) {
-                            case 1: routeType = "공항"; break;
-                            case 2: routeType = "마을"; break;
-                            case 3: routeType = "간선"; break;
-                            case 4: routeType = "지선"; break;
-                            case 5: routeType = "순환"; break;
-                            case 6: routeType = "광역"; break;
-                            case 7: routeType = "인천"; break;
-                            case 8: routeType = "경기"; break;
-                            case 9: routeType = "폐지"; break;
-                            case 0: routeType = "공용"; break;
-                            default: routeType = "알수없음"; // 예외 처리
-                                 }
+                            case 1:
+                                routeType = "공항";
+                                break;
+                            case 2:
+                                routeType = "마을";
+                                break;
+                            case 3:
+                                routeType = "간선";
+                                break;
+                            case 4:
+                                routeType = "지선";
+                                break;
+                            case 5:
+                                routeType = "순환";
+                                break;
+                            case 6:
+                                routeType = "광역";
+                                break;
+                            case 7:
+                                routeType = "인천";
+                                break;
+                            case 8:
+                                routeType = "경기";
+                                break;
+                            case 9:
+                                routeType = "폐지";
+                                break;
+                            case 0:
+                                routeType = "공용";
+                                break;
+                            default:
+                                routeType = "알수없음"; // 예외 처리
+                        }
                         return new BusNameAndTypeResponse(i.getBusRouteNm(), routeType);
                     }
                 ).toList();
@@ -192,8 +216,9 @@ public class BusService {
         }
 
         // routeno 리스트 추출
-        List<BusNameAndTypeResponse> list = result.getResponse().getBody().getItems().getItem().stream()
-            .map(i -> new BusNameAndTypeResponse(i.getRouteNo(),i.getRouteTp().substring(0, 2))
+        List<BusNameAndTypeResponse> list = result.getResponse().getBody().getItems().getItem()
+            .stream()
+            .map(i -> new BusNameAndTypeResponse(i.getRouteNo(), i.getRouteTp().substring(0, 2))
             ).toList();
         return list;
     }

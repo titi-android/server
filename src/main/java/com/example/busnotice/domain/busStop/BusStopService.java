@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +117,7 @@ public class BusStopService {
             System.out.println("response.toString() = " + response.toString());
             if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
                 .isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+                return Collections.emptyList();
             }
             List<String> busNames = response.getMsgBody().getItemList().stream()
                 .map(item -> item.getStNm()).toList();
@@ -147,7 +148,7 @@ public class BusStopService {
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
         if (items == null || items.getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+            return Collections.emptyList();
         }
         List<Item> itemsList = items.getItem();
         return itemsList.stream().map(item -> item.getNodenm()).toList();
@@ -176,7 +177,7 @@ public class BusStopService {
             System.out.println("response.toString() = " + response.toString());
             if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
                 .isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+                return new BusInfosResponse(Collections.emptyList());
             }
             List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
                 .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
@@ -207,9 +208,11 @@ public class BusStopService {
             .block();
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
+        // 해당 하는 버스정류장이 없는 경우
         if (items == null || items.getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+            return new BusInfosResponse(Collections.emptyList());
         }
+        // 해당 하는 버스정류장이 존재하는 경우
         List<Item> itemsList = items.getItem();
         List<BusInfoResponse> busInfoResponses = itemsList.stream()
             .map(item -> new BusInfoResponse(item.getNodenm(), item.getNodeid(),

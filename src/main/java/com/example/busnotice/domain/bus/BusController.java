@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class BusController {
 
     private final BusService busService;
-    private final CityCodeRepository cityCodeRepository;
 
     @Operation(
         summary = "특정 노드에 도착 예정인 모든 버스 정보 조회",

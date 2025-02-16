@@ -48,7 +48,8 @@ public class BusStopController {
         ) throws IOException {
         List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_이름만_반환(cityName,
             busStopName);
-        return ApiResponse.createSuccessWithData(busNames, "해당 이름을 포함하는 버스정류장 목록(이름) 조회에 성공했습니다.");
+        String msg = busNames.isEmpty() ? "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" : "해당 이름을 포함하는 버스정류장이 존재합니다.";
+        return ApiResponse.createSuccessWithData(busNames, msg);
     }
 
     @GetMapping("/nodes/infos")
@@ -61,7 +62,8 @@ public class BusStopController {
         BusInfosResponse busInfosResponse = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(
             cityName,
             busStopName);
+        String msg = busInfosResponse.busInfosResponse().isEmpty() ? "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" : "해당 이름을 포함하는 버스정류장이 존재합니다.";
         return ApiResponse.createSuccessWithData(busInfosResponse,
-            "해당 이름을 포함하는 버스정류장 목록(모든 정보) 조회에 성공했습니다.");
+            msg);
     }
 }

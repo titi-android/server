@@ -120,7 +120,7 @@ public class JwtProvider {
         // 유저에게 등록된 리프레시 토큰인지 확인
         RefreshToken existsRefreshToken = refreshTokenRepository.findByToken(refreshToken)
             .orElseThrow(
-                () -> new RefreshTokenException(StatusCode.BAD_REQUEST,
+                () -> new RefreshTokenException(StatusCode.NOT_FOUND,
                     "해당 유저의 리프레시 토큰이 DB에 존재하지 않습니다."));
         if (!existsRefreshToken.equals(refreshToken)) {
             new RefreshTokenException(StatusCode.BAD_REQUEST, "해당 유저에게 등록된 리프레시 토큰이 아닙니다.");

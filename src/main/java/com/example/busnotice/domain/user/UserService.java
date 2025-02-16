@@ -30,9 +30,9 @@ public class UserService {
     @Transactional
     public TokenResponse login(String name, String password) {
         User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
-            StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
+            StatusCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserException(StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다.");
+            throw new UserException(StatusCode.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
         }
         String accessToken = jwtProvider.createAccessToken(name);
         String refreshToken = jwtProvider.createRefreshToken();
