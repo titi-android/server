@@ -7,7 +7,6 @@ import com.example.busnotice.domain.busStop.res.BusStopsDto.Item;
 import com.example.busnotice.domain.busStop.res.BusStopsDto.Items;
 import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.GeneralException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -155,7 +155,7 @@ public class BusStopService {
         return itemsList.stream().map(item -> item.getNodenm()).toList();
     }
 
-    public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName)
+    public Mono<BusInfosResponse> 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName)
         throws UnsupportedEncodingException {
         String cityCode = 도시코드_DB_조회(cityName);
 
@@ -170,20 +170,19 @@ public class BusStopService {
                 url, encodedServiceKey, endCodedBusStopName));
 
             // WebClient 호출 - 서울의 해당 이름이 포함된 버스정류장을 모두 조회
-            SeoulBusStopsDto response = webClient.get()
+            return webClient.get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(SeoulBusStopsDto.class)
-                .block();
-            System.out.println("response.toString() = " + response.toString());
-            if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
-                .isEmpty()) {
-                return new BusInfosResponse(Collections.emptyList());
-            }
-            List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
-                .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
-                    item.getTmX(), item.getTmY())).toList();
-            return new BusInfosResponse(busInfoResponses);
+                .map(response -> {
+                    if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList().isEmpty()) {
+                        return new BusInfosResponse(Collections.emptyList());
+                    }
+                    List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
+                        .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(), item.getTmX(), item.getTmY()))
+                        .toList();
+                    return new BusInfosResponse(busInfoResponses);
+                });
         }
 
         cityCode = cityCode.trim().replaceAll("\\s+", "");
@@ -202,23 +201,20 @@ public class BusStopService {
                 encodedServiceKey, encodedCityCode, encodedName, encodedNumOfRows));
 
         // WebClient 호출 - 해당 지역의 해당 이름이 포함된 버스정류장을 모두 조회
-        BusStopsDto result = webClient.get()
+        return webClient.get()
             .uri(uri)
             .retrieve()
             .bodyToMono(BusStopsDto.class)
-            .block();
-        System.out.println("result.toString() = " + result.toString());
-        Items items = result.getResponse().getBody().getItems();
-        // 해당 하는 버스정류장이 없는 경우
-        if (items == null || items.getItem().isEmpty()) {
-            return new BusInfosResponse(Collections.emptyList());
-        }
-        // 해당 하는 버스정류장이 존재하는 경우
-        List<Item> itemsList = items.getItem();
-        List<BusInfoResponse> busInfoResponses = itemsList.stream()
-            .map(item -> new BusInfoResponse(item.getNodenm(), item.getNodeid(),
-                item.getGpslati(), item.getGpslong())).toList();
-        return new BusInfosResponse(busInfoResponses);
+            .map(result -> {
+                Items items = result.getResponse().getBody().getItems();
+                if (items == null || items.getItem().isEmpty()) {
+                    return new BusInfosResponse(Collections.emptyList());
+                }
+                List<BusInfoResponse> busInfoResponses = items.getItem().stream()
+                    .map(item -> new BusInfoResponse(item.getNodenm(), item.getNodeid(), item.getGpslati(), item.getGpslong()))
+                    .toList();
+                return new BusInfosResponse(busInfoResponses);
+            });
     }
 
     @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")

@@ -4,7 +4,7 @@ import java.util.List;
 
 public record BusInfosResponse(
 
-    List<BusInfoResponse> busInfosResponse
+    List<BusInfoResponse> busInfoResponses
 
 ) {
 

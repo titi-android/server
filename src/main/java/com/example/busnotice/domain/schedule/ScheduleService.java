@@ -94,9 +94,6 @@ public class ScheduleService {
 
         // 도시 코드
         String cityCode = busStopService.도시코드_DB_조회(updateScheduleRequest.regionName());
-        // 수정한 스케줄상의 버스 정류장의 node id
-        String newNodeId = busStopService.버스정류장_노드_ID_조회(updateScheduleRequest.regionName(),
-            updateScheduleRequest.busStopName());
         // 스케줄상의 기존 버스 정류장 엔티티
         BusStop existBusStop = existSchedule.getBusStop();
         // 해당 버스 정류장에 등록된 버스들 삭제
@@ -109,7 +106,8 @@ public class ScheduleService {
                 busInfo.type()))
             .toList();
         busRepository.saveAll(newBuses);
-        existBusStop.update(cityCode, updateScheduleRequest.busStopName(), newNodeId, newBuses);
+        existBusStop.update(cityCode, updateScheduleRequest.busStopName(),
+            updateScheduleRequest.nodeId(), newBuses);
         // 최종적으로 스케줄 업데이트
         existSchedule.update(updateScheduleRequest.name(), updateScheduleRequest.daysList(),
             updateScheduleRequest.startTime(), updateScheduleRequest.endTime(), existBusStop,

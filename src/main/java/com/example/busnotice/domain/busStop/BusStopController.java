@@ -3,8 +3,6 @@ package com.example.busnotice.domain.busStop;
 import com.example.busnotice.domain.bus.res.BusInfosResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "BusStop", description = "버스정류장 관련 API")
 @RestController
@@ -57,22 +56,27 @@ public class BusStopController {
         ) throws IOException {
         List<String> busNames = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_이름만_반환(cityName,
             busStopName);
-        String msg = busNames.isEmpty() ? "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" : "해당 이름을 포함하는 버스정류장이 존재합니다.";
+        String msg =
+            busNames.isEmpty() ? "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" : "해당 이름을 포함하는 버스정류장이 존재합니다.";
         return ApiResponse.createSuccessWithData(busNames, msg);
     }
 
     @GetMapping("/nodes/infos")
     @Operation(summary = "버스정류장 목록(모든 정보) 조회")
-    public ApiResponse<BusInfosResponse> getNodeInfos
+    public Mono<ApiResponse<BusInfosResponse>> getNodeInfos
         (
             @RequestParam("cityName") String cityName, // 도시 이름
             @RequestParam("busStopName") String busStopName // 정류소 이름
         ) throws IOException {
-        BusInfosResponse busInfosResponse = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(
-            cityName,
-            busStopName);
-        String msg = busInfosResponse.busInfosResponse().isEmpty() ? "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" : "해당 이름을 포함하는 버스정류장이 존재합니다.";
-        return ApiResponse.createSuccessWithData(busInfosResponse,
-            msg);
+        Mono<BusInfosResponse> monoBusInfoResponse = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(
+            cityName, busStopName);
+
+        return monoBusInfoResponse.map(busInfosResponse -> {
+            String msg = busInfosResponse.busInfoResponses().isEmpty() ?
+                "해당 이름을 포함하는 버스정류장이 존재하지 않습니다" :
+                "해당 이름을 포함하는 버스정류장이 존재합니다.";
+
+            return ApiResponse.createSuccessWithData(busInfosResponse, msg);
+        });
     }
 }
