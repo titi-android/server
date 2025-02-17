@@ -126,14 +126,14 @@ public class SeoulBusArrInfosDto {
         }
 
         private ArrivalInfo parseArrivalMessage(String arrivalMsg) {
-//            System.out.println("arrivalMsg = " + arrivalMsg);
+            System.out.println("arrivalMsg = " + arrivalMsg);
             if (arrivalMsg.equals("곧 도착")) {
                 return new ArrivalInfo(30, 0);
             }
             if (arrivalMsg.equals("운행종료")) {
                 return null;
             }
-            Pattern pattern = Pattern.compile("\\s*(\\d+)분\\s*(\\d+)초후\\s*\\[(\\d+)번째 전\\]\\s*");
+            Pattern pattern = Pattern.compile("\\s*(\\d+)분(?:\\s*(\\d+)초)?후\\s*\\[(\\d+)번째 전\\]\\s*");
             Matcher matcher = pattern.matcher(arrivalMsg);
 
             if (matcher.find()) {
