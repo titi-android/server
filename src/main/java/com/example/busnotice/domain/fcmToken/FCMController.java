@@ -29,7 +29,8 @@ public class FCMController {
     public ApiResponse<Void> createFCMToken(
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        fcmService.sendTestNotification(userDetails.getId());
-        return ApiResponse.createSuccess("테스트 알림이 전송되었습니다.");
+        boolean isSuccess = fcmService.sendTestNotification(userDetails.getId());
+        String msg =  isSuccess ? "테스트 알림 전송에 성공했습니다." : "테스트 알림 전송애 실패했습니다.";
+        return ApiResponse.createSuccess(msg);
     }
 }
