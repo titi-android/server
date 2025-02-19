@@ -126,7 +126,7 @@ public class SeoulBusArrInfosDto {
         }
 
         private ArrivalInfo parseArrivalMessage(String arrivalMsg) {
-            System.out.println("arrivalMsg = " + arrivalMsg);
+//            System.out.println("arrivalMsg = " + arrivalMsg);
             if (arrivalMsg.equals("곧 도착")) {
                 return new ArrivalInfo(30, 0);
             }

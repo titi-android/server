@@ -122,4 +122,35 @@ public class FCMService {
     }
 
 
+    public void sendTestNotification(Long userId) {
+        // 유저 정보 조회
+        User user = userRepository.findById(userId).orElseThrow(
+            () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        // 유저의 FCM 토큰 조회
+        Optional<FCMToken> optionalFCMToken = fcmRepository.findByUser(user);
+        if (optionalFCMToken.isEmpty()) {
+            log.warn("테스트: 해당 유저({})에게 등록된 FCM 토큰이 없습니다. 알림 전송 중지", user.getName());
+            return;
+        }
+
+        FCMToken token = optionalFCMToken.get();
+        log.info("테스트: 유저({})에게 알림을 전송합니다. 토큰: {}", user.getName(), token.getToken());
+
+        // 임의의 알림 데이터 설정
+        Message message = Message.builder()
+            .setToken(token.getToken())
+            .putData("message", "테스트 메시지입니다.")
+            .build();
+
+        // 메시지 전송
+        try {
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.info("테스트: 알림 전송 성공: {}, 유저: {}", response, user.getName());
+        } catch (FirebaseMessagingException e) {
+            log.error("테스트: 알림 전송 실패: {}, 유저: {}", e.getMessage(), user.getName());
+        }
+    }
+
 }
