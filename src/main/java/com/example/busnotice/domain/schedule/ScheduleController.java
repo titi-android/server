@@ -37,7 +37,7 @@ public class ScheduleController {
     public ApiResponse<Void> createScheduleV2(
         @RequestBody CreateScheduleRequest createScheduleRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws IOException {
+    ) {
         scheduleService.createSchedule(userDetails.getId(), createScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
