@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.schedule.res;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.List;
@@ -8,9 +9,11 @@ public record ScheduleResponse(
     Long id, // 스케줄 id
     String name, // 스케줄 이름
     List<String> days, // 요일 목록
-    @Schema(type = "array", example = "[0,0]")
+    @Schema(type = "string", example = "00:00")
+    @JsonFormat(pattern = "HH:mm")
     LocalTime startTime,
-    @Schema(type = "array", example = "[0,0]")
+    @Schema(type = "string", example = "00:00")
+    @JsonFormat(pattern = "HH:mm")
     LocalTime endTime,
     List<BusStopArrInfoDto> busStopInfos,
     Boolean isAlarmOn

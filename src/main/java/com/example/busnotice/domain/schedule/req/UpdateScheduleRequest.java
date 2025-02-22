@@ -23,7 +23,7 @@ public record UpdateScheduleRequest(
         String regionName,
         String busStopName,
         String nodeId,
-        List<CreateScheduleRequest.RouteInfo.BusInfo> busInfos
+        List<BusInfo> busInfos
     ) {
 
         public record BusInfo(
