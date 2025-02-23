@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +58,15 @@ public class UserController {
         TokenResponse tokenResponse = userService.login(loginRequest.name(),
             loginRequest.password());
         return ApiResponse.createSuccessWithData(tokenResponse, "로그인에 성공했습니다.");
+    }
+
+    @DeleteMapping("/users")
+    @Operation(summary = "회원 탈퇴")
+    public ApiResponse<String> withdrawal(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        userService.withdrawal(userDetails.getId());
+        return ApiResponse.createSuccess("회원탈퇴에 성공했습니다.");
     }
 
     @PostMapping("/users/refresh")
