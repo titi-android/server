@@ -147,13 +147,17 @@ public class SeoulBusArrInfosDto {
         }
 
         private ArrivalInfo parseArrivalMessage(String arrivalMsg) {
-//            System.out.println("arrivalMsg = " + arrivalMsg);
+            System.out.println("arrivalMsg = " + arrivalMsg);
+            // "[우회]" 문자열 제거 후 좌우 공백 제거
+            arrivalMsg = arrivalMsg.replace("[우회]", "").trim();
+
             if (arrivalMsg.equals("곧 도착")) {
                 return new ArrivalInfo(30, 0);
             }
-            if (arrivalMsg.equals("운행종료")) {
+            if (arrivalMsg.equals("운행종료") || arrivalMsg.equals("출발대기")) {
                 return null;
             }
+
             Pattern pattern = Pattern.compile("\\s*(\\d+)분\\s*(\\d+)초후\\s*\\[(\\d+)번째 전\\]\\s*");
             Matcher matcher = pattern.matcher(arrivalMsg);
 
@@ -161,7 +165,6 @@ public class SeoulBusArrInfosDto {
                 int minutes = Integer.parseInt(matcher.group(1));
                 int seconds = Integer.parseInt(matcher.group(2));
                 int stopNumber = Integer.parseInt(matcher.group(3));
-
                 int totalSeconds = (minutes * 60) + seconds;
 
                 System.out.println("stopNumber = " + stopNumber);
@@ -171,6 +174,7 @@ public class SeoulBusArrInfosDto {
 
             throw new IllegalArgumentException("입력 문자열 형식이 올바르지 않습니다.");
         }
+
 
         @Data
         public class ArrivalInfo {
