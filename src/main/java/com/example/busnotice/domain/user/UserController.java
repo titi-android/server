@@ -6,9 +6,12 @@ import com.example.busnotice.domain.user.res.RefreshTokenResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
+import com.example.busnotice.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -41,6 +44,15 @@ public class UserController {
         TokenResponse tokenResponse = userService.login(loginRequest.name(),
             loginRequest.password());
         return ApiResponse.createSuccessWithData(tokenResponse, "로그인에 성공했습니다.");
+    }
+
+    @DeleteMapping("/users")
+    @Operation(summary = "회원 탈퇴")
+    public ApiResponse<String> withdrawal(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        userService.withdrawal(userDetails.getId());
+        return ApiResponse.createSuccess("회원탈퇴에 성공했습니다.");
     }
 
     @PostMapping("/users/refresh")

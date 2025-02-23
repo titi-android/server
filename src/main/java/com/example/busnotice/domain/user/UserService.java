@@ -47,4 +47,8 @@ public class UserService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    @Transactional
+    public void withdrawal(Long userId) {
+        userRepository.deleteById(userId);
+    }
 }
