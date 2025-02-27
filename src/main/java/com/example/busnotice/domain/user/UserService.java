@@ -36,13 +36,13 @@ public class UserService {
         }
         String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken();
-        // 기존 리프레시 토큰 존재 시 삭제
+        // 기존 리프레시 토큰 존재 시 업데이트
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);
         if (optionalRefreshToken.isPresent()) {
-            refreshTokenRepository.delete(optionalRefreshToken.get());
-            refreshTokenRepository.flush();
+            optionalRefreshToken.get().update(refreshToken);
+            return new TokenResponse(accessToken, refreshToken);
         }
-        // 리프레시 토큰 저장
+        // 리프레시 토큰 기존에 없다면 생성하여 저장
         refreshTokenRepository.save(new RefreshToken(user, refreshToken));
         return new TokenResponse(accessToken, refreshToken);
     }
