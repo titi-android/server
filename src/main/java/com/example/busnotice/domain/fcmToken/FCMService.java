@@ -6,6 +6,7 @@
 //import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 //import com.example.busnotice.domain.user.User;
 //import com.example.busnotice.domain.user.UserRepository;
+//import com.example.busnotice.global.code.ErrorCode;
 //import com.example.busnotice.global.code.StatusCode;
 //import com.example.busnotice.global.exception.UserException;
 //import com.google.firebase.messaging.FirebaseMessaging;
@@ -35,7 +36,7 @@
 //    @Transactional
 //    public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
 //        User user = userRepository.findById(userId).orElseThrow(
-//            () -> new UserException(StatusCode.NOT_FOUND, "해당 ID 의 유저가 존재하지 않습니다.")
+//            () -> new UserException(ErrorCode.USER_NOT_FOUND)
 //        );
 //
 //        Optional<FCMToken> optionalFCMToken = fcmRepository.findByUser(user);
