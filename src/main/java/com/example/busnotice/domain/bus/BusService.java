@@ -203,8 +203,11 @@ public class BusService {
             .bodyToMono(BusInfosDto.class).block();
         log.info("BusInfosDto: {}", result);
 
-        if (result.getResponse().getBody().getItems().getItem() == null || result.getResponse()
-            .getBody().getItems().getItem().isEmpty()) {
+        if (
+            result.getResponse().getBody().getItems() == null
+                || result.getResponse().getBody().getItems().getItem() == null
+                || result.getResponse().getBody().getItems().getItem().isEmpty()
+        ) {
             return Collections.emptyList();
         }
 
