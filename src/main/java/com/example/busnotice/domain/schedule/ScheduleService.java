@@ -17,6 +17,7 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfo
 import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfoDto.BusArrInfoDto;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
@@ -90,7 +91,7 @@ public class ScheduleService {
 
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId, userId)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
+            .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
         return ScheduleInfoResponse.fromEntity(schedule);
     }
 
@@ -99,7 +100,7 @@ public class ScheduleService {
         UpdateScheduleRequest updateScheduleRequest) {
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "해당 스케줄이 존재하지 않습니다."));
+            .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
         기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
@@ -142,9 +143,9 @@ public class ScheduleService {
     public void deleteSchedule(Long userId, Long scheduleId) {
         User user = getUserById(userId);
         Schedule schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow(() -> new ScheduleException(StatusCode.NOT_FOUND, "삭제할 스케줄이 존재하지 않습니다."));
+            .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
         if (schedule.getUser().getId() != user.getId()) {
-            throw new ScheduleException(StatusCode.BAD_REQUEST, "삭제할 스케줄이 본인의 스케줄이 아닙니다.");
+            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
         }
         scheduleRepository.deleteById(scheduleId);
     }
@@ -229,7 +230,7 @@ public class ScheduleService {
                 s.getStartTime()));
             // 둘 다 겹치면 충돌 발생
             if (isTimeOverlap) {
-                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
+                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
             }
         }
     }
@@ -251,7 +252,7 @@ public class ScheduleService {
                     existingSchedule.getStartTime());
             // 4. 둘 다 겹치면 예외 발생
             if (isDayOverlap && isTimeOverlap) {
-                throw new ScheduleException(StatusCode.CONFLICT, "스케줄의 요일과 시간대가 겹칩니다.");
+                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
             }
         }
     }
@@ -267,7 +268,7 @@ public class ScheduleService {
 
     private User getUserById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND, "해당 ID의 유저가 존재하지 않습니다."));
+            .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
     }
 
     private List<String> getBusNames(BusStop busStop) {
@@ -277,9 +278,9 @@ public class ScheduleService {
     @Transactional
     public boolean updateAlarm(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-            () -> new ScheduleException(StatusCode.NOT_FOUND, "해당 ID의 스케줄이 존재하지 않습니다."));
+            () -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
         if (schedule.getUser().getId() != userId) {
-            throw new ScheduleException(StatusCode.BAD_REQUEST, "유저가 해당 스케줄의 주인이 아닙니다.");
+            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
         }
         return schedule.updateAlarm();
     }

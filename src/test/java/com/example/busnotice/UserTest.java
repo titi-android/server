@@ -39,6 +39,6 @@ public class UserTest {
         userService.signUp(name, password);
         TokenResponse tr = userService.login(name, password);
 
-        Assertions.assertThat(name).isEqualTo(jwtProvider.getUsername(tr.accessToken()));
+        Assertions.assertThat(name).isEqualTo(jwtProvider.getUserId(tr.accessToken()));
     }
 }

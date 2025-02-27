@@ -6,6 +6,7 @@ import com.example.busnotice.domain.busStop.res.BusStopsDto;
 import com.example.busnotice.domain.busStop.res.BusStopsDto.Item;
 import com.example.busnotice.domain.busStop.res.BusStopsDto.Items;
 import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.GeneralException;
@@ -16,6 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,19 +78,19 @@ public class BusStopService {
             }
             String cityCode = result.toString().trim();
             if (cityCode == null || cityCode.isEmpty()) {
-                throw new GeneralException(StatusCode.BAD_REQUEST, "도시 코드 조회에 실패했습니다.");
+                throw new GeneralException(ErrorCode.CITY_CODE_NOT_FOUND);
             }
             return result.toString().trim();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new GeneralException(StatusCode.INTERNAL_SERVER_ERROR, "도시 코드 조회에 실패했습니다.");
+            throw new GeneralException(ErrorCode.CITY_CODE_NOT_FOUND);
         }
     }
 
     @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_DB_조회(String cityName) {
         String cityCode = cityCodeRepository.findByName(cityName.trim())
-            .orElseThrow(() -> new GeneralException(StatusCode.BAD_REQUEST, "해당 지역이 존재하지 않습니다."))
+            .orElseThrow(() -> new GeneralException(ErrorCode.CITY_CODE_NOT_FOUND))
             .getCode();
 
         return cityCode;
@@ -116,7 +119,7 @@ public class BusStopService {
             System.out.println("response.toString() = " + response.toString());
             if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
                 .isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+                return Collections.emptyList();
             }
             List<String> busNames = response.getMsgBody().getItemList().stream()
                 .map(item -> item.getStNm()).toList();
@@ -147,7 +150,7 @@ public class BusStopService {
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
         if (items == null || items.getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+            return Collections.emptyList();
         }
         List<Item> itemsList = items.getItem();
         return itemsList.stream().map(item -> item.getNodenm()).toList();
@@ -176,7 +179,7 @@ public class BusStopService {
             System.out.println("response.toString() = " + response.toString());
             if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
                 .isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+                return new BusInfosResponse(Collections.emptyList());
             }
             List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
                 .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
@@ -208,7 +211,7 @@ public class BusStopService {
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
         if (items == null || items.getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+            return new BusInfosResponse(Collections.emptyList());
         }
         List<Item> itemsList = items.getItem();
         List<BusInfoResponse> busInfoResponses = itemsList.stream()
@@ -241,7 +244,7 @@ public class BusStopService {
             System.out.println("response.toString() = " + response.toString());
             if (response.getMsgBody().getItemList() == null || response.getMsgBody().getItemList()
                 .isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+                throw new BusStopException(ErrorCode.BUS_STOP_NOT_FOUND);
             }
             String nodeId = response.getMsgBody().getItemList().get(0).getArsId();
             return nodeId;
@@ -269,7 +272,7 @@ public class BusStopService {
         System.out.println("result.toString() = " + result.toString());
         Items items = result.getResponse().getBody().getItems();
         if (items == null || items.getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND, "해당 이름을 포함하는 버스정류장이 존재하지 않습니다.");
+            throw new BusStopException(ErrorCode.BUS_STOP_NOT_FOUND);
         }
         List<Item> itemsList = items.getItem();
         return itemsList.get(0).getNodeid();

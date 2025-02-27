@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.user;
 
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
@@ -22,19 +23,19 @@ public class UserService {
     @Transactional
     public void signUp(String name, String password) {
         if (userRepository.existsByName(name)) {
-            throw new UserException(StatusCode.CONFLICT, "이미 존재하는 이름입니다.");
+            throw new UserException(ErrorCode.USER_DUPLICATED_NAME);
         }
         userRepository.save(new User(name, passwordEncoder.encode(password)));
     }
 
     @Transactional
     public TokenResponse login(String name, String password) {
-        User user = userRepository.findByName(name).orElseThrow(() -> new UserException(
-            StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다."));
+        User user = userRepository.findByName(name)
+            .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserException(StatusCode.BAD_REQUEST, "로그인 정보가 올바르지 않습니다.");
+            throw new UserException(ErrorCode.USER_INVALID_PASSWORD);
         }
-        String accessToken = jwtProvider.createAccessToken(name);
+        String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken();
         // 기존 리프레시 토큰 존재 시 삭제
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserName(name);

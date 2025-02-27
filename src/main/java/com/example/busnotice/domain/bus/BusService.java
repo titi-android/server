@@ -145,8 +145,7 @@ public class BusService {
             log.info("SeoulBusInfosDto: {}", result);
             List<BusRoute> busRoutes = result.getMsgBody().getItemList();
             if (busRoutes == null || busRoutes.isEmpty()) {
-                throw new BusStopException(StatusCode.NOT_FOUND,
-                    "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
+                return Collections.emptyList();
             }
             List<BusNameAndTypeResponse> list = result.getMsgBody().getItemList().stream()
                 .map(i -> {
@@ -208,8 +207,7 @@ public class BusService {
 
         if (result.getResponse().getBody().getItems().getItem() == null || result.getResponse()
             .getBody().getItems().getItem().isEmpty()) {
-            throw new BusStopException(StatusCode.NOT_FOUND,
-                "해당 버스정류장을 경유하는 버스 노선이 존재하지 않습니다. 버스정류장 노드 ID 를 다시 확인해주세요.");
+            return Collections.emptyList();
         }
 
         // routeno 리스트 추출

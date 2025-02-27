@@ -1,17 +1,17 @@
 package com.example.busnotice.global.exception;
 
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 
 public class BusinessException extends RuntimeException {
 
-    private final StatusCode statusCode;
+    private final ErrorCode code;
 
-    private BusinessException(StatusCode status, String message) {
-        super(message);
-        this.statusCode = status;
+    public BusinessException(ErrorCode code) {
+        this.code = code;
     }
 
-    public StatusCode getStatusCode() {
-        return statusCode;
+    public ErrorCode getErrorCode() {
+        return code;
     }
 }

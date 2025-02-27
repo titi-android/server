@@ -74,6 +74,6 @@ public class BusController {
         boolean isValid = busNames.containsAll(busList.stream().map(String::trim).toList());
         return isValid
             ? ApiResponse.createSuccess("올바른 버스 목록입니다.")
-            : ApiResponse.createFail(StatusCode.BAD_REQUEST, "해당 정류장에 속한 버스 노선이 아닙니다.");
+            : ApiResponse.createSuccess("해당 정류장에 속한 버스 노선이 아닙니다.");
     }
 }
