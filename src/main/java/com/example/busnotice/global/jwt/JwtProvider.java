@@ -4,7 +4,6 @@ import com.example.busnotice.domain.user.RefreshToken;
 import com.example.busnotice.domain.user.RefreshTokenRepository;
 import com.example.busnotice.domain.user.res.RefreshTokenResponse;
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.JwtAuthenticationException;
 import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.security.CustomUserDetails;

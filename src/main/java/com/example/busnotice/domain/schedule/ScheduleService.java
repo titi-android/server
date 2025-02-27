@@ -18,12 +18,10 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfo
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.util.DayConverter;
 import jakarta.persistence.EntityManager;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -77,7 +75,8 @@ public class ScheduleService {
             String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
             // 버스정류장 생성
             BusStop savedBusStop = busStopRepository.save(
-                BusStop.toEntity(savedSchedule, cityCode, ri.regionName(), ri.busStopName(), ri.nodeId()));
+                BusStop.toEntity(savedSchedule, cityCode, ri.regionName(), ri.busStopName(),
+                    ri.nodeId()));
             busStops.add(savedBusStop);
             // 해당 버스정류장에 등록될 버스들 생성
             List<Bus> buses = ri.busInfos().stream()
@@ -107,7 +106,8 @@ public class ScheduleService {
             updateScheduleRequest.startTime(), updateScheduleRequest.endTime());
 
         // 수정 대상 스케줄의 BusStops 및 BusStop 에 등록된 Bus 들 모두 삭제
-        busStopRepository.deleteAll(existSchedule.getBusStops());// busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
+        busStopRepository.deleteAll(
+            existSchedule.getBusStops());// busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
         entityManager.flush();
 
         // 새로 BusStop 및 Bus 등록
@@ -118,7 +118,8 @@ public class ScheduleService {
             String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
             // 버스정류장 생성
             BusStop savedBusStop = busStopRepository.save(
-                BusStop.toEntity(existSchedule, cityCode, ri.regionName(), ri.busStopName(), ri.nodeId()));
+                BusStop.toEntity(existSchedule, cityCode, ri.regionName(), ri.busStopName(),
+                    ri.nodeId()));
             busStops.add(savedBusStop);
             // 해당 버스정류장에 등록될 버스들 생성
             List<Bus> buses = ri.busInfos().stream()

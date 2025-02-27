@@ -1,7 +1,6 @@
 package com.example.busnotice.domain.user;
 
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;

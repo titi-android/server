@@ -2,8 +2,6 @@ package com.example.busnotice.domain.bus;
 
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.domain.bus.res.BusNameAndTypeResponse;
-import com.example.busnotice.domain.busStop.CityCodeRepository;
-import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.format.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

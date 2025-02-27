@@ -43,7 +43,8 @@ public class BusStop {
     @OneToMany(mappedBy = "busStop", cascade = CascadeType.REMOVE)
     private List<Bus> busList;
 
-    public BusStop(Schedule schedule, String cityCode, String regionName, String name, String nodeId) {
+    public BusStop(Schedule schedule, String cityCode, String regionName, String name,
+        String nodeId) {
         this.schedule = schedule;
         this.cityCode = cityCode;
         this.regionName = regionName;
@@ -55,7 +56,8 @@ public class BusStop {
 
     }
 
-    public static BusStop toEntity(Schedule schedule, String cityCode, String regionName, String name, String nodeId) {
+    public static BusStop toEntity(Schedule schedule, String cityCode, String regionName,
+        String name, String nodeId) {
         return new BusStop(schedule, cityCode, regionName, name, nodeId);
     }
 

@@ -1,7 +1,6 @@
 package com.example.busnotice.global.format;
 
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 import lombok.Getter;
 
 @Getter

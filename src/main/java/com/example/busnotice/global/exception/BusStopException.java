@@ -1,8 +1,6 @@
 package com.example.busnotice.global.exception;
 
-import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
 
 public class BusStopException extends RuntimeException {
 
