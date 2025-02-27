@@ -30,7 +30,7 @@ public class FCMController {
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         boolean isSuccess = fcmService.sendTestNotification(userDetails.getId());
-        String msg =  isSuccess ? "테스트 알림 전송에 성공했습니다." : "테스트 알림 전송애 실패했습니다.";
+        String msg =  isSuccess ? "테스트 알림 전송에 성공했습니다." : "테스트 알림 전송에 실패했습니다.";
         return ApiResponse.createSuccess(msg);
     }
 }
