@@ -50,13 +50,13 @@ public class BusController {
 
     @Operation(summary = "특정 노드를 경유하는 모든 버스들 이름과 종류 조회")
     @GetMapping("/nodes/bus-names/all")
-    public List<BusNameAndTypeResponse> getBusNamesOfNode(
+    public ApiResponse<List<BusNameAndTypeResponse>> getBusNamesOfNode(
         @RequestParam("cityName") String cityName,
         @RequestParam("nodeId") String nodeId
     ) throws UnsupportedEncodingException {
         List<BusNameAndTypeResponse> busNameAndTypeList = busService.특정_노드_ID를_경유하는_모든_버스들_이름_조회(
             cityName, nodeId);
-        return busNameAndTypeList;
+        return ApiResponse.createSuccessWithData(busNameAndTypeList);
     }
 
     @Operation(summary = "특정 노드를 경유하는 버스들이 맞는지 확인")
