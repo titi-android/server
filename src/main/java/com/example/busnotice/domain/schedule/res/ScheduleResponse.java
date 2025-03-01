@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.schedule.res;
 
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse.DestinationInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
@@ -16,6 +17,7 @@ public record ScheduleResponse(
     @JsonFormat(pattern = "HH:mm")
     LocalTime endTime,
     List<BusStopArrInfoDto> busStopInfos,
+    String desBusStopName,
     Boolean isAlarmOn
 ) {
 
@@ -37,4 +39,5 @@ public record ScheduleResponse(
 
         }
     }
+
 }

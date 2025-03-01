@@ -178,7 +178,7 @@ public class ScheduleService {
             busStopArrInfoDtos.add(new BusStopArrInfoDto(bs.getName(), busArrInfoDtos));
         }
         ScheduleResponse scheduleResponse = new ScheduleResponse(cs.getId(), cs.getName(),
-            cs.getDaysList(), cs.getStartTime(), cs.getEndTime(), busStopArrInfoDtos,
+            cs.getDaysList(), cs.getStartTime(), cs.getEndTime(), busStopArrInfoDtos, cs.getDestinationInfo().busStopName,
             cs.getIsAlarmOn());
         return scheduleResponse;
     }
@@ -206,7 +206,7 @@ public class ScheduleService {
                 busStopArrInfoDtos.add(new BusStopArrInfoDto(bs.getName(), busArrInfoDtos));
             }
             ScheduleResponse scheduleResponse = new ScheduleResponse(s.getId(), s.getName(),
-                s.getDaysList(), s.getStartTime(), s.getEndTime(), busStopArrInfoDtos,
+                s.getDaysList(), s.getStartTime(), s.getEndTime(), busStopArrInfoDtos, s.getDestinationInfo().busStopName,
                 s.getIsAlarmOn());
             scheduleResponsesList.add(scheduleResponse);
         }
