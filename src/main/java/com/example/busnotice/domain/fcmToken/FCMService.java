@@ -115,11 +115,12 @@ public class FCMService {
             try {
                 String response = FirebaseMessaging.getInstance().send(message);
                 log.info("메시지 전송 성공: {}, 토큰: {}", response, notification.token());
+                log.info("메시지 내용: {}", message.toString());
             } catch (FirebaseMessagingException e) {
                 log.error("메시지 전송 실패: {}, 토큰: {}", e.getMessage(), notification.token());
+                log.error("메시지 내용: {}", message.toString());
             }
         }
     }
-
 
 }
