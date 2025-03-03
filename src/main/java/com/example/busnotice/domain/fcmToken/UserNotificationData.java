@@ -7,6 +7,7 @@ import java.util.List;
 
 public record UserNotificationData(
     String token,
+    Long scheduleId,
     String scheduleName,
     List<String> days,
     List<BusStopArrInfoDto> busStopInfos

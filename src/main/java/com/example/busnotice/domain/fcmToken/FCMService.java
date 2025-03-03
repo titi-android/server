@@ -92,6 +92,7 @@ public class FCMService {
 
                 notifications.add(new UserNotificationData(
                     token.getToken(),
+                    sr.id(),
                     sr.name(),
                     sr.days(),
                     busStopInfoDtos
@@ -109,6 +110,7 @@ public class FCMService {
         for (UserNotificationData notification : notifications) {
             Message message = Message.builder()
                 .setToken(notification.token())
+                .putData("scheduleId", notification.scheduleId().toString())
                 .putData("scheduleName", notification.scheduleName())
                 .putData("days", notification.days().toString())
                 .putData("busStopInfos", objectMapper.writeValueAsString(notification.busStopInfos()))
@@ -117,10 +119,10 @@ public class FCMService {
             try {
                 String response = FirebaseMessaging.getInstance().send(message);
                 log.info("메시지 전송 성공: {}, 토큰: {}", response, notification.token());
-                log.info("메시지 내용: {}", message.toString());
+                log.info("메시지 내용: {}", objectMapper.writeValueAsString(message));
             } catch (FirebaseMessagingException e) {
                 log.error("메시지 전송 실패: {}, 토큰: {}", e.getMessage(), notification.token());
-                log.error("메시지 내용: {}", message.toString());
+                log.error("메시지 내용: {}", objectMapper.writeValueAsString(message));
             }
         }
     }
