@@ -10,6 +10,8 @@ import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.code.StatusCode;
 import com.example.busnotice.global.exception.UserException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -34,7 +36,7 @@ public class FCMService {
     private final UserRepository userRepository;
     private final ScheduleService scheduleService;
     private final ScheduleRepository scheduleRepository;
-
+    ObjectMapper objectMapper = new ObjectMapper();  // JSON 변환기
     @Transactional
     public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -54,7 +56,7 @@ public class FCMService {
 
     @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
     @Transactional(readOnly = true)  // 트랜잭션 적용
-    public void sendNotification() throws UnsupportedEncodingException {
+    public void sendNotification() throws UnsupportedEncodingException, JsonProcessingException {
         List<FCMToken> allTokens = fcmRepository.findAll();
         List<UserNotificationData> notifications = new ArrayList<>();
 
@@ -109,7 +111,7 @@ public class FCMService {
                 .setToken(notification.token())
                 .putData("scheduleName", notification.scheduleName())
                 .putData("days", notification.days().toString())
-                .putData("busStopInfos", notification.busStopInfos().toString())
+                .putData("busStopInfos", objectMapper.writeValueAsString(notification.busStopInfos()))
                 .build();
 
             try {
