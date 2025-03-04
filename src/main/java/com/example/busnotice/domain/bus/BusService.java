@@ -54,6 +54,9 @@ public class BusService {
             System.out.println("(서울)특정_노드_ID에_도착하는_모든_버스들_정보_조회: " + result.toString());
 
             List<SeoulBusArrInfosDto.Item> itemList = result.getMsgBody().getItemList();
+            if (itemList == null) {
+                return Collections.emptyList();
+            }
             List<Item> items = itemList.stream().map(i -> i.toGeneralItem())
                 .filter(Objects::nonNull).sorted(Comparator.comparingInt(Item::getArrtime))
                 .toList();
