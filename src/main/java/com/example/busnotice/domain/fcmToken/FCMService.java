@@ -54,7 +54,7 @@ public class FCMService {
         fcmRepository.save(createFCMTokenRequest.toEntity(user));
     }
 
-    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
+//    @Scheduled(fixedRate = 60000)  // 1분(60,000ms)마다 실행
     @Transactional(readOnly = true)  // 트랜잭션 적용
     public void sendNotification() throws UnsupportedEncodingException, JsonProcessingException {
         List<FCMToken> allTokens = fcmRepository.findAll();
@@ -125,4 +125,8 @@ public class FCMService {
         }
     }
 
+    public void sendTestNotification()
+        throws UnsupportedEncodingException, JsonProcessingException {
+        sendNotification();
+    }
 }
