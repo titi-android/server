@@ -103,7 +103,7 @@ public class UserController {
     public ApiResponse<String> validateAccessToken(
         HttpServletRequest request
     ) {
-        boolean isValid = userService.validateAccessToken(request.getHeader("Authorization"));
+        boolean isValid = userService.isValidAccessToken(request.getHeader("Authorization"));
         return isValid ?
             ApiResponse.createSuccess("유효한 엑세스 토큰입니다.")
             : ApiResponse.createFail(ErrorCode.ACCESS_TOKEN_VALIDATION_FAIL);

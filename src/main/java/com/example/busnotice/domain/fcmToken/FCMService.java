@@ -43,13 +43,20 @@ public class FCMService {
             () -> new UserException(ErrorCode.USER_NOT_FOUND)
         );
 
+        // 동일한 토큰이 존재하는 모든 FCMToken 삭제 -> 다른 유저가 동일한 FCMToken 을 가지고 있는 경우를 방지하기 위해
+        List<FCMToken> existingTokens = fcmRepository.findAllByToken(createFCMTokenRequest.token());
+        if (!existingTokens.isEmpty()) {
+            fcmRepository.deleteAll(existingTokens);
+        }
+
+        // 기존 유저의 토큰이 있는 경우 업데이트
         Optional<FCMToken> optionalFCMToken = fcmRepository.findByUser(user);
-        // 기존 토큰 존재하는 경우 업데이트
         if (optionalFCMToken.isPresent()) {
             FCMToken fcmToken = optionalFCMToken.get();
             fcmToken.update(createFCMTokenRequest.token());
             return;
         }
+
         // 그렇지 않은 경우 새로 생성
         fcmRepository.save(createFCMTokenRequest.toEntity(user));
     }

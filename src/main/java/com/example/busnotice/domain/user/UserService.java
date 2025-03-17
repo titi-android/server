@@ -53,7 +53,7 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public boolean validateAccessToken(String bearerToken) {
+    public boolean isValidAccessToken(String bearerToken) {
         try {
             String token = jwtProvider.extractToken(bearerToken);
             jwtProvider.validateAccessToken(token);
