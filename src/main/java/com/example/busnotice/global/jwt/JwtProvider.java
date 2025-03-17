@@ -134,12 +134,7 @@ public class JwtProvider {
     }
 
     // 엑세스 토큰 유효성 검사
-    public boolean validateAccessToken(String token) {
-        try {
-            getClaims(token);
-            return true;
-        } catch (JwtAuthenticationException e) {
-            return false;
-        }
+    public void validateAccessToken(String token) {
+        getClaims(token);
     }
 }

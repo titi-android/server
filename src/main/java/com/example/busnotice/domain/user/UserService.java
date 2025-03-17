@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.user;
 
 import com.example.busnotice.global.code.ErrorCode;
+import com.example.busnotice.global.exception.JwtAuthenticationException;
 import com.example.busnotice.global.exception.UserException;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
@@ -53,7 +54,12 @@ public class UserService {
     }
 
     public boolean validateAccessToken(String bearerToken) {
-        String token = jwtProvider.extractToken(bearerToken);
-        return jwtProvider.validateAccessToken(token);
+        try {
+            String token = jwtProvider.extractToken(bearerToken);
+            jwtProvider.validateAccessToken(token);
+            return true;
+        } catch (JwtAuthenticationException e) {
+            return false;
+        }
     }
 }
