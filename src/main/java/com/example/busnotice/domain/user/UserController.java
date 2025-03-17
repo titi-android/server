@@ -4,6 +4,7 @@ import com.example.busnotice.domain.user.req.FeedBackRequest;
 import com.example.busnotice.domain.user.req.LoginRequest;
 import com.example.busnotice.domain.user.req.SignUpRequest;
 import com.example.busnotice.domain.user.res.RefreshTokenResponse;
+import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
@@ -102,6 +103,6 @@ public class UserController {
         boolean isValid = userService.validateAccessToken(request.getHeader("Authorization"));
         return isValid ?
             ApiResponse.createSuccess("유효한 엑세스 토큰입니다.")
-            : ApiResponse.createFail("유효하지 않은 엑세스 토큰입니다.");
+            : ApiResponse.createFail(ErrorCode.ACCESS_TOKEN_VALIDATION_FAIL);
     }
 }
