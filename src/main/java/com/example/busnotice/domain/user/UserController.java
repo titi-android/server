@@ -97,6 +97,9 @@ public class UserController {
 
     @GetMapping("/users/auth/validate")
     @Operation(summary = "엑세스 토큰 유효성 검증")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "JWT407", description = "(통합) 유효성 검증에 실패한 엑세스 토큰입니다."),
+    })
     public ApiResponse<String> validateAccessToken(
         HttpServletRequest request
     ) {
