@@ -133,4 +133,13 @@ public class JwtProvider {
         return new RefreshTokenResponse(accessToken);
     }
 
+    // 엑세스 토큰 유효성 검사
+    public boolean validateAccessToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (JwtAuthenticationException e) {
+            return false;
+        }
+    }
 }

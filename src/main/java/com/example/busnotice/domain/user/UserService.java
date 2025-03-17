@@ -51,4 +51,9 @@ public class UserService {
     public void withdrawal(Long userId) {
         userRepository.deleteById(userId);
     }
+
+    public boolean validateAccessToken(String bearerToken) {
+        String token = jwtProvider.extractToken(bearerToken);
+        return jwtProvider.validateAccessToken(token);
+    }
 }

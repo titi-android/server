@@ -12,9 +12,11 @@ import com.example.busnotice.util.EmailSender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -87,7 +89,19 @@ public class UserController {
         @RequestBody FeedBackRequest feedBackRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        emailSender.sendMailNotice(userDetails.getUsername(), feedBackRequest.title(), feedBackRequest.content());
+        emailSender.sendMailNotice(userDetails.getUsername(), feedBackRequest.title(),
+            feedBackRequest.content());
         return ApiResponse.createSuccess("문의 메일이 전송되었습니다.");
+    }
+
+    @GetMapping("/users/auth/validate")
+    @Operation(summary = "엑세스 토큰 유효성 검증")
+    public ApiResponse<String> validateAccessToken(
+        HttpServletRequest request
+    ) {
+        boolean isValid = userService.validateAccessToken(request.getHeader("Authorization"));
+        return isValid ?
+            ApiResponse.createSuccess("유효한 엑세스 토큰입니다.")
+            : ApiResponse.createFail("유효하지 않은 엑세스 토큰입니다.");
     }
 }

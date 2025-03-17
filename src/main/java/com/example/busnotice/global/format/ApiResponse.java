@@ -27,6 +27,10 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, data, message);
     }
 
+    public static <T> ApiResponse<T> createFail(String message) {
+        return new ApiResponse<>(false, message);
+    }
+
     public static <T> ApiResponse<T> createFail(ErrorCode errorCode) {
         return new ApiResponse<>(false, errorCode.getCode(), errorCode.getMessage());
     }
