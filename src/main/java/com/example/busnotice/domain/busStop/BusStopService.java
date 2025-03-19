@@ -181,9 +181,12 @@ public class BusStopService {
                 .isEmpty()) {
                 return new BusInfosResponse(Collections.emptyList());
             }
+//            List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
+//                .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
+//                    item.getTmX(), item.getTmY())).toList();
             List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
                 .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
-                    item.getTmX(), item.getTmY())).toList();
+                    item.getTmY(), item.getTmX())).toList();
             return new BusInfosResponse(busInfoResponses);
         }
 
