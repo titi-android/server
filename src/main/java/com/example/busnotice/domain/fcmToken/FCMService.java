@@ -8,7 +8,7 @@ import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.code.StatusCode;
+import com.example.busnotice.global.exception.FCMTokenException;
 import com.example.busnotice.global.exception.UserException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +37,7 @@ public class FCMService {
     private final ScheduleService scheduleService;
     private final ScheduleRepository scheduleRepository;
     ObjectMapper objectMapper = new ObjectMapper();  // JSON 변환기
+
     @Transactional
     public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -79,7 +80,8 @@ public class FCMService {
                     continue;
                 }
                 // 정류장 및 도착 예정 버스 정보를 변환
-                List<UserNotificationData.BusStopArrInfoDto> busStopInfoDtos = sr.busStopInfos().stream()
+                List<UserNotificationData.BusStopArrInfoDto> busStopInfoDtos = sr.busStopInfos()
+                    .stream()
                     .map(busStop -> new UserNotificationData.BusStopArrInfoDto(
                         busStop.busStopName(),
                         busStop.busInfos().stream()
@@ -120,7 +122,8 @@ public class FCMService {
                 .putData("scheduleId", notification.scheduleId().toString())
                 .putData("scheduleName", notification.scheduleName())
                 .putData("days", notification.days().toString())
-                .putData("busStopInfos", objectMapper.writeValueAsString(notification.busStopInfos()))
+                .putData("busStopInfos",
+                    objectMapper.writeValueAsString(notification.busStopInfos()))
                 .build();
 
             try {
@@ -128,12 +131,21 @@ public class FCMService {
                 log.info("메시지 전송 성공: {}, 토큰: {}", response, notification.token());
             } catch (FirebaseMessagingException e) {
                 log.error("메시지 전송 실패: {}, 토큰: {}", e.getMessage(), notification.token());
-                }
+            }
         }
     }
 
     public void sendTestNotification()
         throws UnsupportedEncodingException, JsonProcessingException {
         sendNotification();
+    }
+
+    @Transactional
+    public void deleteFCMToken(Long userId) {
+        Optional<FCMToken> fcmToken = fcmRepository.findByUserId(userId);
+        if (fcmToken.isPresent()) {
+            fcmRepository.delete(fcmToken.get());
+        }
+        throw new FCMTokenException(ErrorCode.FCM_TOKEN_NOT_FOUND);
     }
 }

@@ -35,8 +35,12 @@ public enum ErrorCode {
     ACCESS_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "JWT403", "엑세스 토큰 형식이 올바르지 않습니다."),
     ACCESS_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT404", "지원되지 않는 엑세스 토큰입니다."),
     ACCESS_TOKEN_ILLEGAL_ARGUMENT(HttpStatus.UNAUTHORIZED, "JWT405", "잘못된 엑세스 토큰입니다."),
-    ACCESS_TOKEN_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT406", "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
+    ACCESS_TOKEN_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT406",
+        "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
     ACCESS_TOKEN_VALIDATION_FAIL(HttpStatus.UNAUTHORIZED, "JWT407", "(통합) 유효성 검증에 실패한 엑세스 토큰입니다."),
+
+    // FCM_TOKEN
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM401", "해당 유저에 등록된 FCM 토큰이 존재하지 않습니다."),
 
 
     // ETC

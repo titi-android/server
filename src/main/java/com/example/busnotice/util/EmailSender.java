@@ -21,6 +21,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @Slf4j
 @Transactional(readOnly = true)
 public class EmailSender {
+
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
     @Value("${email.de}")
@@ -34,16 +35,18 @@ public class EmailSender {
      * 이메일 전송
      */
     public void sendMailNotice(String username, String title, String content) {
-        ArrayList<String > emails = new ArrayList<>();
+        ArrayList<String> emails = new ArrayList<>();
         emails.add(de);
         emails.add(back);
         emails.add(aos);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false,
+                "UTF-8");
             mimeMessageHelper.setTo(emails.toArray(new String[0])); // 수신자 메일
             mimeMessageHelper.setSubject(title); // 메일 제목
-            mimeMessageHelper.setText(setContext(todayDate(), username, title, content), true); // 메일 본문
+            mimeMessageHelper.setText(setContext(todayDate(), username, title, content),
+                true); // 메일 본문
             javaMailSender.send(mimeMessage);
 
             log.info("SUCCEEDED TO SEND EMAIL to {}", emails.toArray(new String[0]));
@@ -54,7 +57,8 @@ public class EmailSender {
     }
 
     public String todayDate() {
-        ZonedDateTime todayDate = LocalDateTime.now(ZoneId.of("Asia/Seoul")).atZone(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime todayDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+            .atZone(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
         return todayDate.format(formatter);
     }

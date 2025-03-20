@@ -4,6 +4,7 @@ import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.BusinessException;
 import com.example.busnotice.global.exception.CityCodeException;
+import com.example.busnotice.global.exception.FCMTokenException;
 import com.example.busnotice.global.exception.GeneralException;
 import com.example.busnotice.global.exception.RefreshTokenException;
 import com.example.busnotice.global.exception.ScheduleException;
@@ -55,6 +56,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RefreshTokenException.class)
     public ApiResponse<Void> RefreshTokenException(RefreshTokenException e) {
+        return ApiResponse.createFail(e.getErrorCode());
+    }
+
+    @ExceptionHandler(FCMTokenException.class)
+    public ApiResponse<Void> FCMTokenException(FCMTokenException e) {
         return ApiResponse.createFail(e.getErrorCode());
     }
 

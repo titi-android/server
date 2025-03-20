@@ -14,4 +14,6 @@ public interface FCMRepository extends JpaRepository<FCMToken, Long> {
     Boolean existsByUser(User user);
 
     List<FCMToken> findAllByToken(String token);
+
+    Optional<FCMToken> findByUserId(Long userId);
 }
