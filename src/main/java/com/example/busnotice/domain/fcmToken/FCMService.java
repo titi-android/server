@@ -145,6 +145,7 @@ public class FCMService {
         Optional<FCMToken> fcmToken = fcmRepository.findByUserId(userId);
         if (fcmToken.isPresent()) {
             fcmRepository.delete(fcmToken.get());
+            return;
         }
         throw new FCMTokenException(ErrorCode.FCM_TOKEN_NOT_FOUND);
     }
