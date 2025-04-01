@@ -80,4 +80,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/bus-notice-v2:latest
             docker stop bus-notice-v2
             docker rm $(docker ps --filter 'status=exited' -a -q)
-            docker run -d --name bus-notice-v2 --log-driver=syslog --network bus-notice -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/bus-notice-v2:latest
+            docker run -d --name bus-notice-v2 --log-driver=syslog --network bus-notice -p 8081:8080 --label co.elastic.logs/enabled=true --label co.elastic.logs/module=java ${{ secrets.DOCKER_USERNAME }}/bus-notice-v2:latest
