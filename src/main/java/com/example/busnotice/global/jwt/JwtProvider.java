@@ -26,7 +26,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    private final JwtProperties jwtProperties;
+    @Value("${jwt.secret}")
+    private String secretKey;
+
     private final Long accessValidityInSecs = 86400000L; // 1일 (24시간)
     private final Long refreshValidityInSecs = 7L * 86400000L; // 7일 (1주일)
 
@@ -40,11 +42,11 @@ public class JwtProvider {
         Date validity = new Date(now.getTime() + accessValidityInSecs);
 
         return Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
-            .compact();
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     // 리프레시 토큰 발급
@@ -53,10 +55,10 @@ public class JwtProvider {
         Date validity = new Date(now.getTime() + refreshValidityInSecs);
 
         return Jwts.builder()
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
-            .compact();
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     public String getUserId(String token) {
@@ -66,10 +68,10 @@ public class JwtProvider {
     private Claims getClaims(String token) {
         try {
             return Jwts.parserBuilder()
-                .setSigningKey(jwtProperties.getSecret())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (ExpiredJwtException e) {
             throw new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException e) {
@@ -92,20 +94,20 @@ public class JwtProvider {
 
     public Authentication getAuthentication(String token) {
         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(
-            getUserId(token)
+                getUserId(token)
         );
 
         return new UsernamePasswordAuthenticationToken(customUserDetails,
-            customUserDetails.getPassword());
+                customUserDetails.getPassword());
     }
 
     public boolean isRefreshTokenExpired(String refreshToken) {
         try {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtProperties.getSecret()) // 서명 키 설정
-                .build()
-                .parseClaimsJws(refreshToken)
-                .getBody();
+                    .setSigningKey(secretKey) // 서명 키 설정
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
 
             Date expiration = claims.getExpiration();
             return expiration.before(new Date()); // 만료 시간이 현재 시간보다 이전이면 만료됨
@@ -115,15 +117,19 @@ public class JwtProvider {
     }
 
     public RefreshTokenResponse recreateAccessToken(String refreshToken) {
-        // 1. 토큰 존재 여부 확인
+        // 유저에게 등록된 리프레시 토큰인지 확인
         RefreshToken existsRefreshToken = refreshTokenRepository.findByToken(refreshToken)
-            .orElseThrow(() -> new RefreshTokenException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
-        // 2. 토큰 만료 여부 검사
+                .orElseThrow(
+                        () -> new RefreshTokenException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+        if (!existsRefreshToken.equals(refreshToken)) {
+            new RefreshTokenException(ErrorCode.REFRESH_TOKEN_INVALID);
+        }
+        // 만료된 리프레시 토큰인지 확인
         if (isRefreshTokenExpired(refreshToken)) {
             throw new RefreshTokenException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
-        // 3. 새로운 Access Token 생성
-        String accessToken = createAccessToken(existsRefreshToken.getUser().getId());
+        // 해당 리프레시 토큰의 유저 정보를 통해 다시 엑세스 토큰 생성
+        String accessToken = createAccessToken(Long.valueOf(existsRefreshToken.getUser().getId()));
         return new RefreshTokenResponse(accessToken);
     }
 
