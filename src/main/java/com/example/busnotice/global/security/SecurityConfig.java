@@ -36,6 +36,7 @@ public class SecurityConfig {
                             "/api/v1/users/**",
                             "/api/v1/schedules/**",
                             "/api/v2/schedules/**",
+                            "/api/v1/subway/**",
                             "/api/v1/cityCode",
                             "/api/v1/nodes/**",
                             "/api/v1/fcm/**",
