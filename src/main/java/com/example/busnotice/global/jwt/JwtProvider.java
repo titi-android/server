@@ -26,9 +26,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
+    private final JwtProperties jwtProperties;
     private final Long accessValidityInSecs = 86400000L; // 1일 (24시간)
     private final Long refreshValidityInSecs = 7L * 86400000L; // 7일 (1주일)
 
@@ -45,7 +43,7 @@ public class JwtProvider {
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
             .compact();
     }
 
@@ -57,7 +55,7 @@ public class JwtProvider {
         return Jwts.builder()
             .setIssuedAt(now)
             .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecret())
             .compact();
     }
 
@@ -68,7 +66,7 @@ public class JwtProvider {
     private Claims getClaims(String token) {
         try {
             return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(jwtProperties.getSecret())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -104,7 +102,7 @@ public class JwtProvider {
     public boolean isRefreshTokenExpired(String refreshToken) {
         try {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey) // 서명 키 설정
+                .setSigningKey(jwtProperties.getSecret()) // 서명 키 설정
                 .build()
                 .parseClaimsJws(refreshToken)
                 .getBody();
