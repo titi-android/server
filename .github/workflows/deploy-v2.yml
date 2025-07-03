@@ -23,7 +23,7 @@ jobs:
       - name: Create application.yaml
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YAML_V2 }}" > src/main/resources/application.yaml
+          echo "${{ secrets.APPLICATION_YAML_V2 }}" | base64 --decode > src/main/resources/application.yaml
           cat src/main/resources/application.yaml
         shell: bash
 
