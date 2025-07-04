@@ -1,46 +1,46 @@
 package com.example.busnotice.domain.schedule.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.LocalTime;
 import java.util.List;
 
 public record UpdateScheduleRequest(
-        String name, // 스케줄 이름
-        List<String> daysList,  // 요일 리스트
-        @Schema(type = "string", example = "00:00")
-        @JsonFormat(pattern = "HH:mm")
-        LocalTime startTime, // 시작 시간
-        @Schema(type = "string", example = "00:00")
-        @JsonFormat(pattern = "HH:mm")
-        LocalTime endTime, // 마치는 시간
-        List<RouteInfo> routeInfos,
+        String name,
+        List<String> daysList,
+        LocalTime startTime,
+        LocalTime endTime,
+        Boolean isAlarmOn,
         DestinationInfo destinationInfo,
-        Boolean isAlarmOn // 잠금화면 알림 여부
+        List<RouteInfo> routeInfos
 ) {
+    public record DestinationInfo(
+            String type,      // "BUS" 또는 "SUBWAY"
+            String regionName,
+            String placeName,
+            String nodeId
+    ) {}
 
     public record RouteInfo(
+            String type, // "BUS" or "SUBWAY"
+            BusStopSectionInfo busStopSection, // BUS일 때만 사용
+            SubwaySectionInfo subwaySection    // SUBWAY일 때만 사용
+    ) {}
+
+    public record BusStopSectionInfo(
             String regionName,
             String busStopName,
             String nodeId,
-            List<BusInfo> busInfos
-    ) {
+            List<BusInfo> busList
+    ) {}
 
-        public record BusInfo(
-                String name,
-                String type
-        ) {
+    public record BusInfo(
+            String name,
+            String type
+    ) {}
 
-        }
-    }
-
-    public record DestinationInfo(
+    public record SubwaySectionInfo(
             String regionName,
-            String busStopName,
-            String nodeId
-
-    ) {
-
-    }
+            String lineName,
+            String stationName,
+            String dir // "UP" (상행), "DOWN" (하행) 등
+    ) {}
 }

@@ -2,14 +2,14 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.bus.BusRepository;
-import com.example.busnotice.domain.bus.BusService;
 import com.example.busnotice.domain.busStop.BusStopSectionRepository;
-import com.example.busnotice.domain.busStop.BusStopService;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
+import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -29,6 +32,8 @@ public class ScheduleService {
     private final BusStopSectionRepository busStopSectionRepository;
     private final SubwaySectionRepository subwaySectionRepository;
     private final BusRepository busRepository;
+    private final SectionRepository sectionRepository;
+    private final EntityManager entityManager;
 
     @Transactional
     public void createSchedule(Long userId, CreateScheduleRequest req) {
@@ -116,60 +121,100 @@ public class ScheduleService {
 
         log.info("created schedule: {}", savedSchedule);
     }
-//
+
+    //
 //    public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
 //        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId, userId)
 //                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
 //        return ScheduleInfoResponse.fromEntity(schedule);
 //    }
 //
-//    @Transactional
-//    public void updateSchedule(Long userId, Long scheduleId,
-//                               UpdateScheduleRequest updateScheduleRequest) {
-//        User user = getUserById(userId);
-//        Schedule existSchedule = scheduleRepository.findById(scheduleId)
-//                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
-//
-//        // 수정 전 스케줄을 제외하고, 수정한 스케줄과 겹치는 스케줄 있는지 확인
-//        기존_스케줄_수정시_겹침_유무_파악(user, scheduleId, updateScheduleRequest.daysList(),
-//                updateScheduleRequest.startTime(), updateScheduleRequest.endTime());
-//
-//        // 수정 대상 스케줄의 BusStops 및 BusStop 에 등록된 Bus 들 모두 삭제
-//        busStopRepository.deleteAll(
-//                existSchedule.getBusStops());// busStop 과 bus 모두 삭제됨 (둘 다 Cascade ALL, orphanremoval true 로 설정했기 때문)
-//        entityManager.flush();
-//
-//        // 새로 BusStop 및 Bus 등록
-//        List<UpdateScheduleRequest.RouteInfo> routeInfos = updateScheduleRequest.routeInfos();
-//        List<BusStop> busStops = new ArrayList<>();
-//        for (UpdateScheduleRequest.RouteInfo ri : routeInfos) {
-//            // 도시 코드
-//            String cityCode = busStopService.도시코드_DB_조회(ri.regionName());
-//            // 버스정류장 생성
-//            BusStop savedBusStop = busStopRepository.save(
-//                    BusStop.toEntity(existSchedule, cityCode, ri.regionName(), ri.busStopName(),
-//                            ri.nodeId()));
-//            busStops.add(savedBusStop);
-//            // 해당 버스정류장에 등록될 버스들 생성
-//            List<Bus> buses = ri.busInfos().stream()
-//                    .map(bi -> Bus.toEntity(savedBusStop, bi.name(), bi.type()))
-//                    .toList();
-//            busRepository.saveAll(buses);
-//        }
-//        // 스케줄 생성한 후 생성한 도착지 및 버스 정류장 등록
-//        UpdateScheduleRequest.DestinationInfo crdi = updateScheduleRequest.destinationInfo();
-//        DestinationInfo destinationInfo = new DestinationInfo(crdi.regionName(), crdi.busStopName(),
-//                crdi.nodeId());
-//        // 스케줄 업데이트
-//        existSchedule.update(
-//                updateScheduleRequest.name(),
-//                updateScheduleRequest.daysList(),
-//                updateScheduleRequest.startTime(), updateScheduleRequest.endTime(),
-//                busStops, destinationInfo, updateScheduleRequest.isAlarmOn()
-//        );
-//    }
-//
-//    @Transactional
+    @Transactional
+    public void updateSchedule(Long userId, Long scheduleId, UpdateScheduleRequest req) {
+        // 1. 사용자 및 기존 스케줄 조회
+        User user = getUserById(userId);
+        Schedule existSchedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+
+        // 2. 겹치는 스케줄 유무 확인
+        기존_스케줄_수정시_겹침_유무_파악(
+                user, scheduleId, req.daysList(), req.startTime(), req.endTime()
+        );
+
+        // 3. 기존 Section, BusStopSection, SubwaySection, Bus 모두 삭제
+        // (Section이 orphanRemoval = true, cascade = ALL로 설정되어 있어야 함)
+        List<Section> sections = existSchedule.getSections();
+        sections.clear(); // 기존 Section 모두 orphan 처리됨
+        entityManager.flush();
+
+        // 4. 새 Section, BusStopSection, SubwaySection, Bus 등록
+        List<UpdateScheduleRequest.RouteInfo> routeInfos = req.routeInfos();
+        for (int i = 0; i < routeInfos.size(); i++) {
+            UpdateScheduleRequest.RouteInfo route = routeInfos.get(i);
+
+            if ("BUS".equalsIgnoreCase(route.type())) {
+                UpdateScheduleRequest.BusStopSectionInfo bssi = route.busStopSection();
+                BusStopSection busStopSection = new BusStopSection(
+                        bssi.regionName(),
+                        bssi.busStopName(),
+                        bssi.nodeId(),
+                        new ArrayList<>()
+                );
+                BusStopSection savedBusStopSection = busStopSectionRepository.save(busStopSection);
+
+                List<Bus> busEntities = new ArrayList<>();
+                if (bssi.busList() != null) {
+                    for (UpdateScheduleRequest.BusInfo bi : bssi.busList()) {
+                        Bus bus = new Bus(savedBusStopSection, bi.name(), bi.type());
+                        busEntities.add(bus);
+                    }
+                    busRepository.saveAll(busEntities);
+                    savedBusStopSection.setBusList(busEntities);
+                }
+
+                Section section = Section.busSection(i, existSchedule, savedBusStopSection);
+                sections.add(section);
+
+            } else if ("SUBWAY".equalsIgnoreCase(route.type())) {
+                UpdateScheduleRequest.SubwaySectionInfo ssi = route.subwaySection();
+                SubwaySection subwaySection = new SubwaySection(
+                        ssi.regionName(),
+                        ssi.lineName(),
+                        ssi.stationName(),
+                        ssi.dir()
+                );
+                SubwaySection savedSubwaySection = subwaySectionRepository.save(subwaySection);
+
+                Section section = Section.subwaySection(i, existSchedule, savedSubwaySection);
+                sections.add(section);
+
+            } else {
+                throw new IllegalArgumentException("지원하지 않는 구간 타입: " + route.type());
+            }
+        }
+
+        // 5. 도착지 정보 생성
+        UpdateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
+        Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo(
+                crdi.type(),
+                crdi.regionName(),
+                crdi.placeName(),
+                crdi.nodeId()
+        );
+
+        // 6. 스케줄 정보 업데이트 (sections 컬렉션은 이미 직접 조작)
+        existSchedule.setName(req.name());
+        existSchedule.setDaysList(req.daysList());
+        existSchedule.setStartTime(req.startTime());
+        existSchedule.setEndTime(req.endTime());
+        existSchedule.setDestinationInfo(destinationInfo);
+        existSchedule.setIsAlarmOn(req.isAlarmOn());
+
+        scheduleRepository.save(existSchedule);
+    }
+
+
+    //    @Transactional
 //    public void deleteSchedule(Long userId, Long scheduleId) {
 //        User user = getUserById(userId);
 //        Schedule schedule = scheduleRepository.findById(scheduleId)
@@ -245,50 +290,52 @@ public class ScheduleService {
 //                .sorted(Comparator.comparing(responses -> responses.startTime())).toList();
 //    }
 //
-//    private void 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
-//                                    LocalTime newEndTime) {
-//        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
-//
-//        for (Schedule s : schedules) {
-//            // 기존 스케줄의 요일 리스트
-//            List<String> existingDays = s.getDaysList();
-//            // 1. 요일이 겹치는지 확인
-//            boolean isDayOverlap = existingDays.stream().anyMatch(newDays::contains);
-//            if (!isDayOverlap) {
-//                continue; // 요일이 겹치지 않으면 스킵
-//            }
-//            // 2. 시간대가 겹치는지 확인
-//            boolean isTimeOverlap = (newStartTime.isBefore(s.getEndTime()) && newEndTime.isAfter(
-//                    s.getStartTime()));
-//            // 둘 다 겹치면 충돌 발생
-//            if (isTimeOverlap) {
-//                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
-//            }
-//        }
-//    }
-//
-//    private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, List<String> daysList,
-//                                     LocalTime startTime, LocalTime endTime) {
-//        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
-//        for (Schedule existingSchedule : schedules) {
-//            // 1. 수정 중인 스케줄은 제외
-//            if (Objects.equals(scheduleId, existingSchedule.getId())) {
-//                continue;
-//            }
-//            // 2. 요일이 겹치는지 확인
-//            boolean isDayOverlap = existingSchedule.getDaysList().stream()
-//                    .anyMatch(daysList::contains);
-//            // 3. 시간대가 겹치는지 확인
-//            boolean isTimeOverlap =
-//                    startTime.isBefore(existingSchedule.getEndTime()) && endTime.isAfter(
-//                            existingSchedule.getStartTime());
-//            // 4. 둘 다 겹치면 예외 발생
-//            if (isDayOverlap && isTimeOverlap) {
-//                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
-//            }
-//        }
-//    }
-//
+    private void 새_스케줄_생성시_겹침_유무_파악(User user, List<String> newDays, LocalTime newStartTime,
+                                    LocalTime newEndTime) {
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
+
+        for (Schedule s : schedules) {
+            // 기존 스케줄의 요일 리스트
+            List<String> existingDays = s.getDaysList();
+            // 1. 요일이 겹치는지 확인
+            boolean isDayOverlap = existingDays.stream().anyMatch(newDays::contains);
+            if (!isDayOverlap) {
+                continue; // 요일이 겹치지 않으면 스킵
+            }
+            // 2. 시간대가 겹치는지 확인
+            boolean isTimeOverlap = (newStartTime.isBefore(s.getEndTime()) && newEndTime.isAfter(
+                    s.getStartTime()));
+            // 둘 다 겹치면 충돌 발생
+            if (isTimeOverlap) {
+                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
+            }
+        }
+    }
+
+    //
+    private void 기존_스케줄_수정시_겹침_유무_파악(User user, Long scheduleId, List<String> daysList,
+                                     LocalTime startTime, LocalTime endTime) {
+        List<Schedule> schedules = scheduleRepository.findAllByUser(user);
+        for (Schedule existingSchedule : schedules) {
+            // 1. 수정 중인 스케줄은 제외
+            if (Objects.equals(scheduleId, existingSchedule.getId())) {
+                continue;
+            }
+            // 2. 요일이 겹치는지 확인
+            boolean isDayOverlap = existingSchedule.getDaysList().stream()
+                    .anyMatch(daysList::contains);
+            // 3. 시간대가 겹치는지 확인
+            boolean isTimeOverlap =
+                    startTime.isBefore(existingSchedule.getEndTime()) && endTime.isAfter(
+                            existingSchedule.getStartTime());
+            // 4. 둘 다 겹치면 예외 발생
+            if (isDayOverlap && isTimeOverlap) {
+                throw new ScheduleException(ErrorCode.SCHEDULE_CONFLICT);
+            }
+        }
+    }
+
+    //
 //    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String days) {
 //        return scheduleRepository.findAllByUserAndDays(user, days);
 //    }
