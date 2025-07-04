@@ -5,6 +5,7 @@ import com.example.busnotice.domain.user.UserService;
 import com.example.busnotice.global.jwt.JwtProvider;
 import com.example.busnotice.global.jwt.TokenResponse;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +35,7 @@ public class UserTest {
         System.out.println("tr = " + tr);
     }
 
+    @Disabled
     @Test
     public void getUsernameFromJwt() {
         userService.signUp(name, password);

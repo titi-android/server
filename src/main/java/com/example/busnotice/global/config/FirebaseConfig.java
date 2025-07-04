@@ -13,18 +13,21 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        // 클래스패스에서 파일을 읽어옵니다.
-        ClassPathResource serviceAccountResource = new ClassPathResource(
-            "firebase/firebase-service-key.json");
+        if (FirebaseApp.getApps().isEmpty()) {
+            ClassPathResource serviceAccountResource = new ClassPathResource(
+                    "firebase/firebase-service-key.json");
 
-        // 리소스를 InputStream으로 읽어옵니다.
-        GoogleCredentials credentials = GoogleCredentials.fromStream(
-            serviceAccountResource.getInputStream());
+            GoogleCredentials credentials = GoogleCredentials.fromStream(
+                    serviceAccountResource.getInputStream());
 
-        FirebaseOptions options = FirebaseOptions.builder()
-            .setCredentials(credentials)
-            .build();
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(credentials)
+                    .build();
 
-        return FirebaseApp.initializeApp(options);
+            return FirebaseApp.initializeApp(options);
+        } else {
+            // 이미 초기화된 인스턴스 반환
+            return FirebaseApp.getInstance();
+        }
     }
 }
