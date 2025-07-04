@@ -4,7 +4,7 @@ import com.example.busnotice.domain.fcmToken.FCMToken;
 import com.example.busnotice.domain.user.User;
 
 public record CreateFCMTokenRequest(
-    String token
+        String token
 ) {
 
     public FCMToken toEntity(User user) {

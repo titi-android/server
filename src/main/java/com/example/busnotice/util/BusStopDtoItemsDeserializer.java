@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class BusStopDtoItemsDeserializer extends JsonDeserializer<List<Item>> {
         if (p.currentToken() == JsonToken.START_ARRAY) {
             // JSON이 배열인 경우
             items = mapper.readValue(p, mapper.getTypeFactory()
-                .constructCollectionType(List.class, BusStopsDto.Item.class));
+                    .constructCollectionType(List.class, BusStopsDto.Item.class));
         } else if (p.currentToken() == JsonToken.START_OBJECT) {
             // JSON이 단일 객체인 경우
             BusStopsDto.Item item = mapper.readValue(p, BusStopsDto.Item.class);

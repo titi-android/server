@@ -15,16 +15,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,7 +42,7 @@ public class FCMService {
     @Transactional
     public void createFCMToken(Long userId, CreateFCMTokenRequest createFCMTokenRequest) {
         User user = userRepository.findById(userId).orElseThrow(
-            () -> new UserException(ErrorCode.USER_NOT_FOUND)
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
         );
 
         // 동일한 토큰이 존재하는 모든 FCMToken 삭제 -> 다른 유저가 동일한 FCMToken 을 가지고 있는 경우를 방지하기 위해
@@ -71,40 +72,40 @@ public class FCMService {
         for (FCMToken token : allTokens) {
             log.info("토큰의 유저 이름: {}", token.getUser().getName());
             ScheduleResponse sr = scheduleService.현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-                token.getUser().getId());
+                    token.getUser().getId());
             if (sr != null) {
                 Schedule schedule = scheduleRepository.findById(sr.id()).get();
                 if (!schedule.getIsAlarmOn()) {
                     log.info("{} 의 현재 스케줄이 존재하나, 알림 전송 대상이 아닙니다. : {}", token.getUser().getName(),
-                        sr);
+                            sr);
                     continue;
                 }
                 // 정류장 및 도착 예정 버스 정보를 변환
                 List<UserNotificationData.BusStopArrInfoDto> busStopInfoDtos = sr.busStopInfos()
-                    .stream()
-                    .map(busStop -> new UserNotificationData.BusStopArrInfoDto(
-                        busStop.busStopName(),
-                        busStop.busInfos().stream()
-                            .map(bus -> new UserNotificationData.BusStopArrInfoDto.BusArrInfoDto(
-                                bus.arrprevstationcnt(),
-                                bus.arrtime(),
-                                bus.nodeid(),
-                                bus.nodenm(),
-                                bus.routeid(),
-                                bus.routeno(),
-                                bus.routetp(),
-                                bus.vehicletp()
-                            ))
-                            .collect(Collectors.toList())
-                    ))
-                    .collect(Collectors.toList());
+                        .stream()
+                        .map(busStop -> new UserNotificationData.BusStopArrInfoDto(
+                                busStop.busStopName(),
+                                busStop.busInfos().stream()
+                                        .map(bus -> new UserNotificationData.BusStopArrInfoDto.BusArrInfoDto(
+                                                bus.arrprevstationcnt(),
+                                                bus.arrtime(),
+                                                bus.nodeid(),
+                                                bus.nodenm(),
+                                                bus.routeid(),
+                                                bus.routeno(),
+                                                bus.routetp(),
+                                                bus.vehicletp()
+                                        ))
+                                        .collect(Collectors.toList())
+                        ))
+                        .collect(Collectors.toList());
 
                 notifications.add(new UserNotificationData(
-                    token.getToken(),
-                    sr.id(),
-                    sr.name(),
-                    sr.days(),
-                    busStopInfoDtos
+                        token.getToken(),
+                        sr.id(),
+                        sr.name(),
+                        sr.days(),
+                        busStopInfoDtos
                 ));
             } else {
                 log.info("{} 의 현재 스케줄이 존재하지 않습니다.", token.getUser().getName());
@@ -118,13 +119,13 @@ public class FCMService {
 
         for (UserNotificationData notification : notifications) {
             Message message = Message.builder()
-                .setToken(notification.token())
-                .putData("scheduleId", notification.scheduleId().toString())
-                .putData("scheduleName", notification.scheduleName())
-                .putData("days", notification.days().toString())
-                .putData("busStopInfos",
-                    objectMapper.writeValueAsString(notification.busStopInfos()))
-                .build();
+                    .setToken(notification.token())
+                    .putData("scheduleId", notification.scheduleId().toString())
+                    .putData("scheduleName", notification.scheduleName())
+                    .putData("days", notification.days().toString())
+                    .putData("busStopInfos",
+                            objectMapper.writeValueAsString(notification.busStopInfos()))
+                    .build();
 
             try {
                 String response = FirebaseMessaging.getInstance().send(message);
@@ -136,7 +137,7 @@ public class FCMService {
     }
 
     public void sendTestNotification()
-        throws UnsupportedEncodingException, JsonProcessingException {
+            throws UnsupportedEncodingException, JsonProcessingException {
         sendNotification();
     }
 

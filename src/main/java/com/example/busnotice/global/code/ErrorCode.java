@@ -36,7 +36,7 @@ public enum ErrorCode {
     ACCESS_TOKEN_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT404", "지원되지 않는 엑세스 토큰입니다."),
     ACCESS_TOKEN_ILLEGAL_ARGUMENT(HttpStatus.UNAUTHORIZED, "JWT405", "잘못된 엑세스 토큰입니다."),
     ACCESS_TOKEN_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT406",
-        "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
+            "JWT 를 통해 추출한 유저의 ID가 DB에 존재하지 않습니다."),
     ACCESS_TOKEN_VALIDATION_FAIL(HttpStatus.UNAUTHORIZED, "JWT407", "(통합) 유효성 검증에 실패한 엑세스 토큰입니다."),
 
     // FCM_TOKEN
@@ -45,7 +45,7 @@ public enum ErrorCode {
 
     // ETC
     UNSUPPORTED_ENCODING(HttpStatus.INTERNAL_SERVER_ERROR, "UNSUPPORTED_ENCODING",
-        "지원되지 않는 인코딩 형식입니다.");
+            "지원되지 않는 인코딩 형식입니다.");
 
 
     private final HttpStatus httpStatus;

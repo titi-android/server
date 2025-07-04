@@ -21,33 +21,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .headers(headers -> headers.frameOptions(
-                frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(
-                auth ->
-                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
-                            "/h2-console/**",
-                            "/swagger-ui/**",
-                            "/swagger-resource",
-                            "/v3/api-docs/**",
-                            "/api/v1/users/**",
-                            "/api/v1/schedules/**",
-                            "/api/v2/schedules/**",
-                            "/api/v1/subway/**",
-                            "/api/v1/cityCode",
-                            "/api/v1/nodes/**",
-                            "/api/v1/fcm/**",
-                            "/api/v1/test/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-            )
-            // jwt filter
-            .addFilterBefore(jwtAuthorizationFilter,
-                UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint));
+                .headers(headers -> headers.frameOptions(
+                        frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                        .requestMatchers(
+                                                "/h2-console/**",
+                                                "/swagger-ui/**",
+                                                "/swagger-resource",
+                                                "/v3/api-docs/**",
+                                                "/api/v1/users/**",
+                                                "/api/v1/schedules/**",
+                                                "/api/v2/schedules/**",
+                                                "/api/v1/subway/**",
+                                                "/api/v1/cityCode",
+                                                "/api/v1/nodes/**",
+                                                "/api/v1/fcm/**",
+                                                "/api/v1/test/**"
+                                        ).permitAll()
+                                        .anyRequest().authenticated()
+                )
+                // jwt filter
+                .addFilterBefore(jwtAuthorizationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint));
 
         return http.build();
     }

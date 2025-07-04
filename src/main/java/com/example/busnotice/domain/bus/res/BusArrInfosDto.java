@@ -3,8 +3,9 @@ package com.example.busnotice.domain.bus.res;
 import com.example.busnotice.domain.schedule.res.ScheduleResponse.BusStopArrInfoDto.BusArrInfoDto;
 import com.example.busnotice.util.BusArrInfosDtoItemsDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class BusArrInfosDto {
@@ -58,7 +59,7 @@ public class BusArrInfosDto {
         }
 
         public Item(int arrprevstationcnt, int arrtime, String nodeId, String nodenm,
-            String routeid, String routeno, String routetp, String vehicletp) {
+                    String routeid, String routeno, String routetp, String vehicletp) {
             this.arrprevstationcnt = arrprevstationcnt;
             this.arrtime = arrtime;
             this.nodeid = nodeId;
@@ -92,16 +93,16 @@ public class BusArrInfosDto {
 //        }
 
         public BusArrInfoDto toBusInfoDto(int arrprevstationcnt, int arrtime, String nodeid,
-            String nodenm, String routeid, String routeno, String routetp, String vehicletp) {
+                                          String nodenm, String routeid, String routeno, String routetp, String vehicletp) {
             return new BusArrInfoDto(
-                arrprevstationcnt,
-                arrtime,
-                nodeid,
-                nodenm,
-                routeid,
-                routeno,
-                routetp,
-                vehicletp
+                    arrprevstationcnt,
+                    arrtime,
+                    nodeid,
+                    nodenm,
+                    routeid,
+                    routeno,
+                    routetp,
+                    vehicletp
             );
         }
     }

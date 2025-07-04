@@ -1,11 +1,6 @@
 package com.example.busnotice.util;
 
 import jakarta.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -42,11 +43,11 @@ public class EmailSender {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false,
-                "UTF-8");
+                    "UTF-8");
             mimeMessageHelper.setTo(emails.toArray(new String[0])); // 수신자 메일
             mimeMessageHelper.setSubject(title); // 메일 제목
             mimeMessageHelper.setText(setContext(todayDate(), username, title, content),
-                true); // 메일 본문
+                    true); // 메일 본문
             javaMailSender.send(mimeMessage);
 
             log.info("SUCCEEDED TO SEND EMAIL to {}", emails.toArray(new String[0]));
@@ -58,7 +59,7 @@ public class EmailSender {
 
     public String todayDate() {
         ZonedDateTime todayDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
-            .atZone(ZoneId.of("Asia/Seoul"));
+                .atZone(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
         return todayDate.format(formatter);
     }

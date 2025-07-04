@@ -16,7 +16,7 @@ public class CoercionConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.coercionConfigFor(LogicalType.POJO)
-            .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
+                .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
         return objectMapper;
     }
 }

@@ -1,20 +1,14 @@
 package com.example.busnotice.global.handler;
 
 import com.example.busnotice.global.code.ErrorCode;
-import com.example.busnotice.global.exception.BusStopException;
-import com.example.busnotice.global.exception.BusinessException;
-import com.example.busnotice.global.exception.CityCodeException;
-import com.example.busnotice.global.exception.FCMTokenException;
-import com.example.busnotice.global.exception.GeneralException;
-import com.example.busnotice.global.exception.RefreshTokenException;
-import com.example.busnotice.global.exception.ScheduleException;
-import com.example.busnotice.global.exception.UserException;
+import com.example.busnotice.global.exception.*;
 import com.example.busnotice.global.format.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.io.UnsupportedEncodingException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -66,7 +60,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ApiResponse<Void> handleAuthenticationException(HttpServletRequest request,
-        AuthenticationException e) {
+                                                           AuthenticationException e) {
         return ApiResponse.createAuthFail((String) request.getAttribute("exceptionMessage"));
     }
 }

@@ -10,6 +10,6 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder builder) {
         return builder.baseUrl("") // 공통 URL 설정
-            .build();
+                .build();
     }
 }

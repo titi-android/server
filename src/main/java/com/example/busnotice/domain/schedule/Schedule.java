@@ -3,25 +3,12 @@ package com.example.busnotice.domain.schedule;
 import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.time.LocalTime;
-import java.util.List;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+
+import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -62,8 +49,8 @@ public class Schedule {
     private Boolean isAlarmOn;
 
     public Schedule(User user, String scheduleName, List<String> daysList,
-        LocalTime startTime, LocalTime endTime,
-        List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
+                    LocalTime startTime, LocalTime endTime,
+                    List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
         this.user = user;
         this.name = scheduleName;
         this.daysList = daysList;
@@ -76,9 +63,9 @@ public class Schedule {
 
     @Embeddable
     @AttributeOverrides({
-        @AttributeOverride(name = "regionName", column = @Column(name = "desRegionName")),
-        @AttributeOverride(name = "busStopName", column = @Column(name = "desBusStopName")),
-        @AttributeOverride(name = "nodeId", column = @Column(name = "desNodeId"))
+            @AttributeOverride(name = "regionName", column = @Column(name = "desRegionName")),
+            @AttributeOverride(name = "busStopName", column = @Column(name = "desBusStopName")),
+            @AttributeOverride(name = "nodeId", column = @Column(name = "desNodeId"))
     })
     public static class DestinationInfo {
 
@@ -101,22 +88,22 @@ public class Schedule {
     }
 
     public static Schedule toEntity(
-        User user,
-        String scheduleName,
-        List<String> daysList,
-        LocalTime startTime,
-        LocalTime endTime,
-        List<BusStop> busStops,
-        DestinationInfo destinationInfo,
-        Boolean isAlarmOn
+            User user,
+            String scheduleName,
+            List<String> daysList,
+            LocalTime startTime,
+            LocalTime endTime,
+            List<BusStop> busStops,
+            DestinationInfo destinationInfo,
+            Boolean isAlarmOn
     ) {
         return new Schedule(
-            user, scheduleName, daysList, startTime, endTime, busStops, destinationInfo, isAlarmOn
+                user, scheduleName, daysList, startTime, endTime, busStops, destinationInfo, isAlarmOn
         );
     }
 
     public void update(String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
-        List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
+                       List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
         this.name = name;
         this.daysList = daysList;
         this.startTime = startTime;

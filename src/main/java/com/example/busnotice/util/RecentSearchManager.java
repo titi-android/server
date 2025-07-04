@@ -1,9 +1,10 @@
 package com.example.busnotice.util;
 
-import java.util.Set;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class RecentSearchManager {

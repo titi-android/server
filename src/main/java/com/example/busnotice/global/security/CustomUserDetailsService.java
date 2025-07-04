@@ -22,8 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 //                "JWT 를 통해 추출한 유저의 이름이 DB에 존재하지 않습니다."));
 
         User user = userRepository.findById(Long.parseLong(userId))
-            .orElseThrow(
-                () -> new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_USER_NOT_FOUND));
+                .orElseThrow(
+                        () -> new JwtAuthenticationException(ErrorCode.ACCESS_TOKEN_USER_NOT_FOUND));
 
         return new CustomUserDetails(user);
     }

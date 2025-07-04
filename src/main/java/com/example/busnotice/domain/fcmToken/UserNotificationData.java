@@ -3,27 +3,27 @@ package com.example.busnotice.domain.fcmToken;
 import java.util.List;
 
 public record UserNotificationData(
-    String token,
-    Long scheduleId,
-    String scheduleName,
-    List<String> days,
-    List<BusStopArrInfoDto> busStopInfos
+        String token,
+        Long scheduleId,
+        String scheduleName,
+        List<String> days,
+        List<BusStopArrInfoDto> busStopInfos
 ) {
 
     public record BusStopArrInfoDto(
-        String busStopName,
-        List<BusArrInfoDto> busInfos
+            String busStopName,
+            List<BusArrInfoDto> busInfos
     ) {
 
         public record BusArrInfoDto(
-            int arrprevstationcnt,
-            int arrtime,
-            String nodeid,
-            String nodenm,
-            String routeid,
-            String routeno,
-            String routetp,
-            String vehicletp
+                int arrprevstationcnt,
+                int arrtime,
+                String nodeid,
+                String nodenm,
+                String routeid,
+                String routeno,
+                String routetp,
+                String vehicletp
         ) {
 
         }

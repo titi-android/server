@@ -1,7 +1,8 @@
 package com.example.busnotice.domain.busStop;
 
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 public interface CityCodeRepository extends JpaRepository<CityCode, Long> {
 

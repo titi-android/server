@@ -2,18 +2,11 @@ package com.example.busnotice.domain.busStop;
 
 import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.schedule.Schedule;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.List;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -44,7 +37,7 @@ public class BusStop {
     private List<Bus> busList;
 
     public BusStop(Schedule schedule, String cityCode, String regionName, String name,
-        String nodeId) {
+                   String nodeId) {
         this.schedule = schedule;
         this.cityCode = cityCode;
         this.regionName = regionName;
@@ -57,12 +50,12 @@ public class BusStop {
     }
 
     public static BusStop toEntity(Schedule schedule, String cityCode, String regionName,
-        String name, String nodeId) {
+                                   String name, String nodeId) {
         return new BusStop(schedule, cityCode, regionName, name, nodeId);
     }
 
     public void update(String cityCode, String name, String nodeId,
-        List<Bus> buses) {
+                       List<Bus> buses) {
         this.cityCode = cityCode;
         this.name = name;
         this.nodeId = nodeId;

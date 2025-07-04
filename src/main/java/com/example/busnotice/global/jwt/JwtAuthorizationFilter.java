@@ -5,15 +5,16 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,16 +25,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         // JWT 필터 거치는 PATH 인지 검사
         List<String> excludePaths = Arrays.asList(
-            "/api/v1/users/signup",
-            "/api/v1/users/login",
-            "/api/v1/users/refresh",
-            "/api/v1/users/auth/validate",
-            "/h2-console",
-            "/swagger-ui", "/swagger-resource", "/v3/api-docs"
+                "/api/v1/users/signup",
+                "/api/v1/users/login",
+                "/api/v1/users/refresh",
+                "/api/v1/users/auth/validate",
+                "/h2-console",
+                "/swagger-ui", "/swagger-resource", "/v3/api-docs"
         );
         String requestPath = request.getRequestURI();
         if (excludePaths.stream().anyMatch(requestPath::contains)) {

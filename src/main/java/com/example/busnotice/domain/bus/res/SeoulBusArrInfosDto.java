@@ -1,9 +1,10 @@
 package com.example.busnotice.domain.bus.res;
 
+import lombok.Data;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.Data;
 
 @Data
 public class SeoulBusArrInfosDto {
@@ -135,14 +136,14 @@ public class SeoulBusArrInfosDto {
                     routeType = "알수없음"; // 예외 처리
             }
             return new BusArrInfosDto.Item(
-                arrivalInfo.arrprevstationcnt, // arrprevstationcnt
-                arrivalInfo.arrtime, // arrtime
-                this.arsId, // nodeid
-                this.stNm, // nodenm
-                "", // routeid
-                this.rtNm, //routeno
-                routeType, // routetp
-                "" // vehicletp
+                    arrivalInfo.arrprevstationcnt, // arrprevstationcnt
+                    arrivalInfo.arrtime, // arrtime
+                    this.arsId, // nodeid
+                    this.stNm, // nodenm
+                    "", // routeid
+                    this.rtNm, //routeno
+                    routeType, // routetp
+                    "" // vehicletp
             );
         }
 

@@ -1,10 +1,11 @@
 package com.example.busnotice.global.security;
 
 import com.example.busnotice.domain.user.User;
-import java.util.Collection;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 @ToString
 public class CustomUserDetails implements UserDetails {

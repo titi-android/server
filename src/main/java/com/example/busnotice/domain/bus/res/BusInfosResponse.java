@@ -4,15 +4,15 @@ import java.util.List;
 
 public record BusInfosResponse(
 
-    List<BusInfoResponse> busInfosResponse
+        List<BusInfoResponse> busInfosResponse
 
 ) {
 
     public record BusInfoResponse(
-        String name,
-        String nodeId,
-        double tmX,
-        double tmY
+            String name,
+            String nodeId,
+            double tmX,
+            double tmY
     ) {
 
     }

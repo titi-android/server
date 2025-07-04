@@ -2,8 +2,9 @@ package com.example.busnotice.domain.busStop.res;
 
 import com.example.busnotice.util.BusStopDtoItemsDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class BusStopsDto {
