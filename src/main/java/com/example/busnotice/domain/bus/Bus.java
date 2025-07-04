@@ -1,6 +1,6 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.busStop.BusStop;
+import com.example.busnotice.domain.schedule.BusStopSection;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +15,8 @@ public class Bus {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "busStop_id", nullable = false)
-    private BusStop busStop;
+    @JoinColumn(name = "bus_stop_section_id", nullable = false)
+    private BusStopSection busStopSection;
 
     @Column(nullable = false)
     private String name;
@@ -27,13 +27,13 @@ public class Bus {
     public Bus() {
     }
 
-    public Bus(BusStop busStop, String name, String type) {
-        this.busStop = busStop;
+    public Bus(BusStopSection busStopSection, String name, String type) {
+        this.busStopSection = busStopSection;
         this.name = name;
         this.type = type;
     }
 
-    public static Bus toEntity(BusStop busStop, String name, String type) {
-        return new Bus(busStop, name, type);
+    public static Bus toEntity(BusStopSection busStopSection, String name, String type) {
+        return new Bus(busStopSection, name, type);
     }
 }

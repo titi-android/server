@@ -1,6 +1,5 @@
 package com.example.busnotice.domain.schedule;
 
-import com.example.busnotice.domain.busStop.BusStop;
 import com.example.busnotice.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -9,7 +8,6 @@ import lombok.ToString;
 
 import java.time.LocalTime;
 import java.util.List;
-
 @Entity
 @Data
 @ToString
@@ -29,7 +27,7 @@ public class Schedule {
     @ElementCollection
     @CollectionTable(name = "schedule_days", joinColumns = @JoinColumn(name = "schedule_id"))
     @Column(nullable = false)
-    private List<String> daysList; // 요일 리스트
+    private List<String> daysList;
 
     @Column(columnDefinition = "TIME", nullable = false)
     @JsonFormat(pattern = "HH:mm")
@@ -39,8 +37,9 @@ public class Schedule {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE)
-    private List<BusStop> busStops;
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC")
+    private List<Section> sections;
 
     @Embedded
     private DestinationInfo destinationInfo;
@@ -48,15 +47,16 @@ public class Schedule {
     @Column(nullable = false)
     private Boolean isAlarmOn;
 
-    public Schedule(User user, String scheduleName, List<String> daysList,
-                    LocalTime startTime, LocalTime endTime,
-                    List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
+    public Schedule() {}
+
+    public Schedule(User user, String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
+                    List<Section> sections, DestinationInfo destinationInfo, Boolean isAlarmOn) {
         this.user = user;
-        this.name = scheduleName;
+        this.name = name;
         this.daysList = daysList;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.busStops = busStops;
+        this.sections = sections;
         this.destinationInfo = destinationInfo;
         this.isAlarmOn = isAlarmOn;
     }
@@ -67,56 +67,20 @@ public class Schedule {
             @AttributeOverride(name = "busStopName", column = @Column(name = "desBusStopName")),
             @AttributeOverride(name = "nodeId", column = @Column(name = "desNodeId"))
     })
+    @Data
     public static class DestinationInfo {
+        private String type;
+        private String regionName;
+        private String busStopName;
+        private String nodeId;
 
-        public String regionName;
-        public String busStopName;
-        public String nodeId;
+        public DestinationInfo() {}
 
-        public DestinationInfo(String regionName, String busStopName, String nodeId) {
+        public DestinationInfo(String type, String regionName, String busStopName, String nodeId) {
+            this.type = type;
             this.regionName = regionName;
             this.busStopName = busStopName;
             this.nodeId = nodeId;
         }
-
-        public DestinationInfo() {
-
-        }
-    }
-
-    public Schedule() {
-    }
-
-    public static Schedule toEntity(
-            User user,
-            String scheduleName,
-            List<String> daysList,
-            LocalTime startTime,
-            LocalTime endTime,
-            List<BusStop> busStops,
-            DestinationInfo destinationInfo,
-            Boolean isAlarmOn
-    ) {
-        return new Schedule(
-                user, scheduleName, daysList, startTime, endTime, busStops, destinationInfo, isAlarmOn
-        );
-    }
-
-    public void update(String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
-                       List<BusStop> busStops, DestinationInfo destinationInfo, Boolean isAlarmOn) {
-        this.name = name;
-        this.daysList = daysList;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.busStops = busStops;
-        this.destinationInfo = destinationInfo;
-        this.isAlarmOn = isAlarmOn;
-    }
-
-    public boolean updateAlarm() {
-        System.out.println("기존 알림 상태 = " + this.isAlarmOn);
-        this.isAlarmOn = !this.isAlarmOn;
-        System.out.println("수정된 알림 상태 = " + this.isAlarmOn);
-        return this.isAlarmOn;
     }
 }

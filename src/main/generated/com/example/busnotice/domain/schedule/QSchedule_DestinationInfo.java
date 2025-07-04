@@ -25,6 +25,8 @@ public class QSchedule_DestinationInfo extends BeanPath<Schedule.DestinationInfo
 
     public final StringPath regionName = createString("regionName");
 
+    public final StringPath type = createString("type");
+
     public QSchedule_DestinationInfo(String variable) {
         super(Schedule.DestinationInfo.class, forVariable(variable));
     }
