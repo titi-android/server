@@ -60,15 +60,15 @@ public class ScheduleController {
     }
 //
 //
-//    @DeleteMapping("/v1/schedules/{scheduleId}")
-//    @Operation(summary = "스케줄 삭제")
-//    public ApiResponse<Void> deleteSchedule(
-//            @PathVariable("scheduleId") Long scheduleId,
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) {
-//        scheduleService.deleteSchedule(userDetails.getId(), scheduleId);
-//        return ApiResponse.createSuccess("스케줄이 삭제되었습니다.");
-//    }
+    @DeleteMapping("/v1/schedules/{scheduleId}")
+    @Operation(summary = "스케줄 삭제")
+    public ApiResponse<Void> deleteSchedule(
+            @PathVariable("scheduleId") Long scheduleId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        scheduleService.deleteSchedule(userDetails.getId(), scheduleId);
+        return ApiResponse.createSuccess("스케줄이 삭제되었습니다.");
+    }
 //
 //    @PutMapping("/v1/schedules/alarm/{scheduleId}")
 //    @Operation(summary = "스케줄 알림 여부 수정")

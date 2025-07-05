@@ -24,12 +24,12 @@ public class Section {
     private Schedule schedule;
 
     // 버스 구간일 때만 사용
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "bus_stop_section_id")
     private BusStopSection busStopSection;
 
     // 지하철 구간일 때만 사용
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "subway_section_id")
     private SubwaySection subwaySection;
 

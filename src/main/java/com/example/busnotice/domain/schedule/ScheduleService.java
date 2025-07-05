@@ -214,17 +214,18 @@ public class ScheduleService {
     }
 
 
-    //    @Transactional
-//    public void deleteSchedule(Long userId, Long scheduleId) {
-//        User user = getUserById(userId);
-//        Schedule schedule = scheduleRepository.findById(scheduleId)
-//                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
-//        if (schedule.getUser().getId() != user.getId()) {
-//            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
-//        }
-//        scheduleRepository.deleteById(scheduleId);
-//    }
-//
+    @Transactional
+    public void deleteSchedule(Long userId, Long scheduleId) {
+        User user = getUserById(userId);
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+        if (!schedule.getUser().getId().equals(user.getId())) {
+            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
+        }
+        scheduleRepository.delete(schedule); // 이미 조회한 엔티티로 삭제
+    }
+
+    //
 //
 //    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
 //            throws UnsupportedEncodingException {
