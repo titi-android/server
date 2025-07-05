@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Data
-@ToString
+@ToString(exclude = "user")
 public class Schedule {
 
     @Id
@@ -71,25 +71,19 @@ public class Schedule {
 
     @Embeddable
     @AttributeOverrides({
-            @AttributeOverride(name = "regionName", column = @Column(name = "desRegionName")),
-            @AttributeOverride(name = "busStopName", column = @Column(name = "desBusStopName")),
-            @AttributeOverride(name = "nodeId", column = @Column(name = "desNodeId"))
+            @AttributeOverride(name = "desName", column = @Column(name = "desName"))
     })
     @Data
     public static class DestinationInfo {
         private String type;
-        private String regionName;
-        private String placeName;
-        private String nodeId;
+        private String desName;
 
         public DestinationInfo() {
         }
 
-        public DestinationInfo(String type, String regionName, String busStopName, String nodeId) {
+        public DestinationInfo(String type, String desName) {
             this.type = type;
-            this.regionName = regionName;
-            this.placeName = busStopName;
-            this.nodeId = nodeId;
+            this.desName = desName;
         }
     }
 }

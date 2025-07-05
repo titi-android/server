@@ -14,9 +14,7 @@ public record ScheduleInfoResponse(
 ) {
     public record DestinationInfo(
             String type,      // "BUS" 또는 "SUBWAY"
-            String regionName,
-            String placeName,
-            String nodeId
+            String desName // 목적지 이름
     ) {
     }
 

@@ -36,14 +36,13 @@ public class SubwaySectionController {
     }
 
     @Operation(summary = "특정 노선의 지하철역의 실시간 도착 정보 반환")
-    @GetMapping("/subway/station")
+    @GetMapping("/subway/line/station")
     public ApiResponse<List<RealtimeArrResponse.RealtimeArrival>> getStationArrInfo(
             @RequestParam(name = "lineType") LineType lineType, // 호선명
             @RequestParam(name = "stName") String stName, // 해당 호선 내 지하철역명
             @RequestParam(name = "LineDir") LineDir dir // 상행 또는 하행
     ) {
         List<RealtimeArrResponse.RealtimeArrival> response = subwayService.getStationArrInfo(lineType, stName, dir);
-        System.out.println("response = " + response);
-        return ApiResponse.createSuccessWithData(response, "실시간 도착정보 반환 성공");
+        return ApiResponse.createSuccessWithData(response, "실시간 도착 정보 반환 성공");
     }
 }

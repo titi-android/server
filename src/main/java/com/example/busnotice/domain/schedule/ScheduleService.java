@@ -58,9 +58,7 @@ public class ScheduleService {
         CreateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
         Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo(
                 crdi.type(),
-                crdi.regionName(),
-                crdi.placeName(),
-                crdi.nodeId()
+                crdi.desName()
         );
 
         // 3. Schedule 엔티티 생성(Section은 나중에 추가)
@@ -181,7 +179,7 @@ public class ScheduleService {
 
         Schedule.DestinationInfo di = schedule.getDestinationInfo();
         ScheduleInfoResponse.DestinationInfo destinationInfo = new ScheduleInfoResponse.DestinationInfo(
-                di.getType(), di.getRegionName(), di.getPlaceName(), di.getNodeId()
+                di.getType(), di.getDesName()
         );
 
         return new ScheduleInfoResponse(
@@ -268,9 +266,7 @@ public class ScheduleService {
         UpdateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
         Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo(
                 crdi.type(),
-                crdi.regionName(),
-                crdi.placeName(),
-                crdi.nodeId()
+                crdi.desName()
         );
 
         // 6. 스케줄 정보 업데이트 (sections 컬렉션은 이미 직접 조작)
@@ -403,7 +399,7 @@ public class ScheduleService {
                     schedule.getStartTime(),
                     schedule.getEndTime(),
                     sectionDtos,
-                    schedule.getDestinationInfo().getPlaceName(),
+                    schedule.getDestinationInfo().getDesName(),
                     schedule.getIsAlarmOn()
             ));
         }
@@ -521,7 +517,7 @@ public class ScheduleService {
                 cs.getStartTime(),
                 cs.getEndTime(),
                 sectionDtos,
-                cs.getDestinationInfo().getPlaceName(),
+                cs.getDestinationInfo().getDesName(),
                 cs.getIsAlarmOn()
         );
     }
