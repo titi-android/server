@@ -19,9 +19,9 @@ public class QSchedule_DestinationInfo extends BeanPath<Schedule.DestinationInfo
 
     public static final QSchedule_DestinationInfo destinationInfo = new QSchedule_DestinationInfo("destinationInfo");
 
-    public final StringPath busStopName = createString("busStopName");
-
     public final StringPath nodeId = createString("nodeId");
+
+    public final StringPath placeName = createString("placeName");
 
     public final StringPath regionName = createString("regionName");
 

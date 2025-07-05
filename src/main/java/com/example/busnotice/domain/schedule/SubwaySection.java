@@ -3,7 +3,6 @@ package com.example.busnotice.domain.schedule;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -27,7 +26,8 @@ class SubwaySection {
 
     private String dir;
 
-    public SubwaySection() {}
+    public SubwaySection() {
+    }
 
     public SubwaySection(String regionName, String lineName, String stationName, String dir) {
         this.regionName = regionName;

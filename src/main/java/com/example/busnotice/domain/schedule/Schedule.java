@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.time.LocalTime;
 import java.util.List;
+
 @Entity
 @Data
 @ToString
@@ -47,7 +48,8 @@ public class Schedule {
     @Column(nullable = false)
     private Boolean isAlarmOn;
 
-    public Schedule() {}
+    public Schedule() {
+    }
 
     public Schedule(User user, String name, List<String> daysList, LocalTime startTime, LocalTime endTime,
                     List<Section> sections, DestinationInfo destinationInfo, Boolean isAlarmOn) {
@@ -71,15 +73,16 @@ public class Schedule {
     public static class DestinationInfo {
         private String type;
         private String regionName;
-        private String busStopName;
+        private String placeName;
         private String nodeId;
 
-        public DestinationInfo() {}
+        public DestinationInfo() {
+        }
 
         public DestinationInfo(String type, String regionName, String busStopName, String nodeId) {
             this.type = type;
             this.regionName = regionName;
-            this.busStopName = busStopName;
+            this.placeName = busStopName;
             this.nodeId = nodeId;
         }
     }

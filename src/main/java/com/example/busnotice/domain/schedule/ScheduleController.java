@@ -1,20 +1,15 @@
 package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
-//import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
-//import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
-//import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
-import com.example.busnotice.util.DayConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @Tag(name = "Schedule", description = "스케줄 관련 API")
 @RestController
@@ -34,31 +29,33 @@ public class ScheduleController {
         return ApiResponse.createSuccess("스케줄이 생성되었습니다.");
     }
 
-//    @GetMapping("/v1/schedules/{scheduleId}")
-//    @Operation(
-//            summary = "스케줄 조회"
-//    )
-//    public ApiResponse<ScheduleInfoResponse> getSchedule(
-//            @PathVariable("scheduleId") Long scheduleId,
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) {
-//        ScheduleInfoResponse scheduleInfoResponse = scheduleService.getSchedule(userDetails.getId(),
-//                scheduleId);
-//        return ApiResponse.createSuccessWithData(scheduleInfoResponse, "스케줄 조회에 성공했습니다.");
-//
-//    }
-//
+    @GetMapping("/v1/schedules/{scheduleId}")
+    @Operation(
+            summary = "스케줄 조회"
+    )
+    public ApiResponse<ScheduleInfoResponse> getSchedule(
+            @PathVariable("scheduleId") Long scheduleId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        ScheduleInfoResponse scheduleInfoResponse = scheduleService.getSchedule(userDetails.getId(),
+                scheduleId);
+        return ApiResponse.createSuccessWithData(scheduleInfoResponse, "스케줄 조회에 성공했습니다.");
+
+    }
+
+    //
     @PutMapping("/v2/schedules/{scheduleId}")
     @Operation(summary = "스케줄 수정")
     public ApiResponse<Void> updateSchedule(
             @PathVariable("scheduleId") Long scheduleId,
             @RequestBody UpdateScheduleRequest updateScheduleRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
+    ) {
         scheduleService.updateSchedule(userDetails.getId(), scheduleId, updateScheduleRequest);
         return ApiResponse.createSuccess("스케줄이 수정되었습니다.");
     }
-//
+
+    //
 //
     @DeleteMapping("/v1/schedules/{scheduleId}")
     @Operation(summary = "스케줄 삭제")

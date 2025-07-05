@@ -33,7 +33,8 @@ public class Section {
     @JoinColumn(name = "subway_section_id")
     private SubwaySection subwaySection;
 
-    public Section() {}
+    public Section() {
+    }
 
     public static Section busSection(int orderIndex, Schedule schedule, BusStopSection busStopSection) {
         Section section = new Section();

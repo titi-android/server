@@ -28,7 +28,8 @@ public class BusStopSection {
     @OneToMany(mappedBy = "busStopSection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bus> busList;
 
-    public BusStopSection() {}
+    public BusStopSection() {
+    }
 
     public BusStopSection(String regionName, String busStopName, String nodeId, List<Bus> busList) {
         this.regionName = regionName;

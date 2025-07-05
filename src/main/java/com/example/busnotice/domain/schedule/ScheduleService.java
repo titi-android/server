@@ -6,6 +6,7 @@ import com.example.busnotice.domain.busStop.BusStopSectionRepository;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -122,13 +124,68 @@ public class ScheduleService {
         log.info("created schedule: {}", savedSchedule);
     }
 
-    //
-//    public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
-//        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId, userId)
-//                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
-//        return ScheduleInfoResponse.fromEntity(schedule);
-//    }
-//
+    public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
+        if (!schedule.getUser().getId().equals(userId)) {
+            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
+        }
+
+        // Section 리스트를 orderIndex 순서대로 변환
+        List<ScheduleInfoResponse.RouteInfo> routeInfos = schedule.getSections().stream()
+                .sorted(Comparator.comparingInt(Section::getOrderIndex))
+                .map(section -> {
+                    if ("BUS".equalsIgnoreCase(section.getType())) {
+                        BusStopSection bss = section.getBusStopSection();
+                        List<ScheduleInfoResponse.BusInfo> busList = bss.getBusList().stream()
+                                .map(bus -> new ScheduleInfoResponse.BusInfo(bus.getName(), bus.getType()))
+                                .toList();
+                        return new ScheduleInfoResponse.RouteInfo(
+                                "BUS",
+                                new ScheduleInfoResponse.BusStopSectionInfo(
+                                        bss.getRegionName(),
+                                        bss.getBusStopName(),
+                                        bss.getNodeId(),
+                                        busList
+                                ),
+                                null
+                        );
+                    } else if ("SUBWAY".equalsIgnoreCase(section.getType())) {
+                        SubwaySection ss = section.getSubwaySection();
+                        return new ScheduleInfoResponse.RouteInfo(
+                                "SUBWAY",
+                                null,
+                                new ScheduleInfoResponse.SubwaySectionInfo(
+                                        ss.getRegionName(),
+                                        ss.getLineName(),
+                                        ss.getStationName(),
+                                        ss.getDir()
+                                )
+                        );
+                    } else {
+                        throw new IllegalStateException("알 수 없는 구간 타입: " + section.getType());
+                    }
+                })
+                .toList();
+
+        Schedule.DestinationInfo di = schedule.getDestinationInfo();
+        ScheduleInfoResponse.DestinationInfo destinationInfo = new ScheduleInfoResponse.DestinationInfo(
+                di.getType(), di.getRegionName(), di.getPlaceName(), di.getNodeId()
+        );
+
+        return new ScheduleInfoResponse(
+                schedule.getId(),
+                schedule.getName(),
+                schedule.getDaysList(),
+                schedule.getStartTime().toString(),
+                schedule.getEndTime().toString(),
+                schedule.getIsAlarmOn(),
+                destinationInfo,
+                routeInfos
+        );
+    }
+
+
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId, UpdateScheduleRequest req) {
         // 1. 사용자 및 기존 스케줄 조회
