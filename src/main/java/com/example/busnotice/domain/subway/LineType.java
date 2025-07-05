@@ -20,10 +20,6 @@ public enum LineType {
         this.displayName = displayName;
     }
 
-    public String get() {
-        return displayName;
-    }
-
     // 한글 → Enum 변환 메서드
     public static LineType fromDisplayName(String displayName) {
         for (LineType type : LineType.values()) {
@@ -32,5 +28,9 @@ public enum LineType {
             }
         }
         throw new IllegalArgumentException("지원하지 않는 노선명: " + displayName);
+    }
+
+    public String get() {
+        return displayName;
     }
 }

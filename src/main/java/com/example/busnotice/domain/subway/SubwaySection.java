@@ -1,4 +1,4 @@
-package com.example.busnotice.domain.schedule;
+package com.example.busnotice.domain.subway;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-class SubwaySection {
+public class SubwaySection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

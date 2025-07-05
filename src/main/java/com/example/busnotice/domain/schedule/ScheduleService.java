@@ -4,15 +4,15 @@ import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.bus.BusRepository;
 import com.example.busnotice.domain.bus.BusService;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto;
+import com.example.busnotice.domain.busStop.BusStopSection;
 import com.example.busnotice.domain.busStop.BusStopSectionRepository;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleArrivalResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
-import com.example.busnotice.domain.subway.LineDir;
-import com.example.busnotice.domain.subway.LineType;
-import com.example.busnotice.domain.subway.SubwayService;
+import com.example.busnotice.domain.section.Section;
+import com.example.busnotice.domain.subway.*;
 import com.example.busnotice.domain.subway.dto.RealtimeArrResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
@@ -41,13 +41,15 @@ public class ScheduleService {
     private final BusStopSectionRepository busStopSectionRepository;
     private final SubwaySectionRepository subwaySectionRepository;
     private final BusRepository busRepository;
-    private final SectionRepository sectionRepository;
     private final EntityManager entityManager;
     private final BusService busService;
-    private final SubwayService subwayService;
+    private final SubwaySectionService subwaySectionService;
 
     @Transactional
     public void createSchedule(Long userId, CreateScheduleRequest req) {
+
+        새_스케줄_생성시_겹침_유무_파악(getUserById(userId), req.daysList(), req.startTime(), req.endTime());
+
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -197,6 +199,9 @@ public class ScheduleService {
 
     @Transactional
     public void updateSchedule(Long userId, Long scheduleId, UpdateScheduleRequest req) {
+
+        기존_스케줄_수정시_겹침_유무_파악(getUserById(userId), scheduleId, req.daysList(), req.startTime(), req.endTime());
+
         // 1. 사용자 및 기존 스케줄 조회
         User user = getUserById(userId);
         Schedule existSchedule = scheduleRepository.findById(scheduleId)
@@ -348,7 +353,7 @@ public class ScheduleService {
                     LineDir dir = LineDir.fromDisplayName(ss.getDir());
 
                     List<RealtimeArrResponse.RealtimeArrival> arrivals =
-                            subwayService.getStationArrInfo(lineType, ss.getStationName(), dir);
+                            subwaySectionService.getStationArrInfo(lineType, ss.getStationName(), dir);
 
                     // 가장 빠른 2개만 추출
                     List<RealtimeArrResponse.RealtimeArrival> top2 = arrivals.stream()
@@ -465,7 +470,7 @@ public class ScheduleService {
                 LineDir dir = LineDir.fromDisplayName(ss.getDir());
 
                 List<RealtimeArrResponse.RealtimeArrival> arrivals =
-                        subwayService.getStationArrInfo(lineType, ss.getStationName(), dir);
+                        subwaySectionService.getStationArrInfo(lineType, ss.getStationName(), dir);
 
                 // 가장 빠른 2개만 추출
                 List<RealtimeArrResponse.RealtimeArrival> top2 = arrivals.stream()

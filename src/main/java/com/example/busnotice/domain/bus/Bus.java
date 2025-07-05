@@ -1,6 +1,6 @@
 package com.example.busnotice.domain.bus;
 
-import com.example.busnotice.domain.schedule.BusStopSection;
+import com.example.busnotice.domain.busStop.BusStopSection;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -58,23 +58,19 @@ public class BusInfosDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Item {
 
+        @JsonProperty("endnodenm")
+        private String endNodeNm;
+        @JsonProperty("routeid")
+        private String routeId;
+        @JsonProperty("routeno")
+        private String routeNo;
+        @JsonProperty("routetp")
+        private String routeTp;
+        @JsonProperty("startnodenm")
+        private String startNodeNm;
+
         public Item() {
             // 기본 생성자
         }
-
-        @JsonProperty("endnodenm")
-        private String endNodeNm;
-
-        @JsonProperty("routeid")
-        private String routeId;
-
-        @JsonProperty("routeno")
-        private String routeNo;
-
-        @JsonProperty("routetp")
-        private String routeTp;
-
-        @JsonProperty("startnodenm")
-        private String startNodeNm;
     }
 }

@@ -30,15 +30,14 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BusStopService {
-
-    @Value("${open-api.service.key}")
-    private String serviceKey;
+public class BusStopSectionService {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final CityCodeRepository cityCodeRepository;
     private final RecentSearchManager recentSearchManager;
+    @Value("${open-api.service.key}")
+    private String serviceKey;
 
     //    @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_API_조회(String cityName) throws UnsupportedEncodingException {
@@ -51,7 +50,7 @@ public class BusStopService {
         log.info("{} 에 대한 도시코드 캐싱 실패, 메서드 실행", cityName);
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getCtyCodeList";
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(String.format("%s?serviceKey=%s&_type=json",
                 url, encodedServiceKey));
 
@@ -105,9 +104,9 @@ public class BusStopService {
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";
             String encodedServiceKey = URLEncoder.encode(serviceKey,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             String endCodedBusStopName = URLEncoder.encode(busStopName,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             URI uri = URI.create(String.format("%s?serviceKey=%s&stSrch=%s&resultType=json",
                     url, encodedServiceKey, endCodedBusStopName));
 
@@ -132,12 +131,12 @@ public class BusStopService {
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnNoList";
         String encodedCityCode = URLEncoder.encode(cityCode,
-                StandardCharsets.UTF_8.toString());
-        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
+        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8);
         String encodedNumOfRows = URLEncoder.encode(String.valueOf(100),
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(
                 String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&numOfRows=%s&_type=json", url,
                         encodedServiceKey, encodedCityCode, encodedName, encodedNumOfRows));
@@ -165,9 +164,9 @@ public class BusStopService {
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";
             String encodedServiceKey = URLEncoder.encode(serviceKey,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             String endCodedBusStopName = URLEncoder.encode(busStopName,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             URI uri = URI.create(String.format("%s?serviceKey=%s&stSrch=%s&resultType=json",
                     url, encodedServiceKey, endCodedBusStopName));
 
@@ -196,12 +195,12 @@ public class BusStopService {
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnNoList";
         String encodedCityCode = URLEncoder.encode(cityCode,
-                StandardCharsets.UTF_8.toString());
-        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
+        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8);
         String encodedNumOfRows = URLEncoder.encode(String.valueOf(100),
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(
                 String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&numOfRows=%s&_type=json", url,
                         encodedServiceKey, encodedCityCode, encodedName, encodedNumOfRows));
@@ -233,9 +232,9 @@ public class BusStopService {
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByName";
             String encodedServiceKey = URLEncoder.encode(serviceKey,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             String endCodedBusStopName = URLEncoder.encode(busStopName,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             URI uri = URI.create(String.format("%s?serviceKey=%s&stSrch=%s&resultType=json",
                     url, encodedServiceKey, endCodedBusStopName));
 
@@ -259,11 +258,11 @@ public class BusStopService {
         busStopName = busStopName.trim().replaceAll("\\s+", "");
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnNoList";
-        String encodedCityCode = URLEncoder.encode(String.valueOf(cityCode),
-                StandardCharsets.UTF_8.toString());
-        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8.toString());
+        String encodedCityCode = URLEncoder.encode(cityCode,
+                StandardCharsets.UTF_8);
+        String encodedName = URLEncoder.encode(busStopName, StandardCharsets.UTF_8);
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeNm=%s&_type=json", url,
                 encodedServiceKey, encodedCityCode, encodedName));
 

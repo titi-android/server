@@ -3,7 +3,7 @@ package com.example.busnotice.domain.bus;
 import com.example.busnotice.domain.bus.res.*;
 import com.example.busnotice.domain.bus.res.BusArrInfosDto.Item;
 import com.example.busnotice.domain.bus.res.SeoulBusInfosDto.BusRoute;
-import com.example.busnotice.domain.busStop.BusStopService;
+import com.example.busnotice.domain.busStop.BusStopSectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BusService {
 
+    private final WebClient webClient;
+    private final BusStopSectionService busStopService;
     @Value("${open-api.service.key}")
     private String serviceKey;
-
-    private final WebClient webClient;
-    private final BusStopService busStopService;
 
     public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityName, String nodeId)
             throws UnsupportedEncodingException {
@@ -38,9 +37,9 @@ public class BusService {
         // 서울의 경우는 따로 처리
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid";
-            String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
+            String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8);
             String encodedServiceKey = URLEncoder.encode(serviceKey,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             URI uri = URI.create(
                     String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
                             encodedServiceKey, encodedNodeId));
@@ -64,10 +63,10 @@ public class BusService {
         System.out.println("nodeId = " + nodeId);
         String url = "http://apis.data.go.kr/1613000/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList";
         String encodedCityCode = URLEncoder.encode(cityCode,
-                StandardCharsets.UTF_8.toString());
-        String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
+        String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8);
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(String.format("%s?serviceKey=%s&cityCode=%s&nodeId=%s&_type=json", url,
                 encodedServiceKey, encodedCityCode, encodedNodeId));
 
@@ -130,9 +129,9 @@ public class BusService {
         // 서울인 경우만 따로 처리
         if (cityCode.equals("11")) {
             String url = "http://ws.bus.go.kr/api/rest/stationinfo/getRouteByStation";
-            String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
+            String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8);
             String encodedServiceKey = URLEncoder.encode(serviceKey,
-                    StandardCharsets.UTF_8.toString());
+                    StandardCharsets.UTF_8);
             URI uri = URI.create(
                     String.format("%s?serviceKey=%s&arsId=%s&resultType=json", url,
                             encodedServiceKey, encodedNodeId));
@@ -190,10 +189,10 @@ public class BusService {
 
         String url = "http://apis.data.go.kr/1613000/BusSttnInfoInqireService/getSttnThrghRouteList";
         String encodedCityCode = URLEncoder.encode(cityCode,
-                StandardCharsets.UTF_8.toString());
-        String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
+        String encodedNodeId = URLEncoder.encode(nodeId, StandardCharsets.UTF_8);
         String encodedServiceKey = URLEncoder.encode(serviceKey,
-                StandardCharsets.UTF_8.toString());
+                StandardCharsets.UTF_8);
         URI uri = URI.create(
                 String.format("%s?serviceKey=%s&cityCode=%s&nodeid=%s&numOfRows=20&_type=json", url,
                         encodedServiceKey, encodedCityCode, encodedNodeId));

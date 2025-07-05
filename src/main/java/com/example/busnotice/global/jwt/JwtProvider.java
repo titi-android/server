@@ -22,14 +22,12 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
     private final Long accessValidityInSecs = 86400000L; // 1일 (24시간)
     private final Long refreshValidityInSecs = 7L * 86400000L; // 7일 (1주일)
-
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     // 엑세스 토큰 발급
     public String createAccessToken(Long userId) {
@@ -125,7 +123,7 @@ public class JwtProvider {
             throw new RefreshTokenException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
         // 해당 리프레시 토큰의 유저 정보를 통해 다시 엑세스 토큰 생성
-        String accessToken = createAccessToken(Long.valueOf(existsRefreshToken.getUser().getId()));
+        String accessToken = createAccessToken(existsRefreshToken.getUser().getId());
         return new RefreshTokenResponse(accessToken);
     }
 

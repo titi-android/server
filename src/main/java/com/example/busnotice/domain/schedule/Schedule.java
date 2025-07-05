@@ -1,5 +1,6 @@
 package com.example.busnotice.domain.schedule;
 
+import com.example.busnotice.domain.section.Section;
 import com.example.busnotice.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;

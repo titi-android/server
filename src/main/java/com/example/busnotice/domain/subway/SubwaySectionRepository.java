@@ -1,4 +1,4 @@
-package com.example.busnotice.domain.schedule;
+package com.example.busnotice.domain.subway;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

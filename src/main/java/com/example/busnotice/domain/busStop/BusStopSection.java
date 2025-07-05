@@ -1,4 +1,4 @@
-package com.example.busnotice.domain.schedule;
+package com.example.busnotice.domain.busStop;
 
 import com.example.busnotice.domain.bus.Bus;
 import jakarta.persistence.*;

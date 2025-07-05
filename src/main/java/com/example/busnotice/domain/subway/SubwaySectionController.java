@@ -17,9 +17,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class SubwayController {
+public class SubwaySectionController {
 
-    private final SubwayService subwayService;
+    private final SubwaySectionService subwayService;
 
     @Operation(summary = "해당 검색어를 포함하는 지하철역들의 호선 정보 및 좌표 반환")
     @GetMapping("/subway/stations")

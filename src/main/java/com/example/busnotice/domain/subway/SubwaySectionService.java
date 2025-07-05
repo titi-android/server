@@ -17,10 +17,9 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SubwayService {
+public class SubwaySectionService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final SubwayLineMapper subwayLineMapper;
 
     @Value("${open-api.subway.key}")
     private String apiKey;

@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class BusStopController {
 
-    private final BusStopService busStopService;
+    private final BusStopSectionService busStopService;
 
     @GetMapping("/cityCode")
     @Operation(summary = "도시 이름으로 도시 코드 조회")

@@ -23,12 +23,12 @@ public class FCMToken {
 
     }
 
-    public void update(String token) {
+    public FCMToken(User user, String token) {
+        this.user = user;
         this.token = token;
     }
 
-    public FCMToken(User user, String token) {
-        this.user = user;
+    public void update(String token) {
         this.token = token;
     }
 }
