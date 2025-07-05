@@ -63,6 +63,11 @@ public class Schedule {
         this.isAlarmOn = isAlarmOn;
     }
 
+    public boolean updateAlarmStatus() {
+        this.isAlarmOn = !isAlarmOn;
+        return this.isAlarmOn;
+    }
+
     @Embeddable
     @AttributeOverrides({
             @AttributeOverride(name = "regionName", column = @Column(name = "desRegionName")),

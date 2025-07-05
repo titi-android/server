@@ -32,7 +32,8 @@ public record ScheduleArrivalResponse(
                     String routeno,
                     String routetp,
                     String vehicletp
-            ) {}
+            ) {
+            }
         }
 
         public record SubwayArrInfo(
@@ -49,7 +50,8 @@ public record ScheduleArrivalResponse(
                     String barvlDt,
                     String arvlMsg2,
                     String arvlCd
-            ) {}
+            ) {
+            }
         }
     }
 }
