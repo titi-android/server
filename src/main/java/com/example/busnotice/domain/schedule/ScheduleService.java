@@ -2,27 +2,35 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.bus.Bus;
 import com.example.busnotice.domain.bus.BusRepository;
+import com.example.busnotice.domain.bus.BusService;
+import com.example.busnotice.domain.bus.res.BusArrInfosDto;
 import com.example.busnotice.domain.busStop.BusStopSectionRepository;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleArrivalResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
+import com.example.busnotice.domain.subway.LineDir;
+import com.example.busnotice.domain.subway.LineType;
+import com.example.busnotice.domain.subway.SubwayService;
+import com.example.busnotice.domain.subway.dto.RealtimeArrResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.exception.ScheduleException;
 import com.example.busnotice.global.exception.UserException;
+import com.example.busnotice.util.DayConverter;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.angus.mail.imap.protocol.Item;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,6 +44,8 @@ public class ScheduleService {
     private final BusRepository busRepository;
     private final SectionRepository sectionRepository;
     private final EntityManager entityManager;
+    private final BusService busService;
+    private final SubwayService subwayService;
 
     @Transactional
     public void createSchedule(Long userId, CreateScheduleRequest req) {
@@ -282,7 +292,124 @@ public class ScheduleService {
         scheduleRepository.delete(schedule); // 이미 조회한 엔티티로 삭제
     }
 
-    //
+    // (v3) 특정 요일의 모든 스케줄의 도착 정보 조회
+    @Transactional(readOnly = true)
+    public List<ScheduleArrivalResponse> getSchedulesWithArrivals(Long userId, String day) throws UnsupportedEncodingException {
+        // 1. 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        // 2. 해당 사용자의 특정 요일 스케줄 조회
+        List<Schedule> schedules = 유저의_특정_요일의_모든_스케줄_조회(user, day);
+
+        List<ScheduleArrivalResponse> responseList = new ArrayList<>();
+
+        for (Schedule schedule : schedules) {
+            List<ScheduleArrivalResponse.SectionArrInfoDto> sectionDtos = new ArrayList<>();
+
+            for (Section section : schedule.getSections()) {
+                if ("BUS".equalsIgnoreCase(section.getType())) {
+                    BusStopSection bss = section.getBusStopSection();
+                    List<String> busNames = bss.getBusList().stream()
+                            .map(Bus::getName)
+                            .collect(Collectors.toList());
+
+                    // 버스 도착 정보 조회 (가장 빠른 2개)
+                    List<BusArrInfosDto.Item> items = busService.특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(
+                            bss.getRegionName(), bss.getNodeId(), busNames
+                    );
+
+                    List<ScheduleArrivalResponse.SectionArrInfoDto.BusStopArrInfo.BusArrInfo> busArrivals = items.stream()
+                            .map(item -> new ScheduleArrivalResponse.SectionArrInfoDto.BusStopArrInfo.BusArrInfo(
+                                    item.getArrprevstationcnt(),
+                                    item.getArrtime(),
+                                    item.getNodeid(),
+                                    item.getNodenm(),
+                                    item.getRouteid(),
+                                    item.getRouteno(),
+                                    item.getRoutetp(),
+                                    item.getVehicletp()
+                            ))
+                            .collect(Collectors.toList());
+
+                    sectionDtos.add(new ScheduleArrivalResponse.SectionArrInfoDto(
+                            "BUS",
+                            new ScheduleArrivalResponse.SectionArrInfoDto.BusStopArrInfo(
+                                    bss.getBusStopName(),
+                                    busArrivals
+                            ),
+                            null,
+                            section.getOrderIndex()
+                    ));
+                } else if ("SUBWAY".equalsIgnoreCase(section.getType())) {
+                    SubwaySection ss = section.getSubwaySection();
+
+                    // Enum 변환 (LineType, LineDir)
+                    LineType lineType = LineType.fromDisplayName(ss.getLineName());
+                    LineDir dir = LineDir.fromDisplayName(ss.getDir());
+
+                    List<RealtimeArrResponse.RealtimeArrival> arrivals =
+                            subwayService.getStationArrInfo(lineType, ss.getStationName(), dir);
+
+                    // 가장 빠른 2개만 추출
+                    List<RealtimeArrResponse.RealtimeArrival> top2 = arrivals.stream()
+                            .sorted(Comparator.comparingInt(a -> {
+                                try {
+                                    return Integer.parseInt(a.getBarvlDt());
+                                } catch (Exception e) {
+                                    return Integer.MAX_VALUE;
+                                }
+                            }))
+                            .limit(2)
+                            .collect(Collectors.toList());
+
+                    List<ScheduleArrivalResponse.SectionArrInfoDto.SubwayArrInfo.SubwayArrival> subwayArrivals = top2.stream()
+                            .map(a -> new ScheduleArrivalResponse.SectionArrInfoDto.SubwayArrInfo.SubwayArrival(
+                                    a.getSubwayId(),
+                                    a.getUpdnLine(),
+                                    a.getStatnNm(),
+                                    a.getBarvlDt(),
+                                    a.getArvlMsg2(),
+                                    a.getArvlCd()
+                            ))
+                            .collect(Collectors.toList());
+
+                    sectionDtos.add(new ScheduleArrivalResponse.SectionArrInfoDto(
+                            "SUBWAY",
+                            null,
+                            new ScheduleArrivalResponse.SectionArrInfoDto.SubwayArrInfo(
+                                    ss.getRegionName(),
+                                    ss.getLineName(),
+                                    ss.getStationName(),
+                                    ss.getDir(),
+                                    subwayArrivals
+                            ),
+                            section.getOrderIndex()
+                    ));
+                }
+            }
+
+            // 환승 순서대로 정렬
+            sectionDtos.sort(Comparator.comparingInt(ScheduleArrivalResponse.SectionArrInfoDto::orderIndex));
+
+            responseList.add(new ScheduleArrivalResponse(
+                    schedule.getId(),
+                    schedule.getName(),
+                    schedule.getDaysList(),
+                    schedule.getStartTime(),
+                    schedule.getEndTime(),
+                    sectionDtos,
+                    schedule.getDestinationInfo().getPlaceName(),
+                    schedule.getIsAlarmOn()
+            ));
+        }
+
+        // 스케줄 시작 시간 기준 정렬
+        return responseList.stream()
+                .sorted(Comparator.comparing(ScheduleArrivalResponse::startTime))
+                .collect(Collectors.toList());
+    }
+
 //
 //    public ScheduleResponse 현재_스케줄의_가장_빨리_도착하는_첫번째_두번째_버스_정보(Long userId)
 //            throws UnsupportedEncodingException {
@@ -394,14 +521,14 @@ public class ScheduleService {
     }
 
     //
-//    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String days) {
-//        return scheduleRepository.findAllByUserAndDays(user, days);
-//    }
-//
-//    public Optional<Schedule> getCurrentSchedule(User user) {
-//        String today = DayConverter.getTodayAsString();
-//        return scheduleRepository.findByCurrentTimeAndDay(user, today, LocalTime.now());
-//    }
+    private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String days) {
+        return scheduleRepository.findAllByUserAndDays(user, days);
+    }
+
+    public Optional<Schedule> getCurrentSchedule(User user) {
+        String today = DayConverter.getTodayAsString();
+        return scheduleRepository.findByCurrentTimeAndDay(user, today, LocalTime.now());
+    }
 //
     private User getUserById(Long userId) {
         return userRepository.findById(userId)

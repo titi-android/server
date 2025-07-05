@@ -23,4 +23,14 @@ public enum LineType {
     public String get() {
         return displayName;
     }
+
+    // 한글 → Enum 변환 메서드
+    public static LineType fromDisplayName(String displayName) {
+        for (LineType type : LineType.values()) {
+            if (type.displayName.equals(displayName)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("지원하지 않는 노선명: " + displayName);
+    }
 }

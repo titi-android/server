@@ -2,14 +2,21 @@ package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
+import com.example.busnotice.domain.schedule.res.ScheduleArrivalResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
+import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.global.format.ApiResponse;
 import com.example.busnotice.global.security.CustomUserDetails;
+import com.example.busnotice.util.DayConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @Tag(name = "Schedule", description = "스케줄 관련 API")
 @RestController
@@ -78,22 +85,21 @@ public class ScheduleController {
 //        return ApiResponse.createSuccess(msg);
 //    }
 //
-//    @GetMapping("/v2/schedules/today")
-//    @Operation(
-//            summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
-//            description = "오늘 스케줄이 없는 경우 빈 리스트를 반환"
-//    )
-//    public ApiResponse<List<ScheduleResponse>> getAllSchedulesOfTodayV2(
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) throws UnsupportedEncodingException {
-//        System.out.println("DayConverter.getTodayAsString() = " + DayConverter.getTodayAsString());
-//        List<ScheduleResponse> scheduleResponsesList = scheduleService.특정_요일의_스케줄들의_가장_빨리_도착하는_첫번째_두번째_버스_정보(
-//                userDetails.getId(), DayConverter.getTodayAsString());
-//        String msg = scheduleResponsesList.isEmpty()
-//                ? "오늘 스케줄이 존재하지 않습니다."
-//                : "오늘 스케줄이 존재합니다.";
-//        return ApiResponse.createSuccessWithData(scheduleResponsesList, msg);
-//    }
+    @GetMapping("/v2/schedules/today")
+    @Operation(
+            summary = "오늘 모든 스케줄의 가장 빠른 첫번째, 두번째 버스 정보 조회",
+            description = "오늘 스케줄이 없는 경우 빈 리스트를 반환"
+    )
+    public ApiResponse<List<ScheduleArrivalResponse>> getAllSchedulesOfTodayV2(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) throws UnsupportedEncodingException {
+        System.out.println("DayConverter.getTodayAsString() = " + DayConverter.getTodayAsString());
+        List<ScheduleArrivalResponse> schedulesWithArrivals = scheduleService.getSchedulesWithArrivals(userDetails.getId(), DayConverter.getTodayAsString());
+        String msg = schedulesWithArrivals.isEmpty()
+                ? "오늘 스케줄이 존재하지 않습니다."
+                : "오늘 스케줄이 존재합니다.";
+        return ApiResponse.createSuccessWithData(schedulesWithArrivals, msg);
+    }
 //
 //    @GetMapping("/v2/schedules/days")
 //    @Operation(

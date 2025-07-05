@@ -30,7 +30,7 @@ public class SubwayController {
 
     @Operation(summary = "특정 노선을 지나는 지하철역 리스트 반환")
     @GetMapping("/subway/line")
-    public ApiResponse<List<SubwayStationOfLineDto>> getStationsOfLine(@RequestParam(name = "lineName", required = true) LineType lineType) throws UnsupportedEncodingException {
+    public ApiResponse<List<SubwayStationOfLineDto>> getStationsOfLine(@RequestParam(name = "lineName") LineType lineType) throws UnsupportedEncodingException {
         List<SubwayStationOfLineDto> response = subwayService.getStationsOfLine(lineType);
         return ApiResponse.createSuccessWithData(response, "해당 노선의 지하철역 리스트 반환 성공");
     }
@@ -38,9 +38,9 @@ public class SubwayController {
     @Operation(summary = "특정 노선의 지하철역의 실시간 도착 정보 반환")
     @GetMapping("/subway/station")
     public ApiResponse<List<RealtimeArrResponse.RealtimeArrival>> getStationArrInfo(
-            @RequestParam(name = "lineType", required = true) LineType lineType, // 호선명
-            @RequestParam(name = "stName", required = true) String stName, // 해당 호선 내 지하철역명
-            @RequestParam(name = "LineDir", required = true) LineDir dir // 상행 또는 하행
+            @RequestParam(name = "lineType") LineType lineType, // 호선명
+            @RequestParam(name = "stName") String stName, // 해당 호선 내 지하철역명
+            @RequestParam(name = "LineDir") LineDir dir // 상행 또는 하행
     ) {
         List<RealtimeArrResponse.RealtimeArrival> response = subwayService.getStationArrInfo(lineType, stName, dir);
         System.out.println("response = " + response);
