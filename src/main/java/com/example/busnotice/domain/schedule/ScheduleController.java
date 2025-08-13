@@ -48,7 +48,7 @@ public class ScheduleController {
 
     }
 
-    @PutMapping("/v2/schedules/{scheduleId}")
+    @PutMapping("/v3/schedules/{scheduleId}")
     @Operation(summary = "스케줄 수정")
     public ApiResponse<Void> updateSchedule(
             @PathVariable("scheduleId") Long scheduleId,

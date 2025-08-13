@@ -40,7 +40,7 @@ public class BusStopSectionService {
     private String serviceKey;
 
     //    @Cacheable(value = "cityCodes", key = "#p0")
-    public String 도시코드_API_조회(String cityName) throws UnsupportedEncodingException {
+    public String 도시코드_API_조회(String cityName) {
         // 서울인 경우만 따로 처리
         if (cityName.contains("서울")) {
             System.out.println(cityName + "의 도시 코드: " + "11");
@@ -156,8 +156,7 @@ public class BusStopSectionService {
         return itemsList.stream().map(item -> item.getNodenm()).toList();
     }
 
-    public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName)
-            throws UnsupportedEncodingException {
+    public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName) {
         String cityCode = 도시코드_DB_조회(cityName);
 
         // 서울인 경우만 따로 처리

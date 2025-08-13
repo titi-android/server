@@ -31,8 +31,7 @@ public class BusService {
     @Value("${open-api.service.key}")
     private String serviceKey;
 
-    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityName, String nodeId)
-            throws UnsupportedEncodingException {
+    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityName, String nodeId) {
         String cityCode = busStopService.도시코드_DB_조회(cityName);
         // 서울의 경우는 따로 처리
         if (cityCode.equals("11")) {
@@ -92,7 +91,7 @@ public class BusService {
     }
 
     public List<Item> 특정_노드_ID에_도착하는_특정_버스들_정보_조회(String cityName, String nodeId,
-                                                  List<String> busList) throws UnsupportedEncodingException {
+                                                  List<String> busList) {
         List<Item> items = 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityName, nodeId);
         System.out.println("items = " + items);
         // 특정 routeno 에 해당하는 item 필터링
@@ -113,7 +112,7 @@ public class BusService {
     }
 
     public List<Item> 특정_노드_ID에_가장_빨리_도착하는_첫번째_두번째_버스_조회(String cityName, String nodeId,
-                                                         List<String> busList) throws UnsupportedEncodingException {
+                                                         List<String> busList) {
         List<Item> items = 특정_노드_ID에_도착하는_특정_버스들_정보_조회(cityName, nodeId, busList);
         List<Item> sortedItems = items.stream().sorted(Comparator.comparingInt(Item::getArrtime))
                 .collect(Collectors.toList());
@@ -121,8 +120,7 @@ public class BusService {
     }
 
     @Cacheable(value = "busNames_through_stn", key = "#p0 + '_' + #p1")
-    public List<BusNameAndTypeResponse> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId)
-            throws UnsupportedEncodingException {
+    public List<BusNameAndTypeResponse> 특정_노드_ID를_경유하는_모든_버스들_이름_조회(String cityName, String nodeId) {
         log.info("{}_{} 를 경유하는 모든 버스들 이름 캐싱 실패, 메서드 실행", cityName, nodeId);
         String cityCode = busStopService.도시코드_DB_조회(cityName);
 
