@@ -25,7 +25,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/v2/schedules")
-    @Operation(summary = "스케줄 등록")
+    @Operation(summary = "스케줄 등록, 역명 입력 시 '역' 문구 제외하고 입력")
     public ApiResponse<Void> createScheduleV2(
             @RequestBody CreateScheduleRequest createScheduleRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails

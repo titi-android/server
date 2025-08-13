@@ -23,7 +23,7 @@ public class SubwaySectionController {
 
     private final SubwaySectionService subwayService;
 
-    @Operation(summary = "해당 검색어를 포함하는 지하철역들의 호선 정보 및 좌표 반환")
+    @Operation(summary = "해당 검색어를 포함하는 지하철역들의 호선 정보 및 좌표 반환. '역' 문구 제외하고 입력")
     @GetMapping("/subway/stations")
     public ApiResponse<List<MergedStationDto>> getSubwayStations(@RequestParam(name = "stName", required = false) String stName) {
         List<MergedStationDto> response = subwayService.fetchMergedStationList(stName);
@@ -37,7 +37,7 @@ public class SubwaySectionController {
         return ApiResponse.createSuccessWithData(response, "해당 노선의 지하철역 리스트 반환 성공");
     }
 
-    @Operation(summary = "특정 노선의 지하철역의 실시간 도착 정보 반환")
+    @Operation(summary = "특정 노선의 지하철역의 실시간 도착 정보 반환. '역' 문구 제외하고 입력.")
     @GetMapping("/subway/line/station")
     public ApiResponse<List<RealtimeArrResponse.RealtimeArrival>> getStationArrInfo(
             @RequestParam(name = "lineType") LineType lineType, // 호선명
