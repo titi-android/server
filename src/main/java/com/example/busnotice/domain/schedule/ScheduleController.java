@@ -1,6 +1,7 @@
 package com.example.busnotice.domain.schedule;
 
 import com.example.busnotice.domain.schedule.req.CreateScheduleRequest;
+import com.example.busnotice.domain.schedule.req.SchedulesDeleteRequest;
 import com.example.busnotice.domain.schedule.req.UpdateScheduleRequest;
 import com.example.busnotice.domain.schedule.res.ScheduleArrivalResponse;
 import com.example.busnotice.domain.schedule.res.ScheduleInfoResponse;
@@ -67,6 +68,16 @@ public class ScheduleController {
     ) {
         scheduleService.deleteSchedule(userDetails.getId(), scheduleId);
         return ApiResponse.createSuccess("스케줄이 삭제되었습니다.");
+    }
+
+    @DeleteMapping("/v3/schedules")
+    @Operation(summary = "여러 스케줄 삭제")
+    public ApiResponse<Void> deleteSchedules(
+            @RequestBody SchedulesDeleteRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        scheduleService.deleteSchedules(userDetails.getId(), request.scheduleIds());
+        return ApiResponse.createSuccess("스케줄들이 삭제되었습니다.");
     }
 
     @PutMapping("/v1/schedules/alarm/{scheduleId}")

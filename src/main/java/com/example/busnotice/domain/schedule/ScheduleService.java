@@ -595,4 +595,23 @@ public class ScheduleService {
         }
         return schedule.updateAlarmStatus();
     }
+
+    @Transactional
+    public void deleteSchedules(Long userId, List<Long> scheduleIds) {
+        User user = getUserById(userId);
+
+        List<Schedule> schedules = scheduleRepository.findAllById(scheduleIds);
+        // 없는 ID 검증
+        if (schedules.size() != scheduleIds.size()) {
+            throw new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND);
+        }
+        // 소유자 검증
+        boolean unauthorized = schedules.stream()
+                .anyMatch(schedule -> !schedule.getUser().getId().equals(user.getId()));
+        if (unauthorized) {
+            throw new ScheduleException(ErrorCode.USER_UNAUTHORIZED);
+        }
+        // 일괄 삭제
+        scheduleRepository.deleteAll(schedules);
+    }
 }
