@@ -324,7 +324,6 @@ public class ScheduleService {
 
     // (v3) 특정 요일의 모든 스케줄의 도착 정보 조회
     @Transactional(readOnly = true)
-    @Cacheable(value = "schedulesByDay", key = "#userId + '_' + #day")
     public List<ScheduleArrivalResponse> 특정_요일의_스케줄들의_교통편_정보(Long userId, String day) throws UnsupportedEncodingException {
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
