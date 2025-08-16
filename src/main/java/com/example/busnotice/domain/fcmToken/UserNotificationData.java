@@ -2,6 +2,7 @@ package com.example.busnotice.domain.fcmToken;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.util.List;
 
 public record UserNotificationData(
@@ -83,7 +84,8 @@ public record UserNotificationData(
             String routeno,
             String routetp,
             String vehicletp
-    ) {}
+    ) {
+    }
 
     // 지하철 도착 정보
     public record SubwayArrInfoDto(
@@ -93,5 +95,6 @@ public record UserNotificationData(
             String barvlDt,
             String arvlMsg2,
             String arvlCd
-    ) {}
+    ) {
+    }
 }

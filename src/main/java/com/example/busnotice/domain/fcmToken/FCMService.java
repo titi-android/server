@@ -5,7 +5,6 @@ import com.example.busnotice.domain.schedule.Schedule;
 import com.example.busnotice.domain.schedule.ScheduleService;
 import com.example.busnotice.domain.schedule.repository.ScheduleRepository;
 import com.example.busnotice.domain.schedule.res.ScheduleArrivalResponse;
-import com.example.busnotice.domain.schedule.res.ScheduleResponse;
 import com.example.busnotice.domain.user.User;
 import com.example.busnotice.domain.user.UserRepository;
 import com.example.busnotice.global.code.ErrorCode;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

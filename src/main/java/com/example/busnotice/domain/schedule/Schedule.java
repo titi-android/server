@@ -89,6 +89,7 @@ public class Schedule {
             this.regionName = regionName;
             this.desName = desName;
         }
+
         public DestinationInfo(String type, String regionName, String desName, String lineType, String dir) {
             this.type = type;
             this.regionName = regionName;
