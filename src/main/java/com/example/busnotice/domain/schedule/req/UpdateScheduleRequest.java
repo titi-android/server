@@ -20,8 +20,11 @@ public record UpdateScheduleRequest(
         List<RouteInfo> routeInfos
 ) {
     public record DestinationInfo(
-            String type,      // "BUS" 또는 "SUBWAY"
-            String desName // 목적지 이름
+            String type,
+            String regionName,// "BUS" 또는 "SUBWAY"
+            String desName,
+            String lineName,
+            String dir
     ) {
     }
 

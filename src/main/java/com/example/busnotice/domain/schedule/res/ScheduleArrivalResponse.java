@@ -10,6 +10,7 @@ public record ScheduleArrivalResponse(
         LocalTime startTime,
         LocalTime endTime,
         List<SectionArrInfoDto> sections, // 순서대로 환승 구간 정보
+        String destinationType,
         String destinationName,
         Boolean isAlarmOn
 ) {

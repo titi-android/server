@@ -75,15 +75,26 @@ public class Schedule {
     })
     @Data
     public static class DestinationInfo {
-        private String type;
-        private String desName;
+        private String type; // BUS or SUBWAY
+        private String regionName; // 지역명 ex) 서울특별시
+        private String desName; // 버즈정류장명 or 역 이름
+        private String lineName; // (지하철인 경우) 호선명
+        private String dir; // (지하철인 경우) 방향명 ex) 신설동역 방향
 
         public DestinationInfo() {
         }
 
-        public DestinationInfo(String type, String desName) {
+        public DestinationInfo(String type, String regionName, String desName) {
             this.type = type;
+            this.regionName = regionName;
             this.desName = desName;
+        }
+        public DestinationInfo(String type, String regionName, String desName, String lineType, String dir) {
+            this.type = type;
+            this.regionName = regionName;
+            this.desName = desName;
+            this.lineName = lineType;
+            this.dir = dir;
         }
     }
 }

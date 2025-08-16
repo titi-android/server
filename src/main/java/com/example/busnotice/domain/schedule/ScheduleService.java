@@ -56,10 +56,23 @@ public class ScheduleService {
 
         // 2. 도착지 정보 생성
         CreateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
-        Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo(
-                crdi.type(),
-                crdi.desName()
-        );
+        Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo();
+        if("BUS".equalsIgnoreCase(crdi.type())){ // 버스인 경우
+            destinationInfo = new Schedule.DestinationInfo(
+                    crdi.type(),
+                    crdi.regionName(),
+                    crdi.desName()
+            );
+        }
+        else if("SUBWAY".equalsIgnoreCase(crdi.type())){ // 지하철인 경우
+            destinationInfo = new Schedule.DestinationInfo(
+                    crdi.type(),
+                    crdi.regionName(),
+                    crdi.desName(),
+                    crdi.lineName(),
+                    crdi.dir()
+            );
+        }
 
         // 3. Schedule 엔티티 생성(Section은 나중에 추가)
         Schedule schedule = new Schedule(
@@ -264,10 +277,23 @@ public class ScheduleService {
 
         // 5. 도착지 정보 생성
         UpdateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
-        Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo(
-                crdi.type(),
-                crdi.desName()
-        );
+        Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo();
+        if("BUS".equalsIgnoreCase(crdi.type())){ // 버스인 경우
+            destinationInfo = new Schedule.DestinationInfo(
+                    crdi.type(),
+                    crdi.regionName(),
+                    crdi.desName()
+            );
+        }
+        else if("SUBWAY".equalsIgnoreCase(crdi.type())){ // 지하철인 경우
+            destinationInfo = new Schedule.DestinationInfo(
+                    crdi.type(),
+                    crdi.regionName(),
+                    crdi.desName(),
+                    crdi.lineName(),
+                    crdi.dir()
+            );
+        }
 
         // 6. 스케줄 정보 업데이트 (sections 컬렉션은 이미 직접 조작)
         existSchedule.setName(req.name());
@@ -399,6 +425,7 @@ public class ScheduleService {
                     schedule.getStartTime(),
                     schedule.getEndTime(),
                     sectionDtos,
+                    schedule.getDestinationInfo().getType(),
                     schedule.getDestinationInfo().getDesName(),
                     schedule.getIsAlarmOn()
             ));
@@ -517,6 +544,7 @@ public class ScheduleService {
                 cs.getStartTime(),
                 cs.getEndTime(),
                 sectionDtos,
+                cs.getDestinationInfo().getType(),
                 cs.getDestinationInfo().getDesName(),
                 cs.getIsAlarmOn()
         );
