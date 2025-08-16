@@ -9,7 +9,7 @@ import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.GeneralException;
-import com.example.busnotice.util.RecentSearchManager;
+//import com.example.busnotice.util.RecentSearchManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class BusStopSectionService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final CityCodeRepository cityCodeRepository;
-    private final RecentSearchManager recentSearchManager;
+//    private final RecentSearchManager recentSearchManager;
     @Value("${open-api.service.key}")
     private String serviceKey;
 
