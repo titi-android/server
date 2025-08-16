@@ -9,7 +9,6 @@ import com.example.busnotice.domain.busStop.res.SeoulBusStopsDto;
 import com.example.busnotice.global.code.ErrorCode;
 import com.example.busnotice.global.exception.BusStopException;
 import com.example.busnotice.global.exception.GeneralException;
-//import com.example.busnotice.util.RecentSearchManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,11 +33,11 @@ public class BusStopSectionService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final CityCodeRepository cityCodeRepository;
-//    private final RecentSearchManager recentSearchManager;
+    //    private final RecentSearchManager recentSearchManager;
     @Value("${open-api.service.key}")
     private String serviceKey;
 
-    //    @Cacheable(value = "cityCodes", key = "#p0")
+    @Cacheable(value = "cityCodes", key = "#p0")
     public String 도시코드_API_조회(String cityName) {
         // 서울인 경우만 따로 처리
         if (cityName.contains("서울")) {
@@ -96,8 +94,8 @@ public class BusStopSectionService {
         return cityCode;
     }
 
-    public List<String> 해당_이름을_포함하는_버스정류장_목록_조회_이름만_반환(String cityName, String busStopName)
-            throws UnsupportedEncodingException {
+    @Cacheable(value = "busStopNames", key = "#cityName + '_' + #busStopName")
+    public List<String> 해당_이름을_포함하는_버스정류장_목록_조회_이름만_반환(String cityName, String busStopName) {
         String cityCode = 도시코드_DB_조회(cityName);
 
         // 서울인 경우만 따로 처리
@@ -156,6 +154,7 @@ public class BusStopSectionService {
         return itemsList.stream().map(item -> item.getNodenm()).toList();
     }
 
+    @Cacheable(value = "busStopInfos", key = "#cityName + '_' + #busStopName")
     public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName) {
         String cityCode = 도시코드_DB_조회(cityName);
 
@@ -222,7 +221,7 @@ public class BusStopSectionService {
         return new BusInfosResponse(busInfoResponses);
     }
 
-    @Cacheable(value = "nodeIds", key = "#p0 + '_' + #p1")
+    @Cacheable(value = "nodeIds", key = "#cityName + '_' + #busStopName")
     public String 버스정류장_노드_ID_조회(String cityName, String busStopName)
             throws IOException {
         String cityCode = 도시코드_DB_조회(cityName);
