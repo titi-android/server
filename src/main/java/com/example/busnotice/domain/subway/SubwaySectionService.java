@@ -30,7 +30,7 @@ public class SubwaySectionService {
     @Value("${open-api.normal.key}")
     private String normalKey;
 
-//    @Cacheable(value = "subwayStations", key = "#p0")
+    @Cacheable(value = "subwayStations", key = "#p0")
     public List<MergedStationDto> fetchMergedStationList(String stName) {
         String url = String.format("https://t-data.seoul.go.kr/apig/apiman-gateway/tapi/TaimsKsccDvSubwayStationGeom/1.0?apikey=%s", seoulApiKey);
 
