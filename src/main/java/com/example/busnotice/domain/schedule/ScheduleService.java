@@ -23,6 +23,8 @@ import com.example.busnotice.util.DayConverter;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,7 @@ public class ScheduleService {
     private final SubwaySectionService subwaySectionService;
 
     @Transactional
+    @CacheEvict(value = {"scheduleInfo", "schedulesByDay"}, allEntries = true)
     public void createSchedule(Long userId, CreateScheduleRequest req) {
 
         새_스케줄_생성시_겹침_유무_파악(getUserById(userId), req.daysList(), req.startTime(), req.endTime());
@@ -57,14 +60,13 @@ public class ScheduleService {
         // 2. 도착지 정보 생성
         CreateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
         Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo();
-        if("BUS".equalsIgnoreCase(crdi.type())){ // 버스인 경우
+        if ("BUS".equalsIgnoreCase(crdi.type())) { // 버스인 경우
             destinationInfo = new Schedule.DestinationInfo(
                     crdi.type(),
                     crdi.regionName(),
                     crdi.desName()
             );
-        }
-        else if("SUBWAY".equalsIgnoreCase(crdi.type())){ // 지하철인 경우
+        } else if ("SUBWAY".equalsIgnoreCase(crdi.type())) { // 지하철인 경우
             destinationInfo = new Schedule.DestinationInfo(
                     crdi.type(),
                     crdi.regionName(),
@@ -146,6 +148,7 @@ public class ScheduleService {
         log.info("created schedule: {}", savedSchedule);
     }
 
+    @Cacheable(value = "scheduleInfo", key = "#userId + '_' + #scheduleId")
     public ScheduleInfoResponse getSchedule(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
@@ -209,6 +212,7 @@ public class ScheduleService {
 
 
     @Transactional
+    @CacheEvict(value = {"scheduleInfo", "schedulesByDay"}, allEntries = true)
     public void updateSchedule(Long userId, Long scheduleId, UpdateScheduleRequest req) {
 
         기존_스케줄_수정시_겹침_유무_파악(getUserById(userId), scheduleId, req.daysList(), req.startTime(), req.endTime());
@@ -278,14 +282,13 @@ public class ScheduleService {
         // 5. 도착지 정보 생성
         UpdateScheduleRequest.DestinationInfo crdi = req.destinationInfo();
         Schedule.DestinationInfo destinationInfo = new Schedule.DestinationInfo();
-        if("BUS".equalsIgnoreCase(crdi.type())){ // 버스인 경우
+        if ("BUS".equalsIgnoreCase(crdi.type())) { // 버스인 경우
             destinationInfo = new Schedule.DestinationInfo(
                     crdi.type(),
                     crdi.regionName(),
                     crdi.desName()
             );
-        }
-        else if("SUBWAY".equalsIgnoreCase(crdi.type())){ // 지하철인 경우
+        } else if ("SUBWAY".equalsIgnoreCase(crdi.type())) { // 지하철인 경우
             destinationInfo = new Schedule.DestinationInfo(
                     crdi.type(),
                     crdi.regionName(),
@@ -308,6 +311,7 @@ public class ScheduleService {
 
 
     @Transactional
+    @CacheEvict(value = {"scheduleInfo", "schedulesByDay"}, allEntries = true)
     public void deleteSchedule(Long userId, Long scheduleId) {
         User user = getUserById(userId);
         Schedule schedule = scheduleRepository.findById(scheduleId)
@@ -320,6 +324,7 @@ public class ScheduleService {
 
     // (v3) 특정 요일의 모든 스케줄의 도착 정보 조회
     @Transactional(readOnly = true)
+    @Cacheable(value = "schedulesByDay", key = "#userId + '_' + #day")
     public List<ScheduleArrivalResponse> 특정_요일의_스케줄들의_교통편_정보(Long userId, String day) throws UnsupportedEncodingException {
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
@@ -615,6 +620,7 @@ public class ScheduleService {
     }
 
     @Transactional
+    @CacheEvict(value = {"scheduleInfo", "schedulesByDay"}, allEntries = true)
     public boolean updateAlarm(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleException(ErrorCode.SCHEDULE_NOT_FOUND));
@@ -625,6 +631,7 @@ public class ScheduleService {
     }
 
     @Transactional
+    @CacheEvict(value = {"scheduleInfo", "schedulesByDay"}, allEntries = true)
     public void deleteSchedules(Long userId, List<Long> scheduleIds) {
         User user = getUserById(userId);
 
