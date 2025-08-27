@@ -1,9 +1,13 @@
 package com.example.busnotice.domain.fcmToken;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.ToString;
 
 import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 
 public record UserNotificationData(
         String token,
@@ -27,6 +31,8 @@ public record UserNotificationData(
     }
 
     // 버스 전용
+    @ToString
+    @JsonAutoDetect(fieldVisibility = ANY)  // 👈 필드 직렬화 활성화
     public static class BusSectionInfoDto extends SectionInfoDto {
         private final String busStopName;
         private final List<BusArrInfoDto> busArrivals;
@@ -51,6 +57,8 @@ public record UserNotificationData(
     }
 
     // 지하철 전용
+    @ToString
+    @JsonAutoDetect(fieldVisibility = ANY)  // 👈 필드 직렬화 활성화
     public static class SubwaySectionInfoDto extends SectionInfoDto {
         private final String stationName;
         private final List<SubwayArrInfoDto> subwayArrivals;

@@ -155,6 +155,7 @@ public class FCMService {
                     .putData("days", notification.days().toString())
                     .putData("sections", objectMapper.writeValueAsString(notification.sections()))
                     .build();
+            log.info("{}", notification);
             try {
                 String response = FirebaseMessaging.getInstance().send(message);
                 log.info("FCM 전송 성공: {}", response);
