@@ -21,6 +21,8 @@ public class QSubwaySection extends EntityPathBase<SubwaySection> {
 
     public final StringPath dir = createString("dir");
 
+    public final StringPath dirName = createString("dirName");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath lineName = createString("lineName");

@@ -72,6 +72,7 @@ public class ScheduleService {
                     crdi.regionName(),
                     crdi.desName(),
                     crdi.lineName(),
+                    crdi.dirName(),
                     crdi.dir()
             );
         }
@@ -128,6 +129,7 @@ public class ScheduleService {
                         ssi.regionName(),
                         ssi.lineName(),
                         ssi.stationName(),
+                        ssi.dirName(),
                         ssi.dir()
                 );
                 SubwaySection savedSubwaySection = subwaySectionRepository.save(subwaySection);
@@ -184,6 +186,7 @@ public class ScheduleService {
                                         ss.getRegionName(),
                                         ss.getLineName(),
                                         ss.getStationName(),
+                                        ss.getDirName(),
                                         ss.getDir()
                                 )
                         );
@@ -267,6 +270,7 @@ public class ScheduleService {
                         ssi.regionName(),
                         ssi.lineName(),
                         ssi.stationName(),
+                        ssi.dirName(),
                         ssi.dir()
                 );
                 SubwaySection savedSubwaySection = subwaySectionRepository.save(subwaySection);
@@ -294,6 +298,7 @@ public class ScheduleService {
                     crdi.regionName(),
                     crdi.desName(),
                     crdi.lineName(),
+                    crdi.dirName(),
                     crdi.dir()
             );
         }
@@ -324,7 +329,7 @@ public class ScheduleService {
 
     // (v3) 특정 요일의 모든 스케줄의 도착 정보 조회
     @Transactional(readOnly = true)
-    public List<ScheduleArrivalResponse> 특정_요일의_스케줄들의_교통편_정보(Long userId, String day) throws UnsupportedEncodingException {
+    public List<ScheduleArrivalResponse> 특정_요일의_스케줄들의_교통편_정보(Long userId, String day) {
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -411,6 +416,7 @@ public class ScheduleService {
                                     ss.getRegionName(),
                                     ss.getLineName(),
                                     ss.getStationName(),
+                                    ss.getDirName(),
                                     ss.getDir(),
                                     subwayArrivals
                             ),
@@ -529,6 +535,7 @@ public class ScheduleService {
                                 ss.getRegionName(),
                                 ss.getLineName(),
                                 ss.getStationName(),
+                                ss.getDirName(),
                                 ss.getDir(),
                                 subwayArrivals
                         ),

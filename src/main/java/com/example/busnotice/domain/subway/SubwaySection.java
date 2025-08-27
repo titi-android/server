@@ -24,15 +24,19 @@ public class SubwaySection {
     @Column(nullable = false)
     private String stationName;
 
+    @Column(nullable = false)
+    private String dirName;
+
     private String dir;
 
     public SubwaySection() {
     }
 
-    public SubwaySection(String regionName, String lineName, String stationName, String dir) {
+    public SubwaySection(String regionName, String lineName, String stationName, String dirName, String dir) {
         this.regionName = regionName;
         this.lineName = lineName;
         this.stationName = stationName;
+        this.dirName = dirName;
         this.dir = dir;
     }
 }

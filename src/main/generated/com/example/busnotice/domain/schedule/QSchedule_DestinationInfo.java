@@ -23,6 +23,8 @@ public class QSchedule_DestinationInfo extends BeanPath<Schedule.DestinationInfo
 
     public final StringPath dir = createString("dir");
 
+    public final StringPath dirName = createString("dirName");
+
     public final StringPath lineName = createString("lineName");
 
     public final StringPath regionName = createString("regionName");

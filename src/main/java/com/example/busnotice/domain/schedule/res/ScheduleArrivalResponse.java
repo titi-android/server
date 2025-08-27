@@ -41,6 +41,7 @@ public record ScheduleArrivalResponse(
                 String regionName,
                 String lineName,
                 String stationName,
+                String dirName,
                 String dir,
                 List<SubwayArrival> arrivals // 도착 예정 열차 2개 등
         ) {

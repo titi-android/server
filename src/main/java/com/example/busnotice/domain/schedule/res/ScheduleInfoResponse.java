@@ -43,6 +43,7 @@ public record ScheduleInfoResponse(
             String regionName,
             String lineName,
             String stationName,
+            String dirName, // 방면 정보
             String dir // "UP" (상행), "DOWN" (하행) 등
     ) {
     }

@@ -24,6 +24,7 @@ public record CreateScheduleRequest(
             String regionName,// "BUS" 또는 "SUBWAY"
             String desName,
             String lineName,
+            String dirName,
             String dir
     ) {
     }
@@ -53,6 +54,7 @@ public record CreateScheduleRequest(
             String regionName,
             String lineName,
             String stationName,
+            String dirName, // 방면 정보
             String dir // "UP" (상행), "DOWN" (하행) 등
     ) {
     }
