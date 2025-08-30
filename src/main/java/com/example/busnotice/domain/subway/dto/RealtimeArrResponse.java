@@ -29,6 +29,7 @@ public class RealtimeArrResponse {
         private String statnNm;
         private String barvlDt;
         private String arvlMsg2;
+        private String arvlMsg3;
         private String arvlCd;
         // ... 필요한 필드 추가
     }

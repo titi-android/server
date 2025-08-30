@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 @RestController
 public class FCMController {
 
-    private final FCMService fcmService;
+    private final NewFCMService fcmService;
 
     @PostMapping("/api/v1/fcm/tokens")
     @Operation(summary = "FCM 토큰 등록")

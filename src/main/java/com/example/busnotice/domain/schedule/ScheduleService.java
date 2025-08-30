@@ -405,6 +405,7 @@ public class ScheduleService {
                                     a.getStatnNm(),
                                     a.getBarvlDt(),
                                     a.getArvlMsg2(),
+                                    a.getArvlMsg3(),
                                     a.getArvlCd()
                             ))
                             .collect(Collectors.toList());
@@ -524,6 +525,7 @@ public class ScheduleService {
                                 a.getStatnNm(),
                                 a.getBarvlDt(),
                                 a.getArvlMsg2(),
+                                a.getArvlMsg3(),
                                 a.getArvlCd()
                         ))
                         .toList();

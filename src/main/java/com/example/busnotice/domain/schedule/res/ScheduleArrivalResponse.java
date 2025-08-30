@@ -51,6 +51,7 @@ public record ScheduleArrivalResponse(
                     String statnNm,
                     String barvlDt,
                     String arvlMsg2,
+                    String arvlMsg3,
                     String arvlCd
             ) {
             }
