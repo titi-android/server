@@ -12,6 +12,11 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(
+        indexes = {
+                @Index(name = "idx_schedule_user_start", columnList = "user_id, start_time")
+        }
+)
 @ToString(exclude = "user")
 public class Schedule {
 

@@ -610,7 +610,10 @@ public class ScheduleService {
     }
 
     private List<Schedule> 유저의_특정_요일의_모든_스케줄_조회(User user, String days) {
-        return scheduleRepository.findAllByUserAndDays(user, days);
+        log.info("(시작) 유저의 특정 요일의 모든 스케줄 조회");
+        List<Schedule> allByUserAndDays = scheduleRepository.findAllByUserAndDaysOrderByStartTime(user, days);
+        log.info("(종료) 유저의 특정 요일의 모든 스케줄 조회");
+        return allByUserAndDays;
     }
 
     public Optional<Schedule> getCurrentSchedule(User user) {

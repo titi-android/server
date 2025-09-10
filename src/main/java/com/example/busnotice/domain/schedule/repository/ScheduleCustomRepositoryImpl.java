@@ -30,14 +30,27 @@ public class ScheduleCustomRepositoryImpl implements ScheduleCustomRepository {
                 .fetchOne());
     }
 
+//    @Override
+//    public List<Schedule> findAllByUserAndDays(User user, String today) {
+//        List<Schedule> schedules = jpaQueryFactory
+//                .selectFrom(schedule)
+//                .where(
+//                        schedule.user.eq(user),
+//                        schedule.daysList.any().eq(today)
+//                )
+//                .fetch();
+//        return schedules;
+//    }
+
     @Override
-    public List<Schedule> findAllByUserAndDays(User user, String today) {
+    public List<Schedule> findAllByUserAndDaysOrderByStartTime(User user, String today) {
         List<Schedule> schedules = jpaQueryFactory
                 .selectFrom(schedule)
                 .where(
                         schedule.user.eq(user),
                         schedule.daysList.any().eq(today)
                 )
+                .orderBy(schedule.startTime.asc())
                 .fetch();
         return schedules;
     }

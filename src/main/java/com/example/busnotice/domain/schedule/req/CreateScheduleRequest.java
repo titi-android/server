@@ -58,5 +58,7 @@ public record CreateScheduleRequest(
             String dir // "UP" (상행), "DOWN" (하행) 등
     ) {
     }
+
+
 }
 

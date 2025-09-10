@@ -11,6 +11,5 @@ public interface ScheduleCustomRepository {
 
     Optional<Schedule> findByCurrentTimeAndDay(User user, String today, LocalTime now);
 
-    List<Schedule> findAllByUserAndDays(User user, String today);
-
+    List<Schedule> findAllByUserAndDaysOrderByStartTime(User user, String today);
 }
