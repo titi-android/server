@@ -3,6 +3,7 @@ package com.example.busnotice.domain.subway;
 import com.example.busnotice.domain.subway.dto.*;
 import com.example.busnotice.util.SubwayLineMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubwaySectionService {
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -94,7 +96,7 @@ public class SubwaySectionService {
                 return Collections.emptyList();
             }
 
-            return result.getSearchSTNBySubwayLineInfo().getRow().stream()
+            List<SubwayStationOfLineDto> res = result.getSearchSTNBySubwayLineInfo().getRow().stream()
                     .map(row -> new SubwayStationOfLineDto(
                             row.getStationCd(),
                             row.getStationNm(),
@@ -104,6 +106,8 @@ public class SubwaySectionService {
                     ))
                     .sorted(Comparator.comparing(dto -> Integer.parseInt(dto.getStationCd())))
                     .collect(Collectors.toList());
+            log.info("{}",res);
+            return res;
         } catch (Exception e) {
             // 예외 처리
             return Collections.emptyList();

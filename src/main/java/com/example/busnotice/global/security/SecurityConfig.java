@@ -41,7 +41,10 @@ public class SecurityConfig {
                                                 "/api/v1/cityCode",
                                                 "/api/v1/nodes/**",
                                                 "/api/v1/fcm/**",
-                                                "/api/v1/test/**"
+                                                "/api/v1/test/**",
+                                                "/actuator",
+                                                "/actuator/prometheus",
+                                                "/*"
                                         ).permitAll()
                                         .anyRequest().authenticated()
                 )

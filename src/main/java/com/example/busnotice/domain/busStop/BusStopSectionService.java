@@ -15,10 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -154,6 +158,12 @@ public class BusStopSectionService {
         return itemsList.stream().map(item -> item.getNodenm()).toList();
     }
 
+    // 2초씩, 총 3번까지 호출 수행(처음 1번 + 재호출 2번)
+    @Retryable(
+            retryFor = {WebClientRequestException.class, SocketTimeoutException.class}, // 이렇게 변경
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     @Cacheable(value = "busStopInfos", key = "#cityName + '_' + #busStopName")
     public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName) {
         String cityCode = 도시코드_DB_조회(cityName);
@@ -179,9 +189,7 @@ public class BusStopSectionService {
                     .isEmpty()) {
                 return new BusInfosResponse(Collections.emptyList());
             }
-//            List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
-//                .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
-//                    item.getTmX(), item.getTmY())).toList();
+
             List<BusInfoResponse> busInfoResponses = response.getMsgBody().getItemList().stream()
                     .map(item -> new BusInfoResponse(item.getStNm(), item.getArsId(),
                             item.getTmY(), item.getTmX())).toList();

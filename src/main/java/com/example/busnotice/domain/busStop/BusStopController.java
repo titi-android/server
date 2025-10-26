@@ -59,9 +59,11 @@ public class BusStopController {
                     @RequestParam("cityName") String cityName, // 도시 이름
                     @RequestParam("busStopName") String busStopName // 정류소 이름
             ) throws IOException {
+        long start = System.currentTimeMillis();
         BusInfosResponse busInfosResponse = busStopService.해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(
                 cityName,
                 busStopName);
+        long end = System.currentTimeMillis();
         return ApiResponse.createSuccessWithData(busInfosResponse,
                 "해당 이름을 포함하는 버스정류장 목록(모든 정보) 조회에 성공했습니다.");
     }

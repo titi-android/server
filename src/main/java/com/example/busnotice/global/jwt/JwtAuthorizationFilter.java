@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -34,9 +36,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 "/api/v1/users/refresh",
                 "/api/v1/users/auth/validate",
                 "/h2-console",
-                "/swagger-ui", "/swagger-resource", "/v3/api-docs"
-        );
+                "/swagger-ui", "/swagger-resource", "/v3/api-docs",
+                "/actuator",
+                "/actuator/prometheus",
+                "/actuator/health"
+                );
         String requestPath = request.getRequestURI();
+        log.info("Request URI: " + requestPath);
         if (excludePaths.stream().anyMatch(requestPath::contains)) {
             filterChain.doFilter(request, response);
             return;

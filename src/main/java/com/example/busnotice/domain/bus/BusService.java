@@ -8,10 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +34,15 @@ public class BusService {
     private final BusStopSectionService busStopService;
     @Value("${open-api.service.key}")
     private String serviceKey;
+
+    @Retryable(
+            retryFor = {WebClientRequestException.class, SocketTimeoutException.class}, // 이렇게 변경
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
+    public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회_리트라이(String cityName, String nodeId){
+        return 특정_노드_ID에_도착하는_모든_버스들_정보_조회(cityName, nodeId);
+    }
 
     public List<Item> 특정_노드_ID에_도착하는_모든_버스들_정보_조회(String cityName, String nodeId) {
         String cityCode = busStopService.도시코드_DB_조회(cityName);
