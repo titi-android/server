@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'main'
+      - 'v4'
 
 jobs:
   ci-pipeline:
@@ -23,7 +23,7 @@ jobs:
       - name: Create application.yaml
         run: |
           mkdir -p src/main/resources
-          echo '${{ secrets.APPLICATION_YAML }}' > src/main/resources/application.yaml
+          echo "${{ secrets.APPLICATION_YAML }}" | base64 --decode > src/main/resources/application.yaml
           cat src/main/resources/application.yaml
         shell: bash
 
@@ -80,4 +80,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
             docker stop bus-notice
             docker rm $(docker ps --filter 'status=exited' -a -q)
-            docker run -d --name bus-notice --log-driver=syslog --network bus-notice -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
+            docker run -d --name bus-notice --log-driver=syslog -p 8080:8080 --label co.elastic.logs/enabled=true --label co.elastic.logs/module=java ${{ secrets.DOCKER_USERNAME }}/bus-notice:latest
