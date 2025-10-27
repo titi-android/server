@@ -20,6 +20,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.client.HttpClientErrorException;
+
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -158,11 +160,12 @@ public class BusStopSectionService {
         return itemsList.stream().map(item -> item.getNodenm()).toList();
     }
 
-    // 2초씩, 총 3번까지 호출 수행(처음 1번 + 재호출 2번)
+    
     @Retryable(
-            retryFor = {WebClientRequestException.class, SocketTimeoutException.class}, // 이렇게 변경
+            retryFor = {WebClientRequestException.class, SocketTimeoutException.class}, 
+            exclude = { HttpClientErrorException.class },
             maxAttempts = 3,
-            backoff = @Backoff(delay = 2000)
+            backoff = @Backoff(delay = 1000)
     )
     @Cacheable(value = "busStopInfos", key = "#cityName + '_' + #busStopName")
     public BusInfosResponse 해당_이름을_포함하는_버스정류장_목록_조회_모든_정보_반환(String cityName, String busStopName) {
