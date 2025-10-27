@@ -10,6 +10,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
+import java.net.SocketTimeoutException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -75,6 +80,14 @@ public class SubwaySectionService {
     }
 
     // 특정 호선을 지나는 지하철역 리스트 반환
+    @Retryable(
+    retryFor = {
+            SocketTimeoutException.class, ResourceAccessException.class, HttpServerErrorException.class
+        },
+        exclude = { HttpClientErrorException.class }, 
+        maxAttempts = 3,                        
+        backoff = @Backoff(delay = 1000)        
+    )
     @Cacheable(value = "subwayStationsOfLine", key = "#p0")
     public List<SubwayStationOfLineDto> getStationsOfLine(LineType lineType) {
         String url = String.format(
